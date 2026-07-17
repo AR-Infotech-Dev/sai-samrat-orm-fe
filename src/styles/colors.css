@@ -1,0 +1,43 @@
+﻿:root {
+  --primary: #FF8D4B;
+  --dark-primary: #EC6A06;
+  --light-primary: #FFB690;
+
+  --deep-blue: #EC6A06;
+  --royal-blue: #C2410C;
+
+  --black: #334155;
+  --white: #ffffff;
+  --grey: #8c8e8c;
+  --light-grey: #d3d3d3;
+
+  --button-color: var(--primary);
+  --text-primary: #334155;
+  --text-secondary: #64748b;
+  --background-color: #f5faff;
+
+  --primary-gradient: linear-gradient(135deg, #FF8D4B 0%, #EC6A06 100%);
+  --soft-primary-gradient: linear-gradient(180deg, #FFB690 0%, #FF8D4B 100%);
+  --button-gradient: linear-gradient(90deg, #FF8D4B 0%, #EC6A06 100%);
+
+  --primary-50: #fff7ed;
+  --primary-100: #ffedd5;
+  --primary-200: #fed7aa;
+  --primary-300: #fdba74;
+  --primary-400: #fb923c;
+  --primary-500: #FF8D4B;
+  --primary-600: #EC6A06;
+  --primary-700: #c2410c;
+  --primary-800: #9a3412;
+  --primary-900: #7c2d12;
+
+  --surface-base: var(--white);
+  --surface-page: #f5faff;
+  --surface-soft: #f8fafc;
+  --surface-soft-2: #f1f5f9;
+  --surface-soft-3: #e2e8f0;
+  --border-soft: #ebebeb;
+  --border-strong: #cbd5e1;
+  --shadow-soft: rgba(255, 141, 75, 0.12);
+  --shadow-strong: rgba(236, 106, 6, 0.18);
+}
