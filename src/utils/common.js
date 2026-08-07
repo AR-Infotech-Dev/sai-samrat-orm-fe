@@ -69,5 +69,12 @@ export const formatRelativeTime = (dateString) => {
   const years = Math.floor(days / 365);
   return `${years}yr${years > 1 ? "s" : ""} ago`;
 };
+export const formatNumber = (value) => new Intl.NumberFormat("en-IN").format(Number(value) || 0);
+export const formatCurrency = (value) => new Intl.NumberFormat("en-IN", {
+  style: "currency",
+  currency: "INR",
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+}).format(Number(value) || 0);
 
 

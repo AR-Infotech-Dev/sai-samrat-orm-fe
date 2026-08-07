@@ -45,6 +45,10 @@ const SmartSelectInput = ({ id, field = {}, value, onSelect, onObjectSelect, con
     customURL = "",
     statusCheck = false,
     customParameters = {},
+    renderOption,
+    renderSelectedLabel,
+    optionItemSize = 44,
+    returnObjectOnSelect = false,
   } = config;
   // const { openCategoryCreate } = useCategoryCreateStore();
   const key = `${type}-${source}`;
@@ -210,13 +214,13 @@ const SmartSelectInput = ({ id, field = {}, value, onSelect, onObjectSelect, con
       const already = selected.find(v => v.value === item.value);
       selected = already ? selected.filter(v => v.value !== item.value) : [...selected, item];
       setInternalValue(selected);
-      onSelect?.(selected.map(i => i.value).join(','));
+      onSelect?.(returnObjectOnSelect ? selected.map(i => i.original || i) : selected.map(i => i.value).join(','));
       onObjectSelect?.(item);
     } else {
       setInternalValue(item);
       setInputValue('');  // reset after select
       setShowDropdown(false);
-      onSelect?.(item.value);
+      onSelect?.(returnObjectOnSelect ? (item.original || item) : item.value);
       onObjectSelect?.(item);
     }
   };
@@ -312,19 +316,24 @@ const SmartSelectInput = ({ id, field = {}, value, onSelect, onObjectSelect, con
     const isSelected = multi
       ? internalValue.some(v => v.value === item.value)
       : internalValue?.value === item.value;
-    console.log('item : ', item);
 
     return (
       <div
         style={style}
         onClick={() => handleSelect(item)}
-        className="cursor-pointer px-4 py-2 hover:bg-gray-100 flex items-start items-center justify-between text-sm"
+        className={`cursor-pointer text-sm ${renderOption ? "px-2 py-1 hover:bg-orange-50/70" : "px-4 py-2 hover:bg-slate-50 flex items-start items-center justify-between"}`}
       >
-        <span className="whitespace-normal break-words">
-          {item.label}
-        </span>
-        {isSelected && <Check size={16} className="text-green-600 ml-2" />}
-        {item.original.status && item.original.status != "" && <StatusIndicator status={item.original.status} />}
+        {renderOption ? (
+          renderOption({ option: item.original, item, isSelected })
+        ) : (
+          <>
+            <span className="whitespace-normal break-words">
+              {item.label}
+            </span>
+            {isSelected && <Check size={16} className="text-green-600 ml-2" />}
+          </>
+        )}
+        {/* {item.original.status && item.original.status != "" && <StatusIndicator status={item.original.status} />} */}
       </div>
     );
   };
@@ -338,7 +347,7 @@ const SmartSelectInput = ({ id, field = {}, value, onSelect, onObjectSelect, con
         {multi ? (
           <div onClick={() => { if (!isLocked) { setShowDropdown(true); inputRef.current?.focus(); } }}
             aria-disabled={isLocked}
-            className={`flex min-h-[34px] w-full flex-wrap gap-1 rounded border bg-gray-100 px-3 py-1.5 text-sm transition-all focus-within:outline-none focus-within:ring-2 focus-within:ring-purple-100 ${isLocked ? "cursor-not-allowed opacity-70" : ""} ${error ? "border-red-400 text-red-600" : "border-gray-50 text-gray-600"}`}>
+            className={`flex min-h-[34px] w-full flex-wrap gap-1 rounded border bg-slate-50 px-3 py-1.5 text-sm transition-all focus-within:outline-none focus-within:ring-2 focus-within:ring-purple-100 ${isLocked ? "cursor-not-allowed opacity-70" : ""} ${error ? "border-red-400 text-red-600" : "border-gray-200 text-gray-600"}`}>
             {internalValue.map((v, i) => (
               <span key={i} className="bg-orange-100 text-orange-700 px-2 py-1 rounded-full text-sm">
                 {v.label}
@@ -361,7 +370,7 @@ const SmartSelectInput = ({ id, field = {}, value, onSelect, onObjectSelect, con
                   onObjectSelect?.({});
                 }
               }}
-              className="border-gray-50 text-gray-600 bg-gray-200 min-w-[120px] flex-grow border-none bg-transparent text-sm outline-none focus:outline-none"
+              className="border-gray-200 text-gray-600 bg-gray-200 min-w-[120px] flex-grow border-none bg-transparent text-sm outline-none focus:outline-none"
               value={inputValue}
               onChange={(e) => !isLocked && setInputValue(e.target.value)}
               disabled={isLocked}
@@ -377,13 +386,13 @@ const SmartSelectInput = ({ id, field = {}, value, onSelect, onObjectSelect, con
               type="text"
               autoComplete="off"
               ref={inputRef}
-              value={inputValue || internalValue?.label || ''}
+              value={inputValue || (internalValue ? (renderSelectedLabel ? renderSelectedLabel(internalValue.original || internalValue) : internalValue.label) : '')}
               onChange={(e) => !isLocked && setInputValue(e.target.value)}
               onFocus={() => !isLocked && setShowDropdown(true)}
               placeholder={placeholder}
               disabled={isLocked}
               readOnly={isLocked}
-              className={`w-full rounded border border-gray-50 text-gray-600 bg-gray-100 px-3 py-1.5 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-purple-100 disabled:cursor-not-allowed disabled:opacity-70 ${error ? "border-red-400 text-red-600" : "border-gray-50 text-gray-600"}`}
+              className={`w-full rounded border border-gray-200 text-gray-600 bg-slate-50 px-3 py-1.5 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-purple-100 disabled:cursor-not-allowed disabled:opacity-70 ${error ? "border-red-400 text-red-600" : "border-gray-200 text-gray-600"}`}
             />
             {internalValue && !isLocked && (
               <button type="button" onClick={handleClear}
@@ -419,7 +428,7 @@ const SmartSelectInput = ({ id, field = {}, value, onSelect, onObjectSelect, con
               )} */}
             </div>
             {filteredOptions.length ? (
-              <List ref={listRef} height={200} itemCount={filteredOptions.length} onScroll={handleScroll} itemSize={44} width="100%">{Row}</List>
+              <List ref={listRef} height={Math.min(240, filteredOptions.length * optionItemSize)} itemCount={filteredOptions.length} onScroll={handleScroll} itemSize={optionItemSize} width="100%">{Row}</List>
             ) : (
               <div className="px-4 py-5 text-sm text-gray-500">
                 No options found.

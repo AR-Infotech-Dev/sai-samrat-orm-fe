@@ -88,16 +88,17 @@ function SmartSelect({ field, value, onSelect, onObjectSelect, config = {}, erro
   };
 
   return (
-    <div className="flex flex-col gap-1">
+    <div className="flex flex-col gap-1 relative">
       {/* Label */}
       {field?.label && (<DefaultLabel label={field.label} required={field.required} />)}
       {/* Select */}
-      <select name={field.name} value={value || ""} onChange={handleChange} disabled={isLocked} className={`border ${error ? "border-red-400 text-red-600" : "border-gray-50 text-gray-600"} bg-gray-100 px-3 py-1.5 rounded text-sm focus:outline-none focus:ring-2 focus:ring-purple-100 disabled:cursor-not-allowed disabled:opacity-70 `}>
+      <select name={field.name} value={value || ""} onChange={handleChange} disabled={isLocked} className={`border ${error ? "border-red-400 text-red-600" : "border-gray-200 text-gray-600"} bg-slate-50 px-3 py-1.5 rounded text-sm focus:outline-none focus:ring-2 focus:ring-purple-100 disabled:cursor-not-allowed disabled:opacity-70 `}>
         <option value="">{loading ? "Loading..." : placeholder}</option>
         {options.map((item) => (
           <option key={item.value} value={item.value}>{item.label}</option>
         ))}
       </select>
+
       {error && (
         <ValidationError error={error} />
       )}

@@ -20,7 +20,7 @@ function FlyoutPanel({ isOpen, onClose, title ,subtitle , closeButton, children,
                 {subtitle && <p className="text-xs text-slate-500">{subtitle}</p>}
             </div>
           </div>
-          <div className="tab-pane panel_overflow">
+          <div className="tab-pane panel_overflow [scrollbar-width:thin]">
             {children}
           </div>
           <div className="flyout-footer">{footer}</div>

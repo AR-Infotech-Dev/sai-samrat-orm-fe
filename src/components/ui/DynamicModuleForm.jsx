@@ -123,7 +123,7 @@ function DynamicModuleForm({ sections = [], values = {}, onChange, onObjectSelec
                 <h4 className="">{section.title || ''}</h4>
               </div>
             }
-            <div key={`section-${sectionIndex}`} className={`mb-2 ${SECTION_COLUMN_CLASS[section.columns] || SECTION_COLUMN_CLASS[2]}`}>
+            <div key={`section-${sectionIndex}`} className={`mb-3 ${SECTION_COLUMN_CLASS[section.columns] || SECTION_COLUMN_CLASS[2]}`}>
               {visibleFields.map((field) => {
                 const isVisible = field.visibleWhen
                   ? field.visibleWhen(values, oldValues, mode)

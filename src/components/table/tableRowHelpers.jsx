@@ -34,6 +34,9 @@ const PILL_BASE_CLASS = {
 
 export function getRowIdentifier(row) {
   return (
+    row?.order_id ??
+    row?.order_item_id ??
+    row?.planning_id ??
     row?.category_id ??
     row?._id ??
     row?.id ??
@@ -467,3 +470,5 @@ export function createRowRenderContext({ editRow, selectionProps, onDeleteRow, r
         : undefined,
   };
 }
+
+

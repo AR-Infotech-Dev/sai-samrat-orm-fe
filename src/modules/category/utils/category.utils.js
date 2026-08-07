@@ -20,7 +20,7 @@ export function normalizeCategoryData(category = {}) {
     categoryName: category?.categoryName || "",
     slug: category?.slug || "",
     is_parent: category?.is_parent || category?.isParent || "yes",
-    parent_id: category?.parent_id || "",
+    parent_id: category?.parent_id || null,
     cat_color: category?.cat_color || categoryModuleSchema.form.initialValues.cat_color,
     description: category?.description || "",
     status: category?.status || "active",
@@ -32,6 +32,6 @@ export function normalizeCategorySavePayload(formData = {}) {
   return {
     ...formData,
     slug: slugifyCategory(formData.slug || formData.categoryName),
-    parent_id: formData.is_parent === "yes" ? "" : formData.parent_id,
+    parent_id: formData.is_parent === "yes" ? null : formData.parent_id,
   };
 }

@@ -26,46 +26,96 @@ export const productsModuleSchema = {
   staticJoined: [],
   tableCellConfig: [
     { column_name: "product_name", type: "person" },
-    { column_name: "product_type", type: "tag" },
-    { column_name: "product_description", type: "clip" },
+    { column_name: "product_type", type: "badge", color_field: "type_color" },
   ],
   defaultColumns: ["product_name", "product_type", "product_description"],
   skipFields: ["company_id", "created_by", "created_date", "modified_by", "modified_date"],
   columnMappings: [
-    { product_name: "Product/Service Name" },
-    { product_type: "Product/Service Type" },
-    { product_description: "Description" },
+    { standard_rate: "Rate" },
   ],
   savedFilters: [],
   form: {
     initialValues: {
       product_id: null,
-      product_name: "",
-      product_type: "",
-      product_description: "",
+      tally_item_id: null,
+      product_code: null,
+      product_name: null,
+      category_id: null,
+      unit: "Nos",
+      standard_rate: null,
+      gst_rate: null,
+      is_tally_synced: null,
       company_id: null,
+      last_tally_sync_at: null,
+      created_by: null,
+      modified_by: null,
+      created_date: null,
+      modified_date: null,
+      weight: null,
+      status: 'active',
     },
     sections: [
       {
-        columns: 2,
+        columns: 3,
         fields: [
-          { name: "product_name", label: "Product/Service Name", type: "text", required: true, placeholder: "Enter product name", gridSpan: 6 },
-          { name: "product_type", label: "Product/Service Type", type: "text", required: true, placeholder: "Enter product type", gridSpan: 6 },
+          { name: "product_name", label: "Product Name", type: "text", required: true, placeholder: "Enter product name", gridSpan: 12 },
         ],
       },
       {
-        columns: 1,
+        columns: 3,
         fields: [
-          { name: "product_description", label: "Description", type: "textarea", rows: 3, placeholder: "Enter product description", gridSpan: 12 },
+          { name: "product_code", label: "Product Code", type: "text", required: true, placeholder: "Enter product code", gridSpan: 4 },
+          {
+            name: "product_type",
+            label: "Product Type",
+            type: "smartSelect",
+            required: true,
+            gridSpan: 4,
+            config: {
+              apiUrl: "/system/searchSlugList",
+              tableName: "categories",
+              selectFields: "category_id,categoryName",
+              searchField: "categoryName",
+              slug: 'product-types',
+              status: 'active',
+              isCompanyWise: false,
+              labelKey: "categoryName",
+              valueKey: "category_id",
+              placeholder: "Select product type",
+              multi: false,
+            },
+          },
+
+          { name: "brand", label: "Brand", type: "text", placeholder: "Enter product brand", gridSpan: 4 },
+        ],
+      },
+      {
+        columns: 3,
+        fields: [
+          { name: "unit", label: "Unit", type: "text", placeholder: "Enter unit", gridSpan: 4 },
+          { name: "standard_rate", label: "Rate", type: "text", placeholder: "Enter rate", gridSpan: 4 },
+          { name: "weight", label: "Weight", type: "text", placeholder: "Enter weight (kg)", gridSpan: 4 },
+        ],
+      },
+      {
+        columns: 2,
+        fields: [
+          { name: "gst_rate", label: "Gst Rate", type: "text", placeholder: "Enter product brand", gridSpan: 4 },
+          {
+            name: "status", label: "Status", type: "radio", options: [
+              { value: "active", label: "Active" },
+              { value: "inactive", label: "Inactive" },
+              { value: "delete", label: "Delete" },
+            ], gridSpan: 6
+          },
         ],
       },
     ],
   },
   validationSchema: z.object({
-    product_name: z.string().trim().min(1, "Product/Service name is required"),
-    product_type: z.any().optional(),
-    product_description: z.union([z.literal(null), z.string()]).optional(),
-    company_id: z.any().optional(),
+    product_name: z.string().nullable().refine((val) => val !== null && val.trim() !== "", { message: "Product name is required", }),
+    product_type: z.coerce.number().min(1, "Product type required"),
+    product_code: z.string().nullable().refine((val) => val !== null && val.trim() !== "", { message: "Product code required", }),
   }),
 };
 

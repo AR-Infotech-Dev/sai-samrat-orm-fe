@@ -1,4 +1,4 @@
-﻿:root {
+﻿/* :root {
   --primary: #FF8D4B;
   --dark-primary: #EC6A06;
   --light-primary: #FFB690;
@@ -40,4 +40,46 @@
   --border-strong: #cbd5e1;
   --shadow-soft: rgba(255, 141, 75, 0.12);
   --shadow-strong: rgba(236, 106, 6, 0.18);
+} */
+
+:root {
+  --primary: #F28C5B;
+  --dark-primary: #D96A2B;
+  --light-primary: #FFD2BA;
+
+  --primary-50: #FFF8F4;
+  --primary-100: #FFEDE4;
+  --primary-200: #FFD9C7;
+  --primary-300: #FFC0A0;
+  --primary-400: #F7A172;
+  --primary-500: #F28C5B;
+  --primary-600: #D96A2B;
+  --primary-700: #B8501F;
+  --primary-800: #8F3F1E;
+  --primary-900: #6F321B;
+
+  --text-primary: #2F3A4A;
+  --text-secondary: #6B778C;
+
+  --background-color: #F7FAFC;
+  --surface-base: #FFFFFF;
+  --surface-page: #F7FAFC;
+  --surface-soft: #FAFBFC;
+  --surface-soft-2: #F1F5F9;
+  --surface-soft-3: #E5EAF0;
+
+  --border-soft: #E8EDF3;
+  --border-strong: #CBD5E1;
+
+  --success: #22A06B;
+  --warning: #E5A100;
+  --danger: #E25555;
+  --info: #4F8FD9;
+
+  --primary-gradient: linear-gradient(135deg, #F7A172 0%, #D96A2B 100%);
+  --soft-primary-gradient: linear-gradient(180deg, #FFEDE4 0%, #FFD9C7 100%);
+  --button-gradient: linear-gradient(90deg, #F28C5B 0%, #D96A2B 100%);
+
+  --shadow-soft: rgba(47, 58, 74, 0.08);
+  --shadow-primary: rgba(242, 140, 91, 0.18);
 }

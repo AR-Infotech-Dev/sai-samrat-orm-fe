@@ -69,7 +69,7 @@ export const useCategoryForm = ({ isOpen, onClose, selectedCategory, onAfterSave
       }
 
       if (name === "is_parent" && value === "yes") {
-        nextState.parent_id = "";
+        nextState.parent_id = null;
       }
 
       return nextState;

@@ -102,7 +102,7 @@ function Sidebar({ onSelectModule, isMobileOpen = false, onClose }) {
       <div className="sidebar-brand" title={APP_NAME}>
         <img
           // src="/logo 1.png"
-          src="/Sai-Samrat-Logo.png"
+          src="/logo.png"
           alt={APP_NAME}
           className="sidebar-logo"
         />

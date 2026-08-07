@@ -4,9 +4,10 @@
   bottom: 0px;
   left: 0;
   z-index: 19;
+  z-index: 21;
   display: flex;
   justify-content: flex-end;
-  background: #0a10221f;
+  background: #0a102263;
 }
 
 .flyout-panel.open {
@@ -24,8 +25,8 @@
   flex-direction: column;
   position: relative;
   width: min(100%, 835px);
-  height: calc(100vh - var(--topbar-height));
-  max-height: calc(100vh - var(--topbar-height));
+  height: calc(105.7vh - var(--topbar-height));
+  max-height: calc(105.7vh - var(--topbar-height));
   background: #ffffff;
   box-shadow: -14px 0 36px var(--shadow-strong);
   overflow: hidden;
@@ -268,7 +269,7 @@
   display: flex;
   justify-content: flex-end;
   gap: 10px;
-  padding: 5px 24px;
+  padding: 1px 24px;
   background: rgba(255, 255, 255, 0.98);
   border-top: 1px solid var(--border-soft);
 }
