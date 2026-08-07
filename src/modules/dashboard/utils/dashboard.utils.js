@@ -53,6 +53,70 @@ export const getDateInputMinValue = (currentExpiry = "") => {
 
   return currentExpiryValue;
 };
-export const getRedirectFilters = ({label = '' , redirectTo = ''})=>{
-  
+export const getRedirectFilters = ({ label = '', redirectTo = '' }) => {
+
 }
+export const customerSmartSelectConfig = {
+  type: "customer",
+  source: "customer",
+  label: "Customer",
+  placeholder: "Select Customer",
+  apiUrl: "",
+  check: "name",
+  list: "customer_id,name,mobile_no",
+  preload: true,
+  cache: true,
+  showRecent: true,
+  multi: false,
+  statusCheck: true,
+  allowAddNew: false,
+  customParameters: { status: "active", },
+  getValue: (customer) => customer.customer_id,
+  getLabel: (customer) => {
+    return customer.name || customer.customer_name || "Unnamed Customer";
+    // const mobile = customer.mobile_no || customer.mobile || "";
+    // const email = customer.email || "";
+    // const city = customer.city || customer.location || "";
+    // return [name, mobile, email, city].filter(Boolean).join(" • ");
+  },
+};
+export const productSmartSelectConfig = {
+  type: "product",
+  source: "products",
+  label: "product",
+  placeholder: "Select products",
+  apiUrl: "",
+  check: "product_name",
+  list: "product_id,product_name",
+  preload: true,
+  cache: true,
+  showRecent: true,
+  multi: false,
+  statusCheck: true,
+  allowAddNew: false,
+  customParameters: {},
+  getValue: (product) => product.product_id,
+  getLabel: (product) => {
+    return product.product_name || "Unnamed product";
+  },
+};
+export const orderSmartSelectConfig = {
+  type: "order",
+  source: "orders",
+  label: "Order",
+  placeholder: "Select Order",
+  apiUrl: "",
+  check: "order_no",
+  list: "order_id,order_no",
+  preload: true,
+  cache: true,
+  showRecent: true,
+  multi: false,
+  statusCheck: true,
+  allowAddNew: false,
+  customParameters: {},
+  getValue: (order) => order.order_id,
+  getLabel: (order) => {
+    return order.order_no || "Unnamed order";
+  },
+};

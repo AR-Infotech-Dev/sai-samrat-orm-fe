@@ -6,7 +6,6 @@ import DynamicModuleForm from "@components/ui/DynamicModuleForm";
 import { customerModuleSchema } from "../data/module.schema";
 import { useCustomerForm } from "../hooks/useCustomerForm";
 import CustomerContactsEditor from "./CustomerContactsEditor";
-import CustomerProductsEditor from "./CustomerProductsEditor";
 
 const EMPTY_INITIAL_VALUES = {};
 
@@ -15,20 +14,11 @@ function CustomerForm({ isOpen, onClose, selectedCustomer, initialValues = EMPTY
     loading,
     fetchingCustomer,
     formData,
-    productOptions,
-    productRows,
     contactRows,
-    loadingProducts,
     errors,
     handleClose,
     handleChange,
     handleSave,
-    addProductRow,
-    updateProductRow,
-    removeProductRow,
-    addProductAddon,
-    updateProductAddon,
-    removeProductAddon,
     addContactRow,
     updateContactRow,
     removeContactRow,
@@ -94,17 +84,6 @@ function CustomerForm({ isOpen, onClose, selectedCustomer, initialValues = EMPTY
                 onUpdateContactRow={updateContactRow}
                 onRemoveContactRow={removeContactRow}
                 onSetPrimaryContact={setPrimaryContact}
-              />
-              <CustomerProductsEditor
-                productRows={productRows}
-                productOptions={productOptions}
-                loadingProducts={loadingProducts}
-                onAddProductRow={addProductRow}
-                onUpdateProductRow={updateProductRow}
-                onRemoveProductRow={removeProductRow}
-                onAddProductAddon={addProductAddon}
-                onUpdateProductAddon={updateProductAddon}
-                onRemoveProductAddon={removeProductAddon}
               />
             </div>
           )}

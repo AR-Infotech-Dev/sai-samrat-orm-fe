@@ -14,6 +14,7 @@ function normalizeKey(value = "") {
 }
 
 function buildLabelMap(columnMappings = []) {
+  
   return columnMappings.reduce((accumulator, item) => {
     const [key, label] = Object.entries(item || {})[0] || [];
     if (key && label) {
@@ -210,6 +211,7 @@ export function buildFallbackColumnsFromKeys(keys = [], options = {}) {
 
 export function buildTableColumnsFromStructure(fields = [], fallbackColumns = [], options = {}) {
   const skipFieldSet = new Set((options.skipFields || []).map((field) => normalizeKey(field)));
+  
   const labelMap = buildLabelMap(options.columnMappings);
   const cellDisplayMap = buildCellDisplayMap(
     options.tableCellConfig || options.customCelltypes || []

@@ -2,7 +2,7 @@
 import { SortableContext, arrayMove, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Edit3, Folder, GripVertical, Link2, Settings, Trash2 } from "lucide-react";
-import {ICONS} from "../data/module.schema"
+import { ICONS } from "../data/module.schema"
 const getMenuId = (menu = {}) => menu?.menu_id ?? menu?.menuID ?? menu?.id;
 const getMenuName = (menu = {}) => menu?.menu_name || menu?.menuName || menu?.label || "Untitled menu";
 const getModuleName = (menu = {}) => menu?.module_name || menu?.moduleName || "-";
@@ -21,27 +21,12 @@ function MenuListSkeleton() {
   );
 }
 
-function MenuRow({
-  menu,
-  canEdit,
-  canDelete,
-  canSort,
-  onEdit,
-  onDelete,
-  onConfigure,
-}) {
+function MenuRow({ menu, canEdit, canDelete, canSort, onEdit, onDelete, onConfigure, }) {
   const menuId = getMenuId(menu);
   const Icon = getIcon(menu);
   const status = String(getStatus(menu)).toLowerCase();
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging, } = useSortable({ id: menuId });
 
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: menuId });
   return (
     <div
       ref={setNodeRef}
@@ -128,17 +113,7 @@ function MenuRow({
   );
 }
 
-function MenuList({
-  rows = [],
-  loading = false,
-  canEdit = true,
-  canDelete = true,
-  canSort = true,
-  onEdit,
-  onDelete,
-  onConfigure,
-  onSortChange,
-}) {
+function MenuList({ rows = [], loading = false, canEdit = true, canDelete = true, canSort = true, onEdit, onDelete, onConfigure, onSortChange, }) {
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }));
 
   const handleDragEnd = (event) => {
@@ -182,7 +157,7 @@ function MenuList({
   return (
     <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
       <SortableContext items={rows.map((menu) => getMenuId(menu))} strategy={verticalListSortingStrategy}>
-        <div className="space-y-2 overflow-x-auto" style={{"scrollbarWidth":"none"}}>
+        <div className="space-y-2 overflow-x-auto" style={{ "scrollbarWidth": "none" }}>
           {/* <div className="grid min-w-[900px] grid-cols-[auto_minmax(220px,1.4fr)_minmax(150px,0.8fr)_minmax(180px,1fr)_90px_auto] gap-3 px-3 pb-1 text-xs font-semibold uppercase text-slate-500">
             <div />
             <div>Menu</div>
@@ -202,6 +177,7 @@ function MenuList({
               onDelete={onDelete}
               onConfigure={onConfigure}
             />
+            
           ))}
         </div>
       </SortableContext>

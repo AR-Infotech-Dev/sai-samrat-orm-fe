@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate, useLocation } from "react-router-dom";
+﻿import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import { getAuthRoutes } from "./AuthRoutes";
 import { useAuth } from "@auth/components/AuthProvider";
@@ -17,6 +17,12 @@ const CategoryModulePage = lazy(() => import("@modules/category/CategoryModulePa
 const ProductModulePage = lazy(() => import("@modules/products/ProductModulePage"));
 const AccessControlModulePage = lazy(() => import("@modules/access-control/AccessControlModulePage"));
 const UserProfilePage = lazy(() => import("@modules/profile/UserProfilePage"));
+const OrdersBookingPage = lazy(() => import("@modules/orders/booking/OrdersBookingPage"));
+const OrderConfirmationPage = lazy(() => import("@/modules/orders/confirmation/OrdersConfirmationPage"));
+const OrderPlanningPage = lazy(() => import("@modules/orders/planning/OrderPlanningPage"));
+const ProductionPage = lazy(() => import("@modules/orders/production/OrdersModulePage"));
+const ReadyStockPage = lazy(() => import("@modules/orders/ready-stock/OrdersModulePage"));
+const DispatchPage = lazy(() => import("@/modules/orders/dispatch/DispatchModulePage"));
 
 const withPermission = (menuId, element) => (
   <PermissionRoute menuId={menuId}>{element}</PermissionRoute>
@@ -34,6 +40,16 @@ const menuRouteComponents = {
   "/categories": CategoryModulePage,
   "/category": CategoryModulePage,
   "/access-control": AccessControlModulePage,
+
+  "/order-booking": OrdersBookingPage,
+  "/booking": OrdersBookingPage,
+  "/order-confirmation": OrderConfirmationPage,
+  "/confirmation": OrderConfirmationPage,
+  "/order-planning": OrderPlanningPage,
+  "/planning": OrderPlanningPage,
+  "/production": ProductionPage,
+  "/ready-stock": ReadyStockPage,
+  "/dispatch": DispatchPage,
 };
 
 function DefaultMenuRedirect() {
@@ -167,3 +183,6 @@ function MainRoutes() {
 }
 
 export default MainRoutes;
+
+
+

@@ -17,7 +17,7 @@ const Input = ({ field, value, onChange, placeholder, className = '', disabled, 
         onChange={onChange}
         placeholder={field.placeholder}
         required={field.required}
-        className={`border ${!error ? "border-gray-50 text-gray-600" : 'border-red-400 text-red-500'} bg-gray-100 px-3 py-1.5 rounded text-sm focus:outline-none focus:ring-2 focus:ring-purple-100 disabled:cursor-not-allowed disabled:opacity-70 read-only:cursor-default ${className}`}
+        className={`border ${!error ? "border-gray-200 text-gray-600" : 'border-red-400 text-red-500'} bg-slate-50 px-3 py-1.5 rounded text-sm focus:outline-none focus:ring-2 focus:ring-purple-100 disabled:cursor-not-allowed disabled:opacity-70 read-only:cursor-default ${className}`}
         disabled={isDisabled}
         readOnly={isReadOnly}
         {...rest}

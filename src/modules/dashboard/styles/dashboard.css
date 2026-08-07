@@ -1,0 +1,412 @@
+@keyframes pipeline-run {
+  0% {
+    transform: translateX(-120%) translateY(-50%);
+    opacity: 0;
+  }
+
+  12% {
+    opacity: 1;
+  }
+
+  88% {
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateX(420%) translateY(-50%);
+    opacity: 0;
+  }
+}
+
+.pipeline-runner {
+  animation: pipeline-run 8s linear infinite;
+}
+
+.dashboard-page {
+  display: flex;
+  height: 100%;
+  min-height: 0;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px;
+  overflow: hidden;
+  background: #f8fafc;
+}
+
+.dashboard-header,
+.dashboard-filters,
+.dashboard-panel {
+  /* border: 1px solid var(--border-soft); */
+  background: #ffffff;
+}
+
+.dashboard-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 12px;
+}
+
+.dashboard-header span,
+.dashboard-panel-head span {
+  color: var(--primary);
+  font-size: 9px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.dashboard-header h2,
+.dashboard-panel-head h3 {
+  margin: 2px 0 0;
+  color: var(--text-primary);
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.dashboard-header p,
+.dashboard-panel-head p {
+  margin: 2px 0 0;
+  color: var(--text-secondary);
+  font-size: 11px;
+}
+
+.dashboard-company {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 30px;
+  padding: 0 10px;
+  border: 1px solid var(--primary-100);
+  color: var(--primary-800);
+  background: var(--primary-50);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.dashboard-filters {
+  display: grid;
+  grid-template-columns:
+    minmax(150px, 1.05fr)
+    minmax(150px, 1.05fr)
+    minmax(150px, 1.05fr)
+    minmax(118px, 0.68fr)
+    minmax(118px, 0.68fr)
+    minmax(125px, 0.72fr)
+    max-content;
+  gap: 8px;
+  align-items: end;
+  padding: 8px;
+  /* overflow-x: auto; */
+  scrollbar-width: thin;
+}
+
+.dashboard-filters label {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.dashboard-filters label>span,
+.dashboard-filters :where(label, .form-group, .input-group)>span,
+.dashboard-filters :where(label, .form-group, .input-group)>label {
+  color: var(--text-secondary);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.dashboard-filters input,
+.dashboard-filters select,
+.dashboard-filters :where(.smart-select-input, .smart-select-control, .select-control, .form-control, .input-box) {
+  width: 100%;
+  height: 30px !important;
+  min-height: 30px !important;
+  min-width: 0;
+  border: 1px solid #fed7c2 !important;
+  border-radius: 6px !important;
+  color: var(--text-primary);
+  background: #ffffff;
+  font-size: 11px;
+  outline: none;
+  box-shadow: none !important;
+}
+
+.dashboard-filters input,
+.dashboard-filters select {
+  padding: 0 8px;
+}
+
+.dashboard-filters :where(input, select, button):focus,
+.dashboard-filters :where(.smart-select-input, .smart-select-control, .select-control, .form-control, .input-box):focus-within {
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 2px rgba(255, 141, 75, 0.14) !important;
+}
+
+.dashboard-filter-actions {
+  display: flex;
+  gap: 6px;
+  align-items: flex-end;
+  justify-content: flex-end;
+  white-space: nowrap;
+}
+
+.dashboard-filter-actions button {
+  display: inline-flex;
+  height: 30px;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 0 10px;
+  border: 1px solid #fed7c2;
+  border-radius: 6px;
+  color: var(--primary);
+  background: #ffffff;
+  font-size: 10px;
+  font-weight: 800;
+  transition: 0.16s ease;
+}
+
+.dashboard-filter-actions button:hover:not(:disabled) {
+  background: #fff7ed;
+}
+
+.dashboard-filter-actions button.primary {
+  min-width: 86px;
+  border-color: var(--primary);
+  color: #ffffff;
+  background: linear-gradient(90deg, var(--primary) 0%, var(--dark-primary) 100%);
+}
+
+.dashboard-filter-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.dashboard-scroll {
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary-50) transparent;
+}
+
+.dashboard-summary {
+  display: grid;
+  grid-template-columns: repeat(8, minmax(105px, 1fr));
+  gap: 7px;
+  margin-bottom: 8px;
+}
+
+.company-ticket-summary-card {
+  display: flex;
+  min-height: 62px;
+  align-items: center;
+  gap: 8px;
+  padding: 9px;
+  border: 1px solid var(--border-soft);
+  border-top: 3px solid var(--card-tone, var(--primary));
+  background: #ffffff;
+}
+
+.company-ticket-summary-card>span {
+  display: inline-flex;
+  width: 28px;
+  height: 28px;
+  align-items: center;
+  justify-content: center;
+  color: var(--card-tone, var(--primary));
+  background: var(--card-soft, var(--primary-50));
+}
+
+.company-ticket-summary-card div {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+}
+
+.company-ticket-summary-card small {
+  overflow: hidden;
+  color: var(--text-secondary);
+  font-size: 9px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.company-ticket-summary-card strong {
+  color: var(--text-primary);
+  font-size: 19px;
+  line-height: 1.15;
+}
+
+.company-ticket-summary-card.green {
+  --card-tone: #16a34a;
+  --card-soft: #dcfce7;
+}
+
+.company-ticket-summary-card.amber {
+  --card-tone: #d97706;
+  --card-soft: #fef3c7;
+}
+
+.company-ticket-summary-card.red {
+  --card-tone: #dc2626;
+  --card-soft: #fee2e2;
+}
+
+.company-ticket-summary-card.violet {
+  --card-tone: #7c3aed;
+  --card-soft: #ede9fe;
+}
+
+.company-ticket-summary-card.cyan {
+  --card-tone: #0891b2;
+  --card-soft: #cffafe;
+}
+
+.company-ticket-summary-card.slate {
+  --card-tone: #64748b;
+  --card-soft: #f1f5f9;
+}
+
+.dashboard-panel {
+  min-width: 0;
+}
+
+.dashboard-panel-head {
+  display: flex;
+  min-height: 48px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 7px 10px;
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.dashboard-panel-head h3 {
+  font-size: 13px;
+}
+
+.dashboard-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary-50) transparent;
+}
+
+.dashboard-table {
+  display: table;
+  width: 100%;
+  min-width: 920px;
+  border-collapse: collapse;
+}
+
+.dashboard-table thead {
+  display: table-header-group;
+  position: static;
+}
+
+.dashboard-table tbody {
+  display: table-row-group;
+}
+
+.dashboard-table tr {
+  display: table-row;
+}
+
+.dashboard-table th,
+.dashboard-table td {
+  height: 34px;
+  padding: 5px 9px;
+  border-bottom: 1px solid #edf2f7;
+  text-align: left;
+}
+
+.dashboard-table th {
+  position: static;
+  color: var(--primary-800);
+  background: var(--primary-50);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.dashboard-table td {
+  color: var(--text-primary);
+  background: #ffffff;
+  font-size: 11px;
+}
+
+.dashboard-table td strong,
+.dashboard-table td span,
+.dashboard-table td small {
+  display: block;
+}
+
+.dashboard-table td small {
+  margin-top: 2px;
+  color: var(--text-secondary);
+  font-size: 9px;
+}
+
+.dashboard-table td b {
+  color: var(--primary);
+}
+
+.dashboard-table td.is-overdue {
+  color: #dc2626;
+  font-weight: 800;
+}
+
+.dashboard-empty {
+  height: 100px !important;
+  color: var(--text-secondary) !important;
+  text-align: center !important;
+}
+
+.dashboard-panel>.module-pagination {
+  padding: 7px 10px;
+  border-top: 1px solid var(--border-soft);
+}
+
+@media (max-width: 1280px) {
+  .dashboard-summary {
+    grid-template-columns: repeat(4, minmax(120px, 1fr));
+  }
+
+  .dashboard-filters {
+    grid-template-columns: repeat(3, minmax(170px, 1fr));
+  }
+
+  .dashboard-filter-actions {
+    grid-column: 1 / -1;
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 640px) {
+  .dashboard-page {
+    padding: 7px;
+  }
+
+  .dashboard-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .dashboard-filters {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .dashboard-filter-actions button {
+    flex: 1;
+  }
+}
