@@ -45,7 +45,7 @@ export const ordersModuleSchema = {
       options: [],
     },
   ],
-  defaultColumns: [],
+  defaultColumns: ["order_no", "customer_id", "brand", "order_date", "sales_person_id", "priority", "total_order_value", "total_order_qty"],
   skipFields: [],
   tableCellConfig: [
     { column_name: "name", type: "person" },
