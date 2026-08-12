@@ -49,7 +49,7 @@ export const usersModuleSchema = {
       options: [],
     },
   ],
-  defaultColumns: ["name", "userName", "email", "contactNo", "roleID", "status", "company_id"],
+  defaultColumns: ["name", "userName", "email", "contactNo", "roleID", "status"],
   skipFields: ["user_setting", "gfcmToken", "otp", "country_code", "otp_exp_time", "g_cal_token", "one_drive_access_token", "is_google_sync", "is_one_drive_sync", "ftoken", "isVerified", "photo", "adminID", "latitude", "longitude", "roleOfUser", "password"],
   tableCellConfig: [
     { column_name: "name", type: "person" },
@@ -75,9 +75,7 @@ export const usersModuleSchema = {
     initialValues: {
       adminID: null,
       name: null,
-      default_company: null,
       time_zone: "Asia/Kolkata",
-      company_id: null,
       is_approver: "no",
       userName: null,
       email: null,
@@ -138,23 +136,6 @@ export const usersModuleSchema = {
               labelKey: "roleName",
               valueKey: "roleID",
               placeholder: "Select Role",
-              multi: false
-            }
-          },
-          {
-            name: "company_id",
-            label: "Company",
-            type: "smartSelect",
-            required: true,
-            id: "company_id",
-            config: {
-              apiUrl: "/system/searchList",
-              tableName: "company_master",
-              selectFields: "company_name,company_id",
-              searchField: "company_name",
-              labelKey: "company_name",
-              valueKey: "company_id",
-              placeholder: "Select Company",
               multi: false
             }
           },

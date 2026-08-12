@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Plus } from "lucide-react";
 import OrderItemsHeader from "./order-items/OrderItemsHeader";
 import OrderItemRow from "./order-items/OrderItemRow";
@@ -23,6 +23,7 @@ const rowGridClass = "grid grid-cols-[28px_minmax(160px,1.8fr)_minmax(96px,1fr)_
 
 const OrderItems = ({ defaultItems = [], onItemsChange }) => {
   const [items, setItems] = useState(() => normalizeRows());
+  const defaultItemsSignatureRef = useRef("");
 
   const updateItems = (updatedItems) => {
     setItems(updatedItems);
@@ -34,7 +35,7 @@ const OrderItems = ({ defaultItems = [], onItemsChange }) => {
     updateItems(
       items.map((item) =>
         item.id === rowId
-          ? { ...item, [field]: numericFields.includes(field) ? Number(value) : value }
+          ? { ...item, [field]: numericFields.includes(field) ? (value === "" ? "" : Number(value)) : value }
           : item
       )
     );
@@ -70,6 +71,9 @@ const OrderItems = ({ defaultItems = [], onItemsChange }) => {
   };
 
   useEffect(() => {
+    const defaultItemsSignature = JSON.stringify(defaultItems || []);
+    if (defaultItemsSignatureRef.current === defaultItemsSignature) return;
+    defaultItemsSignatureRef.current = defaultItemsSignature;
     const nextItems = normalizeRows(defaultItems);
     updateItems(nextItems);
   }, [defaultItems]);

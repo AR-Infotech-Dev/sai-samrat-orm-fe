@@ -46,7 +46,7 @@ export const ordersModuleSchema = {
       options: [],
     },
   ],
-  defaultColumns: ["order_no", "customer_name", "order_date", "expected_delivery_date", "total_items", "item_total_qty", "saipl_qty", "pmk_qty", "ready_qty", "pending_qty", "planning_status", "priority", "sales_person_id"],
+  defaultColumns: ["order_no", "order_status", "customer_name", "order_date", "expected_delivery_date", "total_items", "item_total_qty", "saipl_qty", "pmk_qty", "ready_qty", "pending_qty", "planning_status", "priority", "sales_person_id"],
   externalColumns: [
     {
       key: "planning_status",

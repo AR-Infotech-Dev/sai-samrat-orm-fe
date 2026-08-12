@@ -100,16 +100,16 @@ function DispatchForm({ isOpen, onClose, sourceOrder, selectedDispatch, onAfterS
     setRowErrors((current) => { const next = { ...current }; delete next[index]; return next; });
     setItems((current) => current.map((item, itemIndex) => {
       if (itemIndex !== index) return item;
-      const dispatchQty = toNumber(value);
-      return { ...item, dispatch_qty: dispatchQty, pending_after_dispatch_qty: Math.max(toNumber(item.available_qty) - dispatchQty, 0) };
+      const numericDispatchQty = toNumber(value);
+      return { ...item, dispatch_qty: value === "" ? "" : numericDispatchQty, pending_after_dispatch_qty: Math.max(toNumber(item.available_qty) - numericDispatchQty, 0) };
     }));
   };
 
   const validate = () => {
     const errors = {};
     items.forEach((item, index) => {
-      if (toNumber(item.dispatch_qty) < 0) errors[index] = "Dispatch qty negative असू शकत नाही.";
-      else if (toNumber(item.dispatch_qty) > toNumber(item.available_qty)) errors[index] = "Dispatch qty available qty पेक्षा जास्त आहे.";
+      if (toNumber(item.dispatch_qty) < 0) errors[index] = "Dispatch qty cannot be negative.";
+      else if (toNumber(item.dispatch_qty) > toNumber(item.available_qty)) errors[index] = "Dispatch qty cannot be greater than available qty.";
     });
     return errors;
   };

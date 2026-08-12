@@ -1,7 +1,6 @@
-﻿import { Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import { gstOptions, formatIndianCurrency, getLineValue } from "../../utils/orders.utils";
-import SmartSelectInput from "@/components/form-inputs/smartSelectInput";
-import { orderItemProductSmartSelectConfig } from "@modules/orders/shared/utils/orderProductSmartSelect.config";
+import ProductSmartSelect from "@components/form-inputs/ProductSmartSelect";
 
 const fieldClassName = `
   h-8 w-full min-w-0 rounded-md border border-slate-200 bg-slate-50 px-2
@@ -48,12 +47,8 @@ function OrderItemRow({
     return (
         <div className={`items-center gap-2 px-2.5 py-2 transition hover:bg-orange-50/30 ${className}`}>
             <span className="text-xs font-semibold text-slate-500">{index + 1}</span>
-
-            <SmartSelectInput
-                id={`product_id_${item.id || index}`}
-                field={{ label: "" }}
-                value={item.product_id || item.productId || item.product}
-                config={orderItemProductSmartSelectConfig}
+            <ProductSmartSelect
+                value={item.product}
                 onSelect={(product) => handleProductSelect?.(item.id, product)}
             />
 
