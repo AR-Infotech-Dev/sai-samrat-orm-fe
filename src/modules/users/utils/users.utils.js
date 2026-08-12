@@ -27,10 +27,6 @@ export function getSelectedLabel(field, value, selectedUser) {
     return selectedUser?.roleName || selectedUser?.role_name || selectedUser?.roleID || value;
   }
 
-  if (field.name === "default_company") {
-    return selectedUser?.company_name || selectedUser?.default_company_name || selectedUser?.default_company || value;
-  }
-
   return value;
 }
 export function getUserIdentifier(user = {}) {
@@ -45,7 +41,6 @@ export function normalizeUserData(selectedUser = {}) {
     whatsappNo: selectedUser?.whatsappNo || selectedUser?.whatsappno || "",
     // dateOfBirth: selectedUser?.dateOfBirth || selectedUser?.dateofbirth || "",
     roleID: selectedUser?.roleID || selectedUser?.roleid || selectedUser?.roleId || "",
-    default_company: selectedUser?.default_company || selectedUser?.company_id || "",
     is_approver: selectedUser?.is_approver || "no",
     time_zone: selectedUser?.time_zone || "Asia/Kolkata",
     google_location: selectedUser?.google_location || "",
