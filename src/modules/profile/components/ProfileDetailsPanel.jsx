@@ -14,7 +14,6 @@ export function ProfileDetailsPanel({ profile, onChange }) {
         <ReadonlySelect label="Time Zone" value={profile.time_zone} />
 
         <ReadonlySelect label="User Role" value={profile.roleName || profile.roleID} />
-        <ReadonlySelect label="Company" value={profile.company_name || profile.company_id} />
         <ReadonlySegment
           label="Approval Privileges"
           value={String(profile.is_approver || "no").toLowerCase()}

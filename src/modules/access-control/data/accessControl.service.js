@@ -21,7 +21,6 @@ export const saveIdentityPermissions = async ({ identity, permissions }) => {
     headers: { "Content-Type": "application/json" },
     body: {
       user_id: parseInt(identity.id),
-      company_id: parseInt(identity.company_id),
       permissions,
     },
   });

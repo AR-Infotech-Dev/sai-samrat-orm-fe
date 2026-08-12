@@ -17,7 +17,6 @@ export const getInitials = (name = "") => {
 
 export const normalizeUserIdentity = (user = {}) => {
     const name = user?.name || user?.userName || user?.email || "Unnamed User";
-    const companyId = user?.company_id || user?.default_company || user?.companyID || "";
 
     return {
         ...user,
@@ -27,8 +26,6 @@ export const normalizeUserIdentity = (user = {}) => {
         role: user?.roleName || user?.role_name || user?.roleID || "User",
         badge: user?.roleName || user?.role_name || "USER",
         initials: getInitials(name),
-        company_id: companyId,
-        companyLabel: user?.company_name || user?.default_company_name || companyId || "Not assigned",
     };
 }
 

@@ -5,7 +5,7 @@ import { makeRequest } from "../../../api/httpClient";
 import { usersModuleSchema } from "../../users/data/module.schema";
 import { normalizeUserIdentity } from "../data/helper";
 
-function IdentitySelector({ companyId, selectedIdentity, onSelect }) {
+function IdentitySelector({ selectedIdentity, onSelect }) {
   const [identities, setIdentities] = useState([]);
   const [searchText, setSearchText] = useState("");
   const [loading, setLoading] = useState(false);
@@ -20,7 +20,6 @@ function IdentitySelector({ companyId, selectedIdentity, onSelect }) {
           status: "active",
           page: 1,
           searchText: text,
-          ...(companyId ? { company_id: companyId } : {}),
         },
       });
 
@@ -48,7 +47,7 @@ function IdentitySelector({ companyId, selectedIdentity, onSelect }) {
     }, searchText.trim() ? 350 : 0);
 
     return () => window.clearTimeout(timeout);
-  }, [companyId, searchText]);
+  }, [searchText]);
 
   const countLabel = useMemo(() => {
     if (loading) return "Loading...";
@@ -115,15 +114,11 @@ function IdentitySelector({ companyId, selectedIdentity, onSelect }) {
               <span className="min-w-0 flex-1">
                 <span className="block truncate text-xs font-semibold text-slate-700">{identity.name}</span>
                 <span className="block truncate text-[11px] text-slate-500">{identity.email}</span>
-                <span className="block truncate text-[10px] font-medium text-slate-400">
-                  Company ID: {identity.company_id || "-"}
-                </span>
               </span>
               <span className="flex shrink-0 flex-col items-end gap-1">
                 <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[9px] font-bold uppercase text-emerald-700">
                   {identity.badge}
                 </span>
-                {/* <span className="max-w-[72px] truncate text-[10px] text-slate-400">{identity.companyLabel}</span> */}
               </span>
             </button>
           ))}
