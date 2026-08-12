@@ -17,6 +17,8 @@ export const ordersModuleSchema = {
   defaultColumns: [
     "order_no",
     "customer_id",
+    "production_status",
+    "production_pending_qty",
     "expected_delivery_date",
     "total_items",
     "item_total_qty",
@@ -26,8 +28,6 @@ export const ordersModuleSchema = {
     "produced_qty",
     "procured_qty",
     "production_ready_qty",
-    "production_pending_qty",
-    "production_status",
     "priority",
   ],
   skipFields: [
@@ -57,7 +57,7 @@ export const ordersModuleSchema = {
     { production_ready_qty: "Ready Qty" },
     { production_pending_qty: "Pending Qty" },
     { production_status: "Production Status" },
-    { sales_person_name: "Sales Person" },
+    { sales_person_id: "Sales Person" },
   ],
   savedFilters: [],
 };

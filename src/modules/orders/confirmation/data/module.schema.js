@@ -45,7 +45,7 @@ export const ordersModuleSchema = {
       options: [],
     },
   ],
-  defaultColumns: ["order_no", "customer_id", "brand", "order_date", "sales_person_id", "priority", "total_order_value", "total_order_qty"],
+  defaultColumns: ["order_no", "order_status","customer_id", "brand", "order_date", "sales_person_id", "priority", "total_order_value", "total_order_qty"],
   skipFields: [],
   tableCellConfig: [
     { column_name: "name", type: "person" },
@@ -59,6 +59,7 @@ export const ordersModuleSchema = {
     { sales_person_id: "Salesman Name" },
     { total_order_qty: "Order Qty " },
     { total_order_value: "Order Value " },
+    { sales_person_id: "Sales Person" },
   ],
   savedFilters: [],
   form: {

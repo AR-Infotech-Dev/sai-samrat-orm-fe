@@ -199,7 +199,7 @@ function PlanningForm({ isOpen, onClose, selectedOrder, onAfterSave }) {
     setItems((current) => current.map((item, itemIndex) => {
       if (itemIndex !== index) return item;
       const numericFields = ["saipl_qty", "pmk_qty", "ready_qty", "dispatched_qty"];
-      const next = { ...item, [field]: numericFields.includes(field) ? toNumber(value) : value };
+      const next = { ...item, [field]: numericFields.includes(field) ? (value === "" ? "" : toNumber(value)) : value };
 
       if (field === "planning_status" && value !== "hold") {
         next.planning_status = calculatePlanningStatus({ ...next, planning_status: "" });
@@ -235,14 +235,14 @@ function PlanningForm({ isOpen, onClose, selectedOrder, onAfterSave }) {
       const plannedQty = saiplQty + pmkQty + readyQty;
       const status = calculatePlanningStatus(item);
 
-      if (orderQty <= 0) addRowError(errors, index, ["order_qty"], "Order qty zero असू शकत नाही.");
-      if (saiplQty < 0 || pmkQty < 0 || readyQty < 0) addRowError(errors, index, ["saipl_qty", "pmk_qty", "ready_qty"], "Qty negative असू शकत नाही.");
-      if (plannedQty > orderQty) addRowError(errors, index, ["saipl_qty", "pmk_qty", "ready_qty"], "SAIPL + PMK + Available Stock order qty पेक्षा जास्त आहे.");
-      if (readyQty > orderQty) addRowError(errors, index, ["ready_qty"], "Available Stock qty order qty पेक्षा जास्त आहे.");
-      if (status === "ready" && readyQty < orderQty) addRowError(errors, index, ["planning_status", "ready_qty"], "Ready status साठी Available Stock = Order Qty पाहिजे.");
-      if (status === "planned" && plannedQty < orderQty) addRowError(errors, index, ["planning_status"], "Planned status साठी full quantity split पाहिजे.");
-      if (status === "not_planned" && plannedQty > 0) addRowError(errors, index, ["planning_status"], "Qty भरली असेल तर status Not Planned राहू शकत नाही.");
-      if ((status === "planned" || status === "in_progress") && !item.expected_ready_date) addRowError(errors, index, ["expected_ready_date"], "Planning चालू/complete असेल तर Ready Date आवश्यक आहे.");
+      if (orderQty <= 0) addRowError(errors, index, ["order_qty"], "Order qty cannot be zero.");
+      if (saiplQty < 0 || pmkQty < 0 || readyQty < 0) addRowError(errors, index, ["saipl_qty", "pmk_qty", "ready_qty"], "Qty cannot be negative.");
+      if (plannedQty > orderQty) addRowError(errors, index, ["saipl_qty", "pmk_qty", "ready_qty"], "SAIPL + PMK + Available Stock cannot be greater than order qty.");
+      if (readyQty > orderQty) addRowError(errors, index, ["ready_qty"], "Available Stock qty cannot be greater than order qty.");
+      if (status === "ready" && readyQty < orderQty) addRowError(errors, index, ["planning_status", "ready_qty"], "Ready status requires Available Stock = Order Qty.");
+      if (status === "planned" && plannedQty < orderQty) addRowError(errors, index, ["planning_status"], "Planned status requires full quantity split.");
+      if (status === "not_planned" && plannedQty > 0) addRowError(errors, index, ["planning_status"], "Status cannot remain Not Planned when quantity is entered.");
+      if ((status === "planned" || status === "in_progress") && !item.expected_ready_date) addRowError(errors, index, ["expected_ready_date"], "Ready Date is required when planning is in progress or complete.");
     });
 
     return errors;

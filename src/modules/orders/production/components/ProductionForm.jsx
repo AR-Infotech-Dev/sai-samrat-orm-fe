@@ -177,7 +177,7 @@ function ProductionForm({ isOpen, onClose, selectedOrder, onAfterSave }) {
     setItems((current) => current.map((item, itemIndex) => {
       if (itemIndex !== index) return item;
       const numericFields = ["produced_qty", "procured_qty", "qc_passed_qty", "rework_qty"];
-      const next = { ...item, [field]: numericFields.includes(field) ? toNumber(value) : value };
+      const next = { ...item, [field]: numericFields.includes(field) ? (value === "" ? "" : toNumber(value)) : value };
       if (field === "production_status" && value !== "hold") next.production_status = calculateProductionStatus({ ...next, production_status: "" });
       if (numericFields.includes(field)) next.production_status = calculateProductionStatus(next);
       next.ready_qty = calculateReadyQty(next);
@@ -188,10 +188,10 @@ function ProductionForm({ isOpen, onClose, selectedOrder, onAfterSave }) {
 
   const validateItems = () => {
     for (const item of items) {
-      if (toNumber(item.produced_qty) > toNumber(item.saipl_mfg_qty)) return `${item.product_name}: Produced qty SAIPL MFG qty Ã Â¤ÂªÃ Â¥â€¡Ã Â¤â€¢Ã Â¥ÂÃ Â¤Â·Ã Â¤Â¾ Ã Â¤Å“Ã Â¤Â¾Ã Â¤Â¸Ã Â¥ÂÃ Â¤Â¤ Ã Â¤â€ Ã Â¤Â¹Ã Â¥â€¡.`;
-      if (toNumber(item.qc_passed_qty) + toNumber(item.rework_qty) > toNumber(item.produced_qty)) return `${item.product_name}: QC Passed + Rework produced qty Ã Â¤ÂªÃ Â¥â€¡Ã Â¤â€¢Ã Â¥ÂÃ Â¤Â·Ã Â¤Â¾ Ã Â¤Å“Ã Â¤Â¾Ã Â¤Â¸Ã Â¥ÂÃ Â¤Â¤ Ã Â¤â€ Ã Â¤Â¹Ã Â¥â€¡.`;
-      if (toNumber(item.procured_qty) > toNumber(item.pmk_procure_qty)) return `${item.product_name}: Procured qty PMK qty Ã Â¤ÂªÃ Â¥â€¡Ã Â¤â€¢Ã Â¥ÂÃ Â¤Â·Ã Â¤Â¾ Ã Â¤Å“Ã Â¤Â¾Ã Â¤Â¸Ã Â¥ÂÃ Â¤Â¤ Ã Â¤â€ Ã Â¤Â¹Ã Â¥â€¡.`;
-      if (calculateReadyQty(item) > toNumber(item.order_qty)) return `${item.product_name}: Ready qty order qty Ã Â¤ÂªÃ Â¥â€¡Ã Â¤â€¢Ã Â¥ÂÃ Â¤Â·Ã Â¤Â¾ Ã Â¤Å“Ã Â¤Â¾Ã Â¤Â¸Ã Â¥ÂÃ Â¤Â¤ Ã Â¤â€ Ã Â¤Â¹Ã Â¥â€¡.`;
+      if (toNumber(item.produced_qty) > toNumber(item.saipl_mfg_qty)) return `${item.product_name}: Produced qty cannot be greater than SAIPL MFG qty.`;
+      if (toNumber(item.qc_passed_qty) + toNumber(item.rework_qty) > toNumber(item.produced_qty)) return `${item.product_name}: QC Passed + Rework cannot be greater than produced qty.`;
+      if (toNumber(item.procured_qty) > toNumber(item.pmk_procure_qty)) return `${item.product_name}: Procured qty cannot be greater than PMK qty.`;
+      if (calculateReadyQty(item) > toNumber(item.order_qty)) return `${item.product_name}: Ready qty cannot be greater than order qty.`;
     }
     return "";
   };
@@ -241,7 +241,7 @@ function ProductionForm({ isOpen, onClose, selectedOrder, onAfterSave }) {
       isOpen={isOpen}
       onClose={onClose}
       title="Production"
-      subtitle={order?.order_no ? `${order.order_no} Ã¢â‚¬Â¢ ${order.customer_name || "Customer"}` : "Update production item rows"}
+      subtitle={order?.order_no ? `${order.order_no} • ${order.customer_name || "Customer"}` : "Update production item rows"}
       panelClassName="!w-[1000px] max-w-full"
       closeButton={
         <button className="flyout-close" onClick={onClose} aria-label="Close panel">
@@ -282,7 +282,7 @@ function ProductionForm({ isOpen, onClose, selectedOrder, onAfterSave }) {
                   {items.map((item, index) => (
                     <div key={item.order_item_id ?? index} className={`grid ${productionGrid} items-center gap-1.5 px-2 py-1.5 text-[10px] text-slate-700 transition hover:bg-slate-50/70`}>
                       <span className="font-semibold text-slate-500">{index + 1}</span>
-                      <div className="min-w-0"><div className="truncate font-semibold text-slate-800">{item.product_name}</div><div className="truncate text-[8px] text-slate-400">{item.product_code} Ã¢â‚¬Â¢ {item.weight || 0}Kg</div></div>
+                      <div className="min-w-0"><div className="truncate font-semibold text-slate-800">{item.product_name}</div><div className="truncate text-[8px] text-slate-400">{item.product_code} • {item.weight || 0}Kg</div></div>
                       <span className="rounded bg-blue-50 px-1 py-1 text-center font-semibold text-blue-600">{formatNumber(item.order_qty)}</span>
                       <span className="rounded bg-emerald-50 px-1 py-1 text-center font-semibold text-emerald-600">{formatNumber(item.available_stock_qty)}</span>
                       <span className="rounded bg-orange-50 px-1 py-1 text-center font-semibold text-orange-600">{formatNumber(item.saipl_mfg_qty)}</span>

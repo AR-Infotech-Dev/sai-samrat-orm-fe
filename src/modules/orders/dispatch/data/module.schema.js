@@ -20,7 +20,7 @@ export const ordersModuleSchema = {
     modelName: "order",
   },
   staticJoined: [],
-  defaultColumns: ["dispatch_no", "order_id", "customer_id", "dispatch_date", "total_items", "total_dispatch_qty", "transporter_name", "vehicle_no", "invoice_no", "dispatch_status"],
+  defaultColumns: ["dispatch_no","order_status", "order_id", "customer_id", "dispatch_date", "total_items", "total_dispatch_qty", "transporter_name", "vehicle_no", "invoice_no", "dispatch_status"],
   skipFields: ["created_by", "created_date", "modified_by", "modified_date", "status", "remarks"],
   tableCellConfig: [
     { key: "customer_id", type: "person" },
@@ -37,6 +37,7 @@ export const ordersModuleSchema = {
     { vehicle_no: "Vehicle No" },
     { invoice_no: "Invoice No" },
     { dispatch_status: "Dispatch Status" },
+    { sales_person_id: "Sales Person" },
   ],
   savedFilters: [],
   form: {
