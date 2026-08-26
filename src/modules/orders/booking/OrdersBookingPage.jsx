@@ -7,6 +7,8 @@ import { getNextSortConfig } from "@utils/sorting";
 import { useModuleFilters, useAppSelector } from "@store/hooks";
 import { selectOrderBookingRows } from "./data/booking.slice";
 
+import { Download } from "lucide-react";
+
 import ModuleControls from "@shared/ModuleControls";
 import ModulePageLayout from "@shared/ModulePageLayout";
 import ModulePagination from "@shared/ModulePagination";
@@ -16,6 +18,8 @@ import useMenuPermissions from "@auth/utils/useMenuPermissions";
 import OrderForm from "./components/OrderForm";
 import OrderTableRow from "./components/OrderTableRow";
 
+import PreviewFile from "./components/PreviewFile";
+
 function OrdersBookingPage({ menu_id }) {
 
   const location = useLocation();
@@ -23,6 +27,10 @@ function OrdersBookingPage({ menu_id }) {
   const permissions = useMenuPermissions(resolvedMenuID);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [isFlyoutOpen, setIsFlyoutOpen] = useState(false);
+
+  const [previewOrder, setPreviewOrder] = useState(null);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+
   const orderList = useAppSelector(selectOrderBookingRows);
   const { filterState, setSearchText, applyFilterPayload, setSort, clearFilters, } = useModuleFilters("order-master", orderList);
   const { pagination, page, loading, deleting, selectedRowIds, getOrderList, handlePageChange, handleToggleRow, handleToggleAllRows, handleDeleteSelected, handleDeleteRow, } = useOrderBookingModule({ filterState });
@@ -41,6 +49,11 @@ function OrdersBookingPage({ menu_id }) {
     });
   };
 
+  const handleReport = (order) => {
+    setPreviewOrder(order);
+    setIsPreviewOpen(true);
+  };
+
   useEffect(() => {
     getOrderList();
   }, [page, filterState.searchText, filterState.order, filterState.order_by, JSON.stringify(filterState.filters)]);
@@ -57,7 +70,6 @@ function OrdersBookingPage({ menu_id }) {
     applyFilterPayload({ filters: dashboardFilters, selectedFilterId: "", searchText: "" });
     if (page !== 1) handlePageChange(1);
   }, [location.key]);
-
 
   return (
     <>
@@ -94,7 +106,7 @@ function OrdersBookingPage({ menu_id }) {
             }
           />
         }
-        table={
+         table={
           <ResizableTable
             loading={loading}
             menuId={resolvedMenuID}
@@ -121,6 +133,15 @@ function OrdersBookingPage({ menu_id }) {
                 table={table}
               />
             )}
+            rowActions={[
+              {
+                key: "download",
+                label: "Download",
+                icon: Download,
+                className: "table-action-edit",
+                onClick: handleReport,
+              },
+            ]}
           />
         }
         footer={<ModulePagination pagination={pagination} onPageChange={handlePageChange} />}
@@ -129,6 +150,16 @@ function OrdersBookingPage({ menu_id }) {
         isOpen={isFlyoutOpen}
         onClose={() => setIsFlyoutOpen(false)}
         selectedOrder={selectedOrder}
+        onAfterSave={getOrderList}
+        menu_id={resolvedMenuID}
+      />
+      <PreviewFile
+        isOpen={isPreviewOpen}
+        onClose={() => {
+          setIsPreviewOpen(false);
+          setPreviewOrder(null);
+        }}
+        selectedOrder={previewOrder}
         onAfterSave={getOrderList}
         menu_id={resolvedMenuID}
       />

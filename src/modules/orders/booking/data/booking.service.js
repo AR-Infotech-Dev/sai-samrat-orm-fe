@@ -15,7 +15,6 @@ export const getOrderBookings = async ({ filterState, page }) => {
     },
   });
 };
-
 export const deleteOrderBookings = async (selectedRowIds) => {
   return makeRequest(ordersModuleSchema.api.delete, {
     method: "POST",
@@ -26,18 +25,18 @@ export const deleteOrderBookings = async (selectedRowIds) => {
     },
   });
 };
-
 export const getOrderBookingDetails = async (orderID) => {
   return makeRequest(`${ordersModuleSchema.api.edit}/${orderID}`, { method: "GET" });
+};
+
+export const getOrderBookingPreview = async (orderID) => {
+  return makeRequest( `${ordersModuleSchema.api.edit}/${orderID}/preview`, {
+     method: "GET",
+     });
 };
 
 export const saveOrderBooking = async ({ mode, orderID, payload }) => {
   const saveUrl = mode === "create" ? ordersModuleSchema.api.create : `${ordersModuleSchema.api.edit}/${orderID}`;
   const method = mode === "create" ? "PUT" : "POST";
-
-  return makeRequest(saveUrl, {
-    method,
-    headers: { "Content-Type": "application/json" },
-    body: payload,
-  });
+  return makeRequest(saveUrl, { method, headers: { "Content-Type": "application/json" }, body: payload, });
 };

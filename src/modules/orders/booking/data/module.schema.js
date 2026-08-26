@@ -15,6 +15,7 @@ export const ordersModuleSchema = {
     delete: "/orders/delete",
     create: "/orders/create",
     edit: "/orders",
+    preview: "/orders",
     definitions: "/system/getDefinations",
     definitionsFallback: "/system/getstructure",
   },
@@ -81,25 +82,20 @@ export const ordersModuleSchema = {
       order_week: "",
       sales_person_id: null,
       expected_delivery_date: "",
-
       order_status: "draft",
       priority: "normal",
-
       total_order_qty: 0,
       total_order_value: 0,
       currency: "INR",
       exchange_rate: 1,
       total_value_in_inr: 0,
-
       source: "manual",
       excel_row_no: null,
       remarks: null,
-
       created_by: null,
       created_date: null,
       modified_by: null,
       modified_date: null,
-
       status: "active",
     },
     sections: [
@@ -152,18 +148,6 @@ export const ordersModuleSchema = {
           { name: "expected_delivery_date", label: "Expected delivery Date", type: "date", required: true, placeholder: "Expected delivery date", gridSpan: 12 },
         ]
       },
-      // {
-      //   columns: 3,
-      //   fields: [
-      //     { name: "order_week", label: "Order Week", type: "date", required: true, placeholder: "Order week", gridSpan: 12 },
-      //   ],
-      // },
-      // {
-      //   columns: 3,
-      //   fields: [
-      //     { name: "order_month", label: "Order Week", type: "date", required: true, placeholder: "Order month", gridSpan: 12 },
-      //   ],
-      // },
       {
         columns: 3,
         fields: [
