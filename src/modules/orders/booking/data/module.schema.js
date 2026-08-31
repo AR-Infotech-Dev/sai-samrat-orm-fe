@@ -1,5 +1,7 @@
 import { buildFallbackColumnsFromKeys } from "@utils/moduleStructure";
-import { readonly, z } from "zod";
+import { optional, readonly, z } from "zod";
+import { currencyOptions } from "../utils/booking.utils";
+console.log(currencyOptions);
 
 const FIXED_TABLE_COLUMNS = [
   { key: "select", className: "check-col", checkbox: true, width: 42, minWidth: 42, resizable: false },
@@ -45,7 +47,7 @@ export const ordersModuleSchema = {
       options: [],
     },
   ],
-  defaultColumns: ["order_no","order_status", "customer_id", "brand", "order_date", "sales_person_id", "priority", "total_order_value", "total_order_qty"],
+  defaultColumns: ["order_no", "order_status", "customer_id", "brand", "order_date", "priority", "total_order_value", "total_order_qty"],
   skipFields: [],
   tableCellConfig: [
     { column_name: "name", type: "person" },
@@ -78,7 +80,6 @@ export const ordersModuleSchema = {
       order_date: "",
       order_month: "",
       order_week: "",
-      sales_person_id: null,
       expected_delivery_date: "",
 
       order_status: "draft",
@@ -113,7 +114,7 @@ export const ordersModuleSchema = {
             required: true,
             id: "customer_id",
             gridSpan: 12,
-            readOnlyWhen: (values) => Boolean(values.order_id),
+            readOnlyWhen: (values) => Boolean(values.order_status !== "draft"),
             config: {
               type: "customer",
               source: "customer",
@@ -142,13 +143,13 @@ export const ordersModuleSchema = {
       {
         columns: 3,
         fields: [
-          { name: "order_date", label: "Order Date", type: "date", required: true, placeholder: "Order date", gridSpan: 12 },
+          { name: "order_date", label: "Order Date", type: "date", required: true, placeholder: "Order date", gridSpan: 12, readOnlyWhen: (values) => Boolean(values.order_status !== "draft"), },
         ]
       },
       {
         columns: 3,
         fields: [
-          { name: "expected_delivery_date", label: "Expected delivery Date", type: "date", required: true, placeholder: "Expected delivery date", gridSpan: 12 },
+          { name: "expected_delivery_date", label: "Expected delivery Date", type: "date", required: true, placeholder: "Expected delivery date", gridSpan: 12, readOnlyWhen: (values) => Boolean(values.order_status !== "draft"), },
         ]
       },
       // {
@@ -172,6 +173,7 @@ export const ordersModuleSchema = {
             type: "smartSelect",
             id: "priority",
             gridSpan: 12,
+            readOnlyWhen: (values) => Boolean(values.order_status !== "draft"),
             config: {
               apiUrl: "/system/searchSlugList",
               tableName: "categories",
@@ -192,25 +194,32 @@ export const ordersModuleSchema = {
         columns: 3,
         fields: [
           {
-            name: "order_status",
-            label: "Order Status",
-            type: "smartSelect",
-            id: "order_status",
-            readonly: true,
+            name: "brand", label: "Brand", type: "text", required: true, placeholder: "Brand", gridSpan: 12,
+            readOnlyWhen: (values) => Boolean(values.order_status !== "draft"),
+          },
+        ],
+      },
+      {
+        columns: 3,
+        fields: [
+          {
+            name: "order_code", label: "Order Code", type: "text", placeholder: "Order Code", gridSpan: 12,
+            readOnlyWhen: (values) => Boolean(values.order_status !== "draft"),
+          },
+        ],
+      },
+      {
+        columns: 3,
+        fields: [
+          {
+            name: "currency",
+            label: "Currency",
+            type: "select",
             gridSpan: 12,
-            config: {
-              apiUrl: "/system/searchSlugList",
-              tableName: "categories",
-              selectFields: "category_id,categoryName,slug",
-              searchField: "categoryName",
-              labelKey: "categoryName",
-              slug: 'order-status',
-              isCompanyWise: true,
-              status: 'active',
-              valueKey: "slug",
-              placeholder: "Select order status",
-              multi: false,
-            },
+            alwaysVisible: true,
+            alwaysEditable: true,
+            readOnlyWhen: (values) => Boolean(values.order_status !== "draft"),
+            options: currencyOptions
           },
         ],
       },
@@ -218,30 +227,9 @@ export const ordersModuleSchema = {
         columns: 1,
         fields: [
           {
-            name: "sales_person_id",
-            label: "Sales Person",
-            type: "smartSelectInput",
-            required: true,
-            id: "sales_person_id",
-            gridSpan: 12,
-            config: {
-              apiUrl: "/system/searchAssignee",
-              type: "sales_person_id",
-              source: "admin",
-              list: "adminID,name,status",
-              check: "name",
-              getValue: (item) => item.adminID,
-              getLabel: (item) => item.name || "Unnamed Sales Person",
-              placeholder: "Select SalesPerson",
-              multi: false
-            }
+            gridSpan: 12, name: "remarks", label: "Remark", type: "textarea", placeholder: "Provide remark about the order...", rows: 2,
+            readOnlyWhen: (values) => Boolean(values.order_status !== "draft"),
           },
-        ]
-      },
-      {
-        columns: 1,
-        fields: [
-          { gridSpan: 12, name: "remarks", label: "Remark", type: "textarea", placeholder: "Provide remark about the order...", rows: 1 },
         ]
       },
     ],
@@ -255,9 +243,6 @@ export const ordersModuleSchema = {
       .refine((val) => val && val <= new Date(), {
         message: "Order date cannot be in the future",
       }),
-    sales_person_id: z.any().refine((value) => value !== "" && value !== null && value !== undefined, {
-      message: "Role is required",
-    }),
   })
 };
 

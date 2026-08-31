@@ -28,14 +28,14 @@ const SummaryRow = ({ icon: Icon, label, value, valueClassName = "text-slate-600
     );
 };
 
-const PriceRow = ({ label, value, }) => {
+const PriceRow = ({ label, value, currency = "INR" }) => {
     return (
         <div className={`flex items-center justify-between gap-4 py-1`} >
             <span className={"leading-4.5 font-normal text-sm text-slate-600"}>
                 {label}
             </span>
             <span className={"leading-4.5 font-bold  text-sm text-orange-400"} >
-                {formatCurrency(value)}
+                {formatCurrency(value, currency)}
             </span>
         </div>
     );
@@ -51,6 +51,7 @@ const OrderSummary = ({
     gstPercentage = 18,
     gstAmount = 332100,
     grandTotal = 2177100,
+    currency = "INR",
     planningStatus = "Pending Planning",
     isSaving = false,
     isConfirming = false,
@@ -84,12 +85,12 @@ const OrderSummary = ({
                     {/* Column 3 */}
                     <div className="flex flex-col gap-1 md:pl-6">
                         <div>
-                            <PriceRow label="Subtotal" value={subtotal} />
-                            <PriceRow label={`GST (${gstPercentage}%)`} value={gstAmount} />
+                            <PriceRow label="Subtotal" value={subtotal} currency={currency} />
+                            <PriceRow label={`GST (${gstPercentage}%)`} value={gstAmount} currency={currency} />
                         </div>
                         <div className="flex justify-between border-t border-gray-200 py-1">
                             <span className="text-[13px] font-bold text-[#373B41]"> Grand Total </span>
-                            <span className="mt-0.5 text-[13px] font-bold text-orange-500"> {formatCurrency(grandTotal)} </span>
+                            <span className="mt-0.5 text-[13px] font-bold text-orange-500"> {formatCurrency(grandTotal, currency)} </span>
                         </div>
                     </div>
                 </div>
@@ -110,9 +111,9 @@ const OrderSummary = ({
 
             <div className="my-3.5 border-t border-gray-200" />
             <div className="">
-                <PriceRow label="Subtotal" value={subtotal} />
-                <PriceRow label={`GST (${gstPercentage}%)`} value={gstAmount} />
-                <PriceRow label="Grand Total" value={grandTotal} highlighted />
+                <PriceRow label="Subtotal" value={subtotal} currency={currency} />
+                <PriceRow label={`GST (${gstPercentage}%)`} value={gstAmount} currency={currency} />
+                <PriceRow label="Grand Total" value={grandTotal} currency={currency} highlighted />
             </div>
 
             {/* <div className="my-3.5 flex items-center justify-between gap-1">
@@ -135,4 +136,3 @@ const OrderSummary = ({
 };
 
 export default OrderSummary;
-

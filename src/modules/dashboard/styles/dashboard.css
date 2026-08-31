@@ -410,3 +410,133 @@
     flex: 1;
   }
 }
+
+/* Order lifecycle dashboard table */
+.lifecycle-table-scroll {
+  width: 100%;
+  overflow-x: hidden !important;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+.lifecycle-table {
+  display: table !important;
+  width: 100% !important;
+  min-width: 100% !important;
+  table-layout: fixed !important;
+  border-collapse: collapse !important;
+}
+
+.lifecycle-table thead {
+  display: table-header-group !important;
+}
+
+.lifecycle-table tbody {
+  display: table-row-group !important;
+}
+
+.lifecycle-table tr {
+  display: table-row !important;
+  width: 100% !important;
+}
+
+.lifecycle-table th,
+.lifecycle-table td {
+  box-sizing: border-box;
+  overflow: hidden !important;
+  vertical-align: middle;
+}
+
+.lifecycle-table-head th {
+  white-space: nowrap !important;
+}
+
+.lifecycle-table-row:hover td {
+  background: #fff7ed;
+}
+
+.lifecycle-qty {
+  display: inline-block;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.lifecycle-qty-order {
+  color: #2563eb !important;
+}
+
+.lifecycle-qty-plan {
+  color: #7c3aed !important;
+}
+
+.lifecycle-qty-pmk {
+  color: #9333ea !important;
+}
+
+.lifecycle-qty-prod {
+  color: #ea580c !important;
+}
+
+.lifecycle-qty-ready {
+  color: #059669 !important;
+}
+
+.lifecycle-qty-dispatch {
+  color: #0891b2 !important;
+}
+
+.lifecycle-qty-pending {
+  color: #dc2626 !important;
+}
+
+.lifecycle-stage-badge {
+  display: inline-flex;
+  width: auto;
+  max-width: 100%;
+  min-width: 78px;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-width: 1px;
+  border-style: solid;
+  border-radius: 6px;
+  padding: 5px 8px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1;
+  text-transform: capitalize;
+}
+
+.lifecycle-table-row:hover td:last-child {
+  background: #fff7ed !important;
+}
+.lifecycle-action-head {
+  position: sticky !important;
+  right: 0 !important;
+  z-index: 45 !important;
+  border-left: 1px solid #e2e8f0 !important;
+  background: #f8fafc !important;
+  box-shadow: -10px 0 14px -14px rgba(15, 23, 42, 0.55);
+}
+
+.lifecycle-action-cell {
+  position: sticky !important;
+  right: 0 !important;
+  z-index: 35 !important;
+  height: 38px;
+  max-height: 38px;
+  padding: 4px 8px;
+  overflow: hidden !important;
+  border-left: 1px solid #edf2f7 !important;
+  background: #ffffff !important;
+  text-align: center;
+  vertical-align: middle;
+  white-space: nowrap;
+  box-shadow: -10px 0 14px -14px rgba(15, 23, 42, 0.55);
+}
+
+.lifecycle-table-row:hover .lifecycle-action-cell {
+  background: #fff7ed !important;
+}

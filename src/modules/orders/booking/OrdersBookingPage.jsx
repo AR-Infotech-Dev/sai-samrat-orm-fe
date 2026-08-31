@@ -17,7 +17,6 @@ import OrderForm from "./components/OrderForm";
 import OrderTableRow from "./components/OrderTableRow";
 
 function OrdersBookingPage({ menu_id }) {
-
   const location = useLocation();
   const resolvedMenuID = menu_id || ordersModuleSchema.menu_id || null;
   const permissions = useMenuPermissions(resolvedMenuID);

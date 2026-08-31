@@ -1,4 +1,4 @@
-﻿import { formatCurrency, formatNumber } from "@/utils/common";
+import { formatCurrency, formatNumber, getCurrencySymbol } from "@/utils/common";
 import { CheckCircle2, Clock3, Eye, PauseCircle, RotateCcw, Search, Send, X } from "lucide-react";
 
 const formatDate = (value) => {
@@ -88,10 +88,9 @@ const ConfirmationTable = ({ rows, loading, selectedOrderId, onView, onQuickActi
                     <div className="text-[11px] text-slate-400">{row.customer_mobile || row.customer_email || ""}</div>
                   </td>
                   <td className="px-3 py-3 text-slate-600">{formatDate(row.order_date)}</td>
-                  <td className="px-3 py-3 text-slate-600">{row.sales_person_name || row.sales_person_id || "-"}</td>
                   <td className="px-3 py-3 text-right font-semibold text-slate-700">{formatNumber(row.total_items)}</td>
                   <td className="px-3 py-3 text-right font-semibold text-slate-700">{formatNumber(row.total_order_qty)}</td>
-                  <td className="px-3 py-3 text-right font-bold text-slate-800">{formatCurrency(row.total_value_in_inr)}</td>
+                  <td className="px-3 py-3 text-right font-bold text-slate-800">{formatCurrency(row.total_value_in_inr, row.currency)}</td>
                   <td className="px-3 py-3"><StatusChip tone={row.priority === "high" || row.priority === "urgent" ? "red" : "blue"}>{row.priority || "normal"}</StatusChip></td>
                   <td className="px-3 py-3"><StatusChip tone={row.order_status === "hold" ? "amber" : "orange"}>{row.order_status || "waiting"}</StatusChip></td>
                   <td className="px-3 py-3">
@@ -142,6 +141,10 @@ const OrderReviewDrawer = ({ isOpen, order, remarks, actionLoading, onClose, onR
 
   const items = order?.items || [];
   const totalItems = items.length || Number(order?.total_items || 0);
+  const currency = order?.currency || "INR";
+  const currencySymbol = getCurrencySymbol(currency);
+  const selectedSubtotal = items.reduce((total, item) => total + (Number(item.order_qty || 0) * Number(item.unit_rate || 0)), 0);
+  const selectedGrandTotal = items.reduce((total, item) => total + Number(item.line_value || 0), 0);
 
   return (
     <div className="fixed inset-0 z-[60] flex justify-end bg-slate-900/35 backdrop-blur-[1px]">
@@ -167,7 +170,6 @@ const OrderReviewDrawer = ({ isOpen, order, remarks, actionLoading, onClose, onR
                 <DetailCell label="Priority" value={order?.priority || "normal"} />
                 <DetailCell label="Order Date" value={formatDate(order?.order_date)} />
                 <DetailCell label="Expected Delivery" value={formatDate(order?.expected_delivery_date)} />
-                <DetailCell label="Sales Person" value={order?.sales_person_name || order?.sales_person_id} />
               </div>
             </section>
 
@@ -185,7 +187,7 @@ const OrderReviewDrawer = ({ isOpen, order, remarks, actionLoading, onClose, onR
           <section className="mt-3 overflow-hidden rounded-xl border border-slate-100 bg-white shadow-sm">
             <div className="flex items-center justify-between border-b border-slate-100 px-3 py-2">
               <h3 className="text-sm font-bold text-slate-800">Order Items</h3>
-              <p className="text-xs text-slate-400">All values in INR</p>
+              <p className="text-xs text-slate-400">All values in {currencySymbol}</p>
             </div>
             <div className="w-full overflow-hidden text-left text-sm">
               <div className="grid w-full grid-cols-[42px_minmax(180px,2fr)_minmax(110px,1fr)_90px_80px_110px_80px_140px] items-center bg-slate-50 text-[11px] font-bold uppercase tracking-wide text-slate-500">
@@ -194,9 +196,9 @@ const OrderReviewDrawer = ({ isOpen, order, remarks, actionLoading, onClose, onR
                 <div className="px-3 py-2">Series</div>
                 <div className="px-3 py-2 text-right">Weight</div>
                 <div className="px-3 py-2 text-right">Qty</div>
-                <div className="px-3 py-2 text-right">Rate</div>
+                <div className="px-3 py-2 text-right">Rate ({currencySymbol})</div>
                 <div className="px-3 py-2 text-right">GST</div>
-                <div className="px-3 py-2 text-right">Line Value</div>
+                <div className="px-3 py-2 text-right">Line Value ({currencySymbol})</div>
               </div>
               <div className="divide-y divide-slate-100">
                 {items.map((item, index) => (
@@ -206,9 +208,9 @@ const OrderReviewDrawer = ({ isOpen, order, remarks, actionLoading, onClose, onR
                     <div className="truncate px-3 py-2 text-slate-500">{item.brand_snapshot || item.brand || "-"}</div>
                     <div className="px-3 py-2 text-right text-slate-500">{formatNumber(item.weight)}</div>
                     <div className="px-3 py-2 text-right font-semibold text-slate-700">{formatNumber(item.order_qty)}</div>
-                    <div className="px-3 py-2 text-right text-slate-600">{formatCurrency(item.unit_rate)}</div>
+                    <div className="px-3 py-2 text-right text-slate-600">{formatCurrency(item.unit_rate, currency)}</div>
                     <div className="px-3 py-2 text-right text-slate-600">{Number(item.gst_rate || 0)}%</div>
-                    <div className="px-3 py-2 text-right font-bold text-slate-800">{formatCurrency(item.line_value)}</div>
+                    <div className="px-3 py-2 text-right font-bold text-slate-800">{formatCurrency(item.line_value, currency)}</div>
                   </div>
                 ))}
               </div>
@@ -221,8 +223,8 @@ const OrderReviewDrawer = ({ isOpen, order, remarks, actionLoading, onClose, onR
               <div className="mt-3 space-y-2 text-sm">
                 <div className="flex justify-between"><span className="text-slate-500">Total Items</span><strong>{formatNumber(totalItems)}</strong></div>
                 <div className="flex justify-between"><span className="text-slate-500">Total Qty</span><strong>{formatNumber(order?.total_order_qty)}</strong></div>
-                <div className="flex justify-between"><span className="text-slate-500">Subtotal</span><strong>{formatCurrency(order?.total_order_value)}</strong></div>
-                <div className="border-t border-dashed border-slate-200 pt-2 flex justify-between"><span className="font-semibold text-slate-700">Grand Total</span><strong className="text-lg text-orange-600">{formatCurrency(order?.total_value_in_inr)}</strong></div>
+                <div className="flex justify-between"><span className="text-slate-500">Subtotal</span><strong>{formatCurrency(selectedSubtotal || order?.total_order_value, currency)}</strong></div>
+                <div className="border-t border-dashed border-slate-200 pt-2 flex justify-between"><span className="font-semibold text-slate-700">Grand Total</span><strong className="text-lg text-orange-600">{formatCurrency(selectedGrandTotal || order?.total_order_value, currency)}</strong></div>
               </div>
             </section>
             <RiskChecklist />
@@ -256,6 +258,5 @@ const OrderReviewDrawer = ({ isOpen, order, remarks, actionLoading, onClose, onR
 };
 
 export { ConfirmationTable, KpiCard, OrderReviewDrawer, StatusChip, formatCurrency, formatDate, formatNumber };
-
 
 

@@ -268,7 +268,6 @@ export const useCustomerForm = ({
         designation: row.designation || "",
         mobile_no: row.mobile_no || "",
         email: row.email || "",
-        department: row.department || "",
         is_primary: row.is_primary === "y" ? "y" : "n",
       }))
       .filter((row) => row.name || row.designation || row.mobile_no || row.email || row.department);

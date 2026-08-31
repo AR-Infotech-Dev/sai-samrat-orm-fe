@@ -41,3 +41,8 @@ export const saveOrderBooking = async ({ mode, orderID, payload }) => {
     body: payload,
   });
 };
+
+export const getCurrencyExchangeRates = async (currencies = []) => {
+  const query = currencies.length ? `?currencies=${encodeURIComponent(currencies.join(","))}` : "";
+  return makeRequest(`/system/exchange-rates${query}`, { method: "GET" });
+};

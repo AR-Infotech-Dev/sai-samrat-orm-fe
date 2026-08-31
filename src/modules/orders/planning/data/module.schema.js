@@ -46,7 +46,7 @@ export const ordersModuleSchema = {
       options: [],
     },
   ],
-  defaultColumns: ["order_no", "order_status", "customer_name", "order_date", "expected_delivery_date", "total_items", "item_total_qty", "saipl_qty", "pmk_qty", "ready_qty", "pending_qty", "planning_status", "priority", "sales_person_id"],
+  defaultColumns: ["order_no", "order_status", "customer_name", "order_date", "expected_delivery_date", "total_items", "item_total_qty", "saipl_qty", "pmk_qty", "ready_qty", "pending_qty", "planning_status", "priority"],
   externalColumns: [
     {
       key: "planning_status",
@@ -115,7 +115,6 @@ export const ordersModuleSchema = {
     { ready_qty: "Ready Qty" },
     { pending_qty: "Pending Qty" },
     { planning_status: "Planning Status" },
-    { sales_person_id: "Sales Person" },
     { roleID: "Order Role" },
     { is_approver: "Approval Privileges" },
     { otp: "OTP" },
@@ -131,7 +130,6 @@ export const ordersModuleSchema = {
       order_date: "",
       order_month: "",
       order_week: "",
-      sales_person_id: null,
       expected_delivery_date: "",
 
       order_status: "draft",
@@ -269,30 +267,6 @@ export const ordersModuleSchema = {
       {
         columns: 1,
         fields: [
-          {
-            name: "sales_person_id",
-            label: "Sales Person",
-            type: "smartSelectInput",
-            required: true,
-            id: "sales_person_id",
-            gridSpan: 12,
-            config: {
-              apiUrl: "/system/searchAssignee",
-              type: "sales_person_id",
-              source: "admin",
-              list: "adminID,name,status",
-              check: "name",
-              getValue: (item) => item.adminID,
-              getLabel: (item) => item.name || "Unnamed Sales Person",
-              placeholder: "Select SalesPerson",
-              multi: false
-            }
-          },
-        ]
-      },
-      {
-        columns: 1,
-        fields: [
           { gridSpan: 12, name: "remarks", label: "Remark", type: "textarea", placeholder: "Provide remark about the order...", rows: 1 },
         ]
       },
@@ -307,9 +281,6 @@ export const ordersModuleSchema = {
       .refine((val) => val && val <= new Date(), {
         message: "Order date cannot be in the future",
       }),
-    sales_person_id: z.any().refine((value) => value !== "" && value !== null && value !== undefined, {
-      message: "Role is required",
-    }),
   })
 };
 

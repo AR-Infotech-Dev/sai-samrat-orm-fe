@@ -171,7 +171,6 @@ export const normalizeCustomerContacts = (customer = {}) => {
       designation: row?.designation || "",
       mobile_no: row?.mobile_no || row?.contact_no || "",
       email: row?.email || "",
-      department: row?.department || "",
       is_primary: row?.is_primary === "y" || row?.is_primary === true ? "y" : "n",
     }))
     .filter((row) =>

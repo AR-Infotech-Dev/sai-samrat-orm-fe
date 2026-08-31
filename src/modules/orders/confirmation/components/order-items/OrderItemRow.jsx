@@ -1,5 +1,5 @@
 import { Trash2 } from "lucide-react";
-import { gstOptions, formatIndianCurrency, getLineValue } from "../../utils/orders.utils";
+import { gstOptions, formatIndianCurrency, getCurrencySymbol, getLineValue } from "../../utils/orders.utils";
 import ProductSmartSelect from "@components/form-inputs/ProductSmartSelect";
 
 const fieldClassName = `
@@ -37,12 +37,14 @@ const SelectInput = ({ value, options, onChange }) => (
 function OrderItemRow({
     index = 0,
     item = {},
+    currency = "INR",
     handleFieldChange,
     handleProductSelect,
     handleDeleteRow,
     className = "grid grid-cols-[28px_minmax(160px,1.8fr)_minmax(96px,1fr)_58px_64px_82px_58px_96px_34px]",
 }) {
     const lineValue = getLineValue(item);
+    const currencySymbol = getCurrencySymbol(currency);
 
     return (
         <div className={`items-center gap-2 px-2.5 py-2 transition hover:bg-orange-50/30 ${className}`}>
@@ -74,12 +76,18 @@ function OrderItemRow({
                 onChange={(value) => handleFieldChange(item.id, "qty", value)}
             />
 
-            <TextInput
-                type="number"
-                min="0"
-                value={item.unitRate}
-                onChange={(value) => handleFieldChange(item.id, "unitRate", value)}
-            />
+            <div className="relative min-w-0">
+                <span className="pointer-events-none absolute left-2 top-1/2 -translate-y-1/2 text-[10px] font-bold text-slate-400">
+                    {currencySymbol}
+                </span>
+                <input
+                    type="number"
+                    min="0"
+                    value={item.unitRate}
+                    onChange={(event) => handleFieldChange(item.id, "unitRate", event.target.value)}
+                    className={`${fieldClassName} pl-5 text-xs`}
+                />
+            </div>
 
             <SelectInput
                 value={item.gst}
@@ -87,7 +95,7 @@ function OrderItemRow({
                 onChange={(value) => handleFieldChange(item.id, "gst", value)}
             />
 
-            <p className="truncate text-xs font-semibold text-slate-700">₹ {formatIndianCurrency(lineValue)}</p>
+            <p className="truncate text-xs font-semibold text-slate-700">{currencySymbol} {formatIndianCurrency(lineValue)}</p>
 
             <div className="flex justify-center">
                 <button

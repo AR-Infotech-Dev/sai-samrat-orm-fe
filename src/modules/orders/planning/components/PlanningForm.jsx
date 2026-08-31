@@ -59,7 +59,13 @@ const calculatePlanningPendingQty = (item = {}) => {
   const plannedQty = toNumber(item.saipl_qty) + toNumber(item.pmk_qty) + toNumber(item.ready_qty);
   return Math.max(orderQty - plannedQty, 0);
 };
-const formatCurrency = (value) => new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 2 }).format(toNumber(value));
+const getCurrencySymbol = (currency = "INR") => {
+  const normalized = String(currency || "INR").toUpperCase();
+  const currencyMap = { INR: "₹", USD: "$", EUR: "€", GBP: "£", JPY: "¥", "₹": "₹", "$": "$", "€": "€", "£": "£", "¥": "¥" };
+  return currencyMap[normalized] || currencyMap[currency] || currency || "₹";
+};
+
+const formatCurrency = (value, currency = "INR") => `${getCurrencySymbol(currency)} ${new Intl.NumberFormat("en-IN", { maximumFractionDigits: 2 }).format(toNumber(value))}`;
 const formatNumber = (value) => new Intl.NumberFormat("en-IN", { maximumFractionDigits: 2 }).format(toNumber(value));
 const dateValue = (value) => (value ? String(value).slice(0, 10) : "");
 const normalizeItem = (item = {}) => {

@@ -53,7 +53,7 @@ const buildSidebar = (menus = [], permissions = {}, user = {}) =>
   })
     .filter(Boolean);
 
-function Sidebar({ onSelectModule, isMobileOpen = false, onClose }) {
+function Sidebar({ onSelectModule, isMobileOpen = false, onClose, isDashboardCollapsed = false }) {
   const { authSession } = useAuth();
   const [menus, setMenus] = useState(() => getStoredMenuList());
   const [loading, setLoading] = useState(() => !getStoredMenuList().length);
@@ -91,123 +91,124 @@ function Sidebar({ onSelectModule, isMobileOpen = false, onClose }) {
 
   return (
     <>
-    <button
-      type="button"
-      className={`sidebar-backdrop ${isMobileOpen ? "is-visible" : ""}`}
-      onClick={onClose}
-      aria-label="Close navigation menu"
-      tabIndex={isMobileOpen ? 0 : -1}
-    />
-    <aside className={`sidebar ${isMobileOpen ? "mobile-open" : ""}`}>
-      <div className="sidebar-brand" title={APP_NAME}>
-        <img
-          // src="/logo 1.png"
-          src="/logo.png"
-          alt={APP_NAME}
-          className="sidebar-logo"
-        />
-        <span className="sidebar-brand-fallback">{APP_NAME}</span>
-        <button
-          type="button"
-          className="sidebar-mobile-close"
-          onClick={onClose}
-          aria-label="Close navigation menu"
-        >
-          <X size={18} />
-        </button>
-      </div>
+      <button
+        type="button"
+        className={`sidebar-backdrop ${isMobileOpen ? "is-visible" : ""}`}
+        onClick={onClose}
+        aria-label="Close navigation menu"
+        tabIndex={isMobileOpen ? 0 : -1}
+      />
+      <aside className={`sidebar ${isMobileOpen ? "mobile-open" : ""} ${isDashboardCollapsed ? "dashboard-mini-sidebar" : ""}`}>
+        <div className="sidebar-brand" title={APP_NAME}>
+          <img
+            // src="/logo 1.png"
+            src="/logo.png"
+            alt={APP_NAME}
+            className="sidebar-logo"
+          />
+          <span className="sidebar-brand-fallback">{APP_NAME}</span>
+          <button
+            type="button"
+            className="sidebar-mobile-close"
+            onClick={onClose}
+            aria-label="Close navigation menu"
+          >
+            <X size={18} />
+          </button>
+        </div>
 
-      <div className="sidebar-sections">
-        <section className="sidebar-group">
-          <div className="sidebar-group-title px-2">Main Menu</div>
+        <div className="sidebar-sections">
+          <section className="sidebar-group">
+            <div className="sidebar-group-title px-2">Main Menu</div>
 
-          <div className="sidebar-group-items">
-            {loading && <div className="p-3 text-xs text-slate-500">Loading menu...</div>}
-            {!loading && sidebarGroups.length === 0 && (
-              <div className="p-3 text-xs text-slate-500">No menu access</div>
-            )}
-            {!loading &&
-              sidebarGroups.map((group) => {
-                const Icon = group.icon;
-                const isCollapsed = collapsedGroups[group.id];
+            <div className="sidebar-group-items">
+              {loading && <div className="p-3 text-xs text-slate-500">Loading menu...</div>}
+              {!loading && sidebarGroups.length === 0 && (
+                <div className="p-3 text-xs text-slate-500">No menu access</div>
+              )}
+              {!loading &&
+                sidebarGroups.map((group) => {
+                  const Icon = group.icon;
+                  const isCollapsed = collapsedGroups[group.id];
 
-                if (group.items.length) {
+                  if (group.items.length) {
+                    return (
+                      <div key={group.id} className="sidebar-group">
+                        <button
+                          type="button"
+                          className="sidebar-group-title sidebar-group-toggle"
+                          title={group.title}
+                          onClick={() =>
+                            setCollapsedGroups((current) => ({
+                              ...current,
+                              [group.id]: !current[group.id],
+                            }))
+                          }
+                        >
+                          <span className="flex items-center gap-2">
+                            <Icon size={16} /> <span className="sidebar-label">{group.title}</span>
+                          </span>
+                          <ChevronDown size={14} className={isCollapsed ? "is-collapsed" : ""} />
+                        </button>
+
+                        {!isCollapsed && (
+                          <div className="sidebar-group-items">
+                            {group.items.map((item) => {
+                              const ItemIcon = item.icon;
+                              return (
+                                <NavLink
+                                  key={item.id}
+                                  to={item.path}
+                                  className="no-underline"
+                                  onClick={() => onSelectModule?.(item.path)}
+                                >
+                                  {({ isActive }) => (
+                                    <button className={`sidebar-item w-full ${isActive ? "active" : ""}`} title={item.label}>
+                                      <span className="sidebar-icon">
+                                        <ItemIcon size={16} />
+                                      </span>
+                                      <span>{item.label}</span>
+                                    </button>
+                                  )}
+                                </NavLink>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  }
+
                   return (
-                    <div key={group.id} className="sidebar-group">
-                      <button
-                        type="button"
-                        className="sidebar-group-title sidebar-group-toggle"
-                        onClick={() =>
-                          setCollapsedGroups((current) => ({
-                            ...current,
-                            [group.id]: !current[group.id],
-                          }))
-                        }
-                      >
-                        <span className="flex items-center gap-2">
-                          <Icon size={16} /> {group.title}
-                        </span>
-                        <ChevronDown size={14} className={isCollapsed ? "is-collapsed" : ""} />
-                      </button>
-
-                      {!isCollapsed && (
-                        <div className="sidebar-group-items">
-                          {group.items.map((item) => {
-                            const ItemIcon = item.icon;
-                            return (
-                              <NavLink
-                                key={item.id}
-                                to={item.path}
-                                className="no-underline"
-                                onClick={() => onSelectModule?.(item.path)}
-                              >
-                                {({ isActive }) => (
-                                  <button className={`sidebar-item w-full ${isActive ? "active" : ""}`}>
-                                    <span className="sidebar-icon">
-                                      <ItemIcon size={16} />
-                                    </span>
-                                    <span>{item.label}</span>
-                                  </button>
-                                )}
-                              </NavLink>
-                            );
-                          })}
-                        </div>
+                    <NavLink
+                      key={group.id}
+                      to={group.path}
+                      className="no-underline"
+                      onClick={() => onSelectModule?.(group.path)}
+                    >
+                      {({ isActive }) => (
+                        <button className={`sidebar-item w-full ${isActive ? "active" : ""}`} title={group.title}>
+                          <span className="sidebar-icon">
+                            <Icon size={16} />
+                          </span>
+                          <span>{group.title}</span>
+                        </button>
                       )}
-                    </div>
+                    </NavLink>
                   );
-                }
+                })}
+            </div>
+          </section>
+        </div >
 
-                return (
-                  <NavLink
-                    key={group.id}
-                    to={group.path}
-                    className="no-underline"
-                    onClick={() => onSelectModule?.(group.path)}
-                  >
-                    {({ isActive }) => (
-                      <button className={`sidebar-item w-full ${isActive ? "active" : ""}`}>
-                        <span className="sidebar-icon">
-                          <Icon size={16} />
-                        </span>
-                        <span>{group.title}</span>
-                      </button>
-                    )}
-                  </NavLink>
-                );
-              })}
-          </div>
-        </section>
-      </div>
-
-      {/* <div className="sync-card">
+        {/* <div className="sync-card">
         <div className="sync-ring" />
         <div>
           <div className="sync-title">CRM Connected</div>
           <div className="sync-subtitle">Permission menu loaded</div>
         </div>
       </div> */}
-    </aside>
+      </aside >
     </>
   );
 }

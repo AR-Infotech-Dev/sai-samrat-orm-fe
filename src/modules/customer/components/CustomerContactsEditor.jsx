@@ -2,20 +2,13 @@
 
 const CONTACT_FIELDS = [
   { key: "name", label: "Name", placeholder: "Contact name", span: "md:col-span-3" },
-  { key: "designation", label: "Designation", placeholder: "Designation", span: "md:col-span-2" },
-  { key: "mobile_no", label: "Mobile", placeholder: "Mobile no", span: "md:col-span-2" },
+  { key: "designation", label: "Designation", placeholder: "Designation", span: "md:col-span-3" },
+  { key: "mobile_no", label: "Mobile", placeholder: "Mobile no", span: "md:col-span-3" },
   { key: "email", label: "Email", placeholder: "Email", span: "md:col-span-3", type: "email" },
-  { key: "department", label: "Department", placeholder: "Department", span: "md:col-span-2" },
+  // { key: "department", label: "Department", placeholder: "Department", span: "md:col-span-2" },
 ];
 
-function CustomerContactsEditor({
-  contactRows,
-  errors = {},
-  onAddContactRow,
-  onUpdateContactRow,
-  onRemoveContactRow,
-  onSetPrimaryContact,
-}) {
+function CustomerContactsEditor({ contactRows, errors = {}, onAddContactRow, onUpdateContactRow, onRemoveContactRow, onSetPrimaryContact, }) {
   return (
     <>
       <div className="mt-5 mb-1 flex items-center justify-between text-md font-semibold">
@@ -49,12 +42,11 @@ function CustomerContactsEditor({
             <div key={row.contact_id || `customer-contact-${index}`} className="rounded-md border border-slate-100 bg-slate-50/60 p-2">
               <div className="mb-2 flex items-center justify-between text-xs">
                 <button
-                  
-                  className={`inline-flex h-5 items-center gap-1 rounded px-2 font-light ${
-                    row.is_primary === "y"
-                      ? "bg-orange-100 text-orange-700"
-                      : "bg-slate-100 text-slate-500 hover:bg-orange-50 hover:text-orange-700"
-                  }`}
+
+                  className={`inline-flex h-5 items-center gap-1 rounded px-2 font-light ${row.is_primary === "y"
+                    ? "bg-orange-100 text-orange-700"
+                    : "bg-slate-100 text-slate-500 hover:bg-orange-50 hover:text-orange-700"
+                    }`}
                   onClick={() => onSetPrimaryContact(index)}
                 >
                   <Circle size={10} fill={row.is_primary === "y" ? "currentColor" : "none"} />
@@ -83,11 +75,10 @@ function CustomerContactsEditor({
                         onChange={(event) => onUpdateContactRow(index, field.key, event.target.value)}
                         placeholder={field.placeholder}
                         aria-label={field.label}
-                        className={`w-full rounded border px-3 py-1.5 text-sm text-gray-600 focus:outline-none focus:ring-2 ${
-                          fieldError
-                            ? "border-red-200 bg-red-50 focus:ring-red-100"
-                            : "border-gray-50 bg-gray-100 focus:ring-purple-100"
-                        }`}
+                        className={`w-full rounded border px-3 py-1.5 text-sm text-gray-600 focus:outline-none focus:ring-2 ${fieldError
+                          ? "border-red-200 bg-red-50 focus:ring-red-100"
+                          : "border-gray-50 bg-gray-100 focus:ring-purple-100"
+                          }`}
                       />
                       {fieldError ? (
                         <p className="mt-1 text-[11px] font-medium text-red-500">{fieldError}</p>

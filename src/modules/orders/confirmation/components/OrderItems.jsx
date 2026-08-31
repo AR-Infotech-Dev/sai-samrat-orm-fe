@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Plus } from "lucide-react";
 import OrderItemsHeader from "./order-items/OrderItemsHeader";
 import OrderItemRow from "./order-items/OrderItemRow";
+import { getCurrencySymbol } from "../utils/orders.utils";
 
 const createBlankRow = () => ({
   id: Date.now(),
@@ -21,9 +22,10 @@ const normalizeRows = (rows = []) => (Array.isArray(rows) && rows.length ? rows 
 
 const rowGridClass = "grid grid-cols-[28px_minmax(160px,1.8fr)_minmax(96px,1fr)_58px_64px_82px_58px_96px_34px]";
 
-const OrderItems = ({ defaultItems = [], onItemsChange }) => {
+const OrderItems = ({ currency = "INR", defaultItems = [], onItemsChange }) => {
   const [items, setItems] = useState(() => normalizeRows());
   const defaultItemsSignatureRef = useRef("");
+  const currencySymbol = getCurrencySymbol(currency);
 
   const updateItems = (updatedItems) => {
     setItems(updatedItems);
@@ -108,7 +110,7 @@ const OrderItems = ({ defaultItems = [], onItemsChange }) => {
 
       <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden [scrollbar-width:thin]">
         <div className="min-w-0">
-          <OrderItemsHeader className={rowGridClass} />
+          <OrderItemsHeader className={rowGridClass} currencySymbol={currencySymbol} />
 
           <div className="divide-y divide-slate-100">
             {items.map((item, index) => (
@@ -117,6 +119,7 @@ const OrderItems = ({ defaultItems = [], onItemsChange }) => {
                 index={index}
                 item={item}
                 className={rowGridClass}
+                currency={currency}
                 handleDeleteRow={handleDeleteRow}
                 handleFieldChange={handleFieldChange}
                 handleProductSelect={handleProductSelect}

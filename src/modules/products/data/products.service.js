@@ -44,3 +44,34 @@ export const saveProduct = async ({ mode, productId, payload }) => {
         body: JSON.stringify(payload),
     });
 }
+
+export const downloadProductImportTemplate = async () => makeRequest(productsModuleSchema.api.importTemplate, {
+    method: "GET",
+    responseType: "blob",
+    timeout: 30000,
+});
+
+export const importProductWorkbook = async ({ file, mode = "preview", onUploadProgress }) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("mode", mode);
+
+    return makeRequest(productsModuleSchema.api.import, {
+        method: "POST",
+        body: formData,
+        timeout: 300000,
+        onUploadProgress,
+    });
+};
+
+export const exportProductsExcel = async ({ filterState }) => makeRequest(productsModuleSchema.api.export, {
+    method: "POST",
+    body: {
+        searchText: filterState.searchText,
+        filters: filterState.filters,
+        order: filterState.order,
+        order_by: filterState.order_by,
+    },
+    responseType: "blob",
+    timeout: 30000,
+});

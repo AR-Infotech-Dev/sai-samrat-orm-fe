@@ -45,21 +45,21 @@ export const ordersModuleSchema = {
       options: [],
     },
   ],
-  defaultColumns: ["order_no", "order_status","customer_id", "brand", "order_date", "sales_person_id", "priority", "total_order_value", "total_order_qty"],
+  defaultColumns: ["order_no", "order_status", "customer_id", "brand", "order_date", "priority", "total_order_value", "total_order_qty"],
   skipFields: [],
   tableCellConfig: [
     { column_name: "name", type: "person" },
     { column_name: "customer_id", type: "person" },
+    { column_name: "total_order_value", type: "currency" },
+    { column_name: "total_value_in_inr", type: "currency" },
     { column_name: "order_status", type: "badge", color_field: "order_status_color" },
     { column_name: "priority", type: "badge", color_field: "priority_color" },
     { column_name: "status", type: "badge", color_field: "status_color" },
   ],
   columnMappings: [
     { customer_id: "Customer Name" },
-    { sales_person_id: "Salesman Name" },
     { total_order_qty: "Order Qty " },
     { total_order_value: "Order Value " },
-    { sales_person_id: "Sales Person" },
   ],
   savedFilters: [],
   form: {
@@ -72,7 +72,6 @@ export const ordersModuleSchema = {
       order_date: "",
       order_month: "",
       order_week: "",
-      sales_person_id: null,
       expected_delivery_date: "",
 
       order_status: "draft",
@@ -145,18 +144,43 @@ export const ordersModuleSchema = {
           { name: "expected_delivery_date", label: "Expected delivery Date", type: "date", required: true, placeholder: "Expected delivery date", gridSpan: 12 },
         ]
       },
-      // {
-      //   columns: 3,
-      //   fields: [
-      //     { name: "order_week", label: "Order Week", type: "date", required: true, placeholder: "Order week", gridSpan: 12 },
-      //   ],
-      // },
-      // {
-      //   columns: 3,
-      //   fields: [
-      //     { name: "order_month", label: "Order Week", type: "date", required: true, placeholder: "Order month", gridSpan: 12 },
-      //   ],
-      // },
+      {
+        columns: 3,
+        fields: [
+          { name: "brand", label: "Brand", type: "text", required: true, placeholder: "Brand", gridSpan: 12 },
+        ],
+      },
+      {
+        columns: 3,
+        fields: [
+          { name: "order_code", label: "Order Code", type: "text", required: true, placeholder: "Order Code", gridSpan: 12 },
+        ],
+      },
+      {
+        columns: 3,
+        fields: [
+          {
+            name: "currency",
+            label: "Currency",
+            type: "smartSelect",
+            id: "currency",
+            gridSpan: 12,
+            config: {
+              apiUrl: "/system/searchSlugList",
+              tableName: "categories",
+              selectFields: "category_id,categoryName,slug",
+              searchField: "categoryName",
+              labelKey: "currency",
+              slug: 'currencies',
+              isCompanyWise: true,
+              status: 'active',
+              valueKey: "slug",
+              placeholder: "Select Currencies",
+              multi: false,
+            },
+          },
+        ],
+      },
       {
         columns: 3,
         fields: [
@@ -182,55 +206,31 @@ export const ordersModuleSchema = {
           },
         ],
       },
-      {
-        columns: 3,
-        fields: [
-          {
-            name: "order_status",
-            label: "Order Status",
-            type: "smartSelect",
-            id: "order_status",
-            gridSpan: 12,
-            config: {
-              apiUrl: "/system/searchSlugList",
-              tableName: "categories",
-              selectFields: "category_id,categoryName,slug",
-              searchField: "categoryName",
-              labelKey: "categoryName",
-              slug: 'order-status',
-              isCompanyWise: true,
-              status: 'active',
-              valueKey: "slug",
-              placeholder: "Select order status",
-              multi: false,
-            },
-          },
-        ],
-      },
-      {
-        columns: 1,
-        fields: [
-          {
-            name: "sales_person_id",
-            label: "Sales Person",
-            type: "smartSelectInput",
-            required: true,
-            id: "sales_person_id",
-            gridSpan: 12,
-            config: {
-              apiUrl: "/system/searchAssignee",
-              type: "sales_person_id",
-              source: "admin",
-              list: "adminID,name,status",
-              check: "name",
-              getValue: (item) => item.adminID,
-              getLabel: (item) => item.name || "Unnamed Sales Person",
-              placeholder: "Select SalesPerson",
-              multi: false
-            }
-          },
-        ]
-      },
+      // {
+      //   columns: 3,
+      //   fields: [
+      //     {
+      //       name: "order_status",
+      //       label: "Order Status",
+      //       type: "smartSelect",
+      //       id: "order_status",
+      //       gridSpan: 12,
+      //       config: {
+      //         apiUrl: "/system/searchSlugList",
+      //         tableName: "categories",
+      //         selectFields: "category_id,categoryName,slug",
+      //         searchField: "categoryName",
+      //         labelKey: "categoryName",
+      //         slug: 'order-status',
+      //         isCompanyWise: true,
+      //         status: 'active',
+      //         valueKey: "slug",
+      //         placeholder: "Select order status",
+      //         multi: false,
+      //       },
+      //     },
+      //   ],
+      // },
       {
         columns: 1,
         fields: [
@@ -248,9 +248,6 @@ export const ordersModuleSchema = {
       .refine((val) => val && val <= new Date(), {
         message: "Order date cannot be in the future",
       }),
-    sales_person_id: z.any().refine((value) => value !== "" && value !== null && value !== undefined, {
-      message: "Role is required",
-    }),
   })
 };
 
@@ -261,4 +258,3 @@ export const ordersFallbackColumns = [
     tableCellConfig: ordersModuleSchema.tableCellConfig,
   }),
 ];
-

@@ -25,8 +25,10 @@
   flex-direction: column;
   position: relative;
   width: min(100%, 835px);
-  height: calc(105.7vh - var(--topbar-height));
-  max-height: calc(105.7vh - var(--topbar-height));
+  /* height: calc(105.7vh - var(--topbar-height));
+  max-height: calc(105.7vh - var(--topbar-height)); */
+  height: calc(106.9vh - var(--topbar-height));
+  max-height: calc(106.9vh - var(--topbar-height));
   background: #ffffff;
   box-shadow: -14px 0 36px var(--shadow-strong);
   overflow: hidden;
@@ -399,7 +401,7 @@
     padding: 6px 8px;
   }
 
-  .flyout-footer > * {
+  .flyout-footer>* {
     flex: 1 1 120px;
   }
 
@@ -417,7 +419,7 @@
     overflow: visible;
   }
 
-  .ticket-drawer-layout > .ticket-scroll-pane {
+  .ticket-drawer-layout>.ticket-scroll-pane {
     flex: 0 0 auto;
     overflow: visible;
     border-right: 0;
@@ -426,7 +428,7 @@
     padding-left: 8px;
   }
 
-  .ticket-drawer-layout > div:last-child {
+  .ticket-drawer-layout>div:last-child {
     flex: 0 0 auto;
     min-height: min(360px, 48dvh);
   }

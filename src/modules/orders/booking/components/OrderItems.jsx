@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Plus } from "lucide-react";
 import OrderItemsHeader from "./order-items/OrderItemsHeader";
 import OrderItemRow from "./order-items/OrderItemRow";
+import { convertInrToCurrency, getCurrencySymbol } from "../utils/booking.utils";
 
 const createBlankRow = () => ({
   id: Date.now(),
@@ -12,6 +13,8 @@ const createBlankRow = () => ({
   weight: null,
   qty: 0,
   unitRate: 0,
+  unitRateInInr: 0,
+  standard_rate: 0,
   gst: 0,
   readyStock: 0,
   pendingStock: 0,
@@ -21,9 +24,11 @@ const normalizeRows = (rows = []) => (Array.isArray(rows) && rows.length ? rows 
 
 const rowGridClass = "grid grid-cols-[28px_minmax(160px,1.8fr)_minmax(96px,1fr)_58px_64px_82px_58px_96px_34px]";
 
-const OrderItems = ({ defaultItems = [], onItemsChange }) => {
+const OrderItems = ({ currency = "INR", exchangeRate = 1, defaultItems = [], onItemsChange }) => {
   const [items, setItems] = useState(() => normalizeRows());
   const defaultItemsSignatureRef = useRef("");
+  const currencySignatureRef = useRef("");
+  const currencySymbol = getCurrencySymbol(currency);
 
   const updateItems = (updatedItems) => {
     setItems(updatedItems);
@@ -32,10 +37,20 @@ const OrderItems = ({ defaultItems = [], onItemsChange }) => {
 
   const handleFieldChange = (rowId, field, value) => {
     const numericFields = ["weight", "qty", "unitRate", "gst"];
+    const numericValue = value === "" ? "" : Number(value);
     updateItems(
       items.map((item) =>
         item.id === rowId
-          ? { ...item, [field]: numericFields.includes(field) ? (value === "" ? "" : Number(value)) : value }
+          ? {
+            ...item,
+            [field]: numericFields.includes(field) ? numericValue : value,
+            ...(field === "unitRate" && numericValue !== ""
+              ? {
+                unitRateInInr: Number(exchangeRate) > 0 ? Math.round((numericValue / Number(exchangeRate)) * 100) / 100 : numericValue,
+                standard_rate: Number(exchangeRate) > 0 ? Math.round((numericValue / Number(exchangeRate)) * 100) / 100 : numericValue,
+              }
+              : {}),
+          }
           : item
       )
     );
@@ -52,7 +67,9 @@ const OrderItems = ({ defaultItems = [], onItemsChange }) => {
             productCode: product.productCode,
             model: product.model,
             weight: product.weight,
-            unitRate: product.unitRate,
+            unitRate: convertInrToCurrency(product.unitRate, exchangeRate),
+            unitRateInInr: product.unitRate,
+            standard_rate: product.unitRate,
             gst: product.gst,
             readyStock: product.readyStock,
             pendingStock: product.pendingStock,
@@ -77,6 +94,26 @@ const OrderItems = ({ defaultItems = [], onItemsChange }) => {
     const nextItems = normalizeRows(defaultItems);
     updateItems(nextItems);
   }, [defaultItems]);
+
+  useEffect(() => {
+    const rate = Number(exchangeRate) || 1;
+    const currencySignature = `${currency}:${rate}`;
+    if (currencySignatureRef.current === currencySignature) return;
+    currencySignatureRef.current = currencySignature;
+
+    setItems((currentItems) => {
+      const nextItems = currentItems.map((item) => {
+        const baseInrRate = Number(item.unitRateInInr || item.standard_rate || 0);
+        if (!baseInrRate) return item;
+        return {
+          ...item,
+          unitRate: convertInrToCurrency(baseInrRate, rate),
+        };
+      });
+      onItemsChange?.(nextItems);
+      return nextItems;
+    });
+  }, [currency, exchangeRate]);
 
   useEffect(() => {
     if (!items.length) {
@@ -107,8 +144,8 @@ const OrderItems = ({ defaultItems = [], onItemsChange }) => {
       </div>
 
       <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden [scrollbar-width:thin]">
-        <div className="min-w-0">
-          <OrderItemsHeader className={rowGridClass} />
+        <div className="min-w-0 border border-gray-200">
+          <OrderItemsHeader className={rowGridClass} currencySymbol={currencySymbol} />
 
           <div className="divide-y divide-slate-100">
             {items.map((item, index) => (
@@ -117,6 +154,7 @@ const OrderItems = ({ defaultItems = [], onItemsChange }) => {
                 index={index}
                 item={item}
                 className={rowGridClass}
+                currency={currency}
                 handleDeleteRow={handleDeleteRow}
                 handleFieldChange={handleFieldChange}
                 handleProductSelect={handleProductSelect}

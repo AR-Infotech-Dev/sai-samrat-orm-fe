@@ -14,6 +14,10 @@ export const getConfirmationOrderDetails = async (orderId) => {
   return makeRequest(`${BASE_URL}/${orderId}`, { method: "GET" });
 };
 
+export const getProformaInvoicePreview = async (orderId) => {
+  return makeRequest(`${BASE_URL}/${orderId}/proforma-invoice/preview`, { method: "GET" });
+};
+
 export const confirmOrder = async ({ orderId, remarks = "" }) => {
   return makeRequest(`${BASE_URL}/${orderId}/confirm`, {
     method: "POST",

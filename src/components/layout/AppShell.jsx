@@ -1,10 +1,10 @@
 import LinearProgress from "../ui/LinearProgress";
 
-function AppShell({ topbar, sidebar, toolbar, children, overlay }) {
+function AppShell({ topbar, sidebar, toolbar, children, overlay, isSidebarCollapsed = false }) {
   return (
     <div className="app-shell">
       <LinearProgress />
-      <div className="app-frame">
+      <div className={`app-frame ${isSidebarCollapsed ? "sidebar-collapsed" : ""}`}>
         {sidebar}
         <div className="main-frame">
           {topbar}

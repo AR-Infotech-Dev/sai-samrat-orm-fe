@@ -14,7 +14,13 @@ const toNumber = (value, fallback = 0) => {
 };
 
 const formatNumber = (value) => new Intl.NumberFormat("en-IN", { maximumFractionDigits: 2 }).format(toNumber(value));
-const formatCurrency = (value) => new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 2 }).format(toNumber(value));
+const getCurrencySymbol = (currency = "INR") => {
+  const normalized = String(currency || "INR").toUpperCase();
+  const currencyMap = { INR: "₹", USD: "$", EUR: "€", GBP: "£", JPY: "¥", "₹": "₹", "$": "$", "€": "€", "£": "£", "¥": "¥" };
+  return currencyMap[normalized] || currencyMap[currency] || currency || "₹";
+};
+
+const formatCurrency = (value, currency = "INR") => `${getCurrencySymbol(currency)} ${new Intl.NumberFormat("en-IN", { maximumFractionDigits: 2 }).format(toNumber(value))}`;
 const dateValue = (value) => (value ? String(value).slice(0, 10) : "");
 
 const getStatusClass = (status) => {
@@ -93,6 +99,8 @@ function ReadyStockForm({ isOpen, onClose, selectedOrder, onCreateDispatch }) {
   const [order, setOrder] = useState(null);
   const [items, setItems] = useState([]);
   const [fetching, setFetching] = useState(false);
+
+  const currency = order?.currency || selectedOrder?.currency || "INR";
 
   const totals = useMemo(() => items.reduce((acc, item) => {
     acc.totalItems += 1;
@@ -217,7 +225,7 @@ function ReadyStockForm({ isOpen, onClose, selectedOrder, onCreateDispatch }) {
               </div>
 
               <div className="mt-2 shrink-0 rounded-sm bg-orange-50/60 px-3 py-2 text-xs text-orange-700">
-                <b>Rule:</b> Total Ready = Planning Stock + QC Pass + Procured. Available = Total Ready - Dispatched. Order Value: <b>{formatCurrency(order?.total_value_in_inr)}</b>
+                <b>Rule:</b> Total Ready = Planning Stock + QC Pass + Procured. Available = Total Ready - Dispatched. Order Value: <b>{formatCurrency(order?.total_value_in_inr, currency)}</b>
               </div>
             </section>
           </>
