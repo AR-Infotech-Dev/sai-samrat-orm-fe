@@ -62,7 +62,7 @@ function OrderForm({ isOpen, onClose, selectedOrder, onAfterSave, menu_id }) {
                 type="button"
                 variant="flyoutPrimary"
                 disabled={loading}
-                onClick={() => handleSave({ ...saveContext, statusOverride: selectedOrder ? undefined : "waiting" })}
+                onClick={() => handleSave({ ...saveContext, statusOverride: "waiting" })}
               >
                 {loading ? <Spinner size="sm" /> : selectedOrder ? "Update Order" : "Book Order"}
               </ActionButton>
