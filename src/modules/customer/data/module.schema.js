@@ -14,7 +14,8 @@ const customerContactSchema = z.object({
   customer_id: z.union([z.literal(null), z.coerce.number(), z.string()]).optional(),
   name: z.string().trim().min(1, "Contact name is required"),
   designation: z.string().optional(),
-  mobile_no: z.string().trim().min(1, "Mobile number is required").regex(/^[0-9]\d{9}$/, "Enter valid 10-digit mobile number"),
+  mobile_no: z.string().trim().min(1, "Mobile number is required").refine((value) => { const cleaned = value.replace(/[\s\-().]/g, ""); return /^\+[1-9]\d{7,14}$/.test(cleaned); }, "Enter a valid mobile number with country code"),
+  // mobile_no: z.string().trim().min(1, "Mobile number is required").regex(/^[0-9]\d{9}$/, "Enter valid 10-digit mobile number"),
   email: z.preprocess((value) => value ?? "", z.string().trim().min(1, "Email is required").email("Invalid email address")),
   department: z.string().optional(),
   is_primary: z.enum(["y", "n"]).optional(),
@@ -148,7 +149,8 @@ export const customerModuleSchema = {
             label: "Is AMC",
             type: "radio",
             gridSpan: 3,
-            alwaysVisible: true,
+            alwaysVisible: false,
+            visibleWhen: (values) => false,
             alwaysEditable: true,
             options: [
               { value: "yes", label: "Yes" },
@@ -244,18 +246,13 @@ export const customerModuleSchema = {
     ]).optional(),
     customer_contacts: z
       .array(customerContactSchema)
-      .min(1, "At least one contact person is required")
       .refine(
         (contacts) => contacts.filter((contact) => contact.is_primary === "y").length <= 1,
         "Only one primary contact is allowed"
       )
-      .refine(
-        (contacts) => contacts.some((contact) => contact.is_primary === "y"),
-        "One primary contact is required"
-      ),
   }).superRefine((data, ctx) => {
+    
     if (data.is_amc !== "yes") return;
-    console.log('data : ', data);
 
     if (!data.responsible_person) {
       ctx.addIssue({

@@ -57,7 +57,6 @@ export const ordersModuleSchema = {
     { production_ready_qty: "Ready Qty" },
     { production_pending_qty: "Pending Qty" },
     { production_status: "Production Status" },
-    { sales_person_id: "Sales Person" },
   ],
   savedFilters: [],
 };

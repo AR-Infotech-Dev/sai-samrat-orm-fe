@@ -1,0 +1,30 @@
+.pi-preview-flyout {
+  width: min(1380px, calc(100vw - 96px)) !important;
+}
+
+.pi-preview-shell {
+  min-height: calc(100vh - 132px);
+  background: #6b7280;
+}
+
+.pi-preview-loader {
+  display: grid;
+  min-height: 320px;
+  place-items: center;
+  color: #64748b;
+}
+
+.pi-preview-frame {
+  display: block;
+  width: 100%;
+  height: calc(100vh - 118px);
+  border: 0;
+  background: #6b7280;
+  scrollbar-width: none;
+}
+
+@media (max-width: 1000px) {
+  .pi-preview-flyout {
+    width: calc(100vw - 40px) !important;
+  }
+}

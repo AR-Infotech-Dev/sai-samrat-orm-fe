@@ -110,13 +110,31 @@ export const productCatalog = [
 export const productOptions = productCatalog.map((item) => item.product);
 export const modelOptions = [...new Set(productCatalog.map((item) => item.model))];
 export const gstOptions = [0, 5, 12, 18, 28];
-export const formatCurrency = (amount) => new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", minimumFractionDigits: 2, maximumFractionDigits: 2, }).format(amount);
+export const formatCurrency = (amount, currency = "INR") => `${getCurrencySymbol(currency)} ${new Intl.NumberFormat("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2, }).format(Number(amount) || 0)}`;
 export const formatNumber = (value) => new Intl.NumberFormat("en-IN").format(value);
 
 export const formatIndianCurrency = (value) => new Intl.NumberFormat("en-IN", {
   minimumFractionDigits: 2,
   maximumFractionDigits: 2,
 }).format(Number(value) || 0);
+
+export const getCurrencySymbol = (currency = "INR") => {
+  const normalized = String(currency || "INR").trim().toUpperCase();
+  const currencyMap = {
+    INR: "₹",
+    "₹": "₹",
+    USD: "$",
+    "$": "$",
+    EUR: "€",
+    "€": "€",
+    GBP: "£",
+    "£": "£",
+    JPY: "¥",
+    "¥": "¥",
+  };
+
+  return currencyMap[normalized] || currencyMap[currency] || currency || "₹";
+};
 
 export const getLineValue = (row) => {
   const qty = Number(row.qty) || 0;

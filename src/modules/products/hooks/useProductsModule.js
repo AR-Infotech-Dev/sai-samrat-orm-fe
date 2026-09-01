@@ -11,6 +11,8 @@ import {
     selectProductsRows,
 } from "../data/products.slice";
 import * as productsActions from "../data/products.slice";
+import { exportProductsExcel } from "../data/products.service";
+import { downloadBlobResponse } from "@/utils/download.utils";
 
 export const useProductsModule = ({ filterState }) => {
     const dispatch = useAppDispatch();
@@ -85,6 +87,14 @@ export const useProductsModule = ({ filterState }) => {
         }
     };
 
+    const handleExportsExcel = async () => {
+        const res = await exportProductsExcel({ filterState });
+
+        if (!res?.success || !downloadBlobResponse(res, "Product-Export.xlsx")) {
+            toast.error(res?.message || "Unable to export product report.");
+        }
+    };
+
     return {
         pagination,
         page,
@@ -97,5 +107,6 @@ export const useProductsModule = ({ filterState }) => {
         handleToggleAllRows,
         handleDeleteSelected,
         handleDeleteRow,
+        handleExportsExcel,
     }
 }

@@ -22,6 +22,20 @@ import { CheckCircle2, Clock3, PauseCircle, RotateCcw } from "lucide-react";
 import { KpiCard } from "./components/ConfirmationUI";
 import { formatCurrency } from "@/utils/common";
 
+const normalizeCurrencyCode = (currency = "INR") => {
+  const normalized = String(currency || "INR").trim().toUpperCase();
+  const currencyMap = { "₹": "INR", INR: "INR", "$": "USD", USD: "USD", "€": "EUR", EUR: "EUR", "£": "GBP", GBP: "GBP", "¥": "JPY", JPY: "JPY" };
+  return currencyMap[normalized] || currencyMap[currency] || normalized || "INR";
+};
+
+const getOrderDisplayValue = (row = {}) => Number(row.total_value_in_inr ?? row.total_order_value ?? 0) || 0;
+const getOrderBaseInrValue = (row = {}) => {
+  const currency = normalizeCurrencyCode(row.currency || "INR");
+  const value = getOrderDisplayValue(row);
+  const exchangeRate = Number(row.exchange_rate || 1) || 1;
+  return currency === "INR" ? value : value / exchangeRate;
+};
+
 function OrdersConfirmationPage({ menu_id }) {
   const location = useLocation();
   const resolvedMenuID = menu_id || ordersModuleSchema.menu_id || null;
@@ -82,12 +96,19 @@ function OrdersConfirmationPage({ menu_id }) {
         acc.hold += ["hold", "Hold"].includes(row.order_status) ? 1 : 0;
         acc.high += ["high","High", "urgent"].includes(row.priority) ? 1 : 0;
         acc.qty += Number(row.total_order_qty || 0);
-        acc.value += Number(row.total_value_in_inr || 0);
+        acc.value += getOrderDisplayValue(row);
+        acc.baseInrValue += getOrderBaseInrValue(row);
+        acc.currencies.add(normalizeCurrencyCode(row.currency || "INR"));
         return acc;
       },
-      { waiting: 0, hold: 0, high: 0, qty: 0, value: 0 }
+      { waiting: 0, hold: 0, high: 0, qty: 0, value: 0, baseInrValue: 0, currencies: new Set() }
     );
   }, [orderList]);
+
+  const pendingValueLabel = totals.currencies.size === 1
+    ? formatCurrency(totals.value, [...totals.currencies][0] || "INR")
+    : formatCurrency(totals.baseInrValue, "INR");
+  const pendingValueHint = totals.currencies.size > 1 ? "mixed currency base INR" : "visible queue";
 
   useEffect(() => {
     getOrderList();
@@ -170,7 +191,7 @@ function OrdersConfirmationPage({ menu_id }) {
           <KpiCard icon={PauseCircle} label="Hold Orders" value={totals.hold} hint="needs reason" tone="amber" />
           <KpiCard icon={RotateCcw} label="High Priority" value={totals.high} hint="quick review" tone="red" />
           <KpiCard icon={CheckCircle2} label="Total Qty" value={totals.qty.toLocaleString("en-IN")} hint="visible queue" tone="green" />
-          <KpiCard icon={CheckCircle2} label="Pending Value" value={formatCurrency(totals.value)} hint="visible queue" tone="blue" />
+          <KpiCard icon={CheckCircle2} label="Pending Value" value={pendingValueLabel} hint={pendingValueHint} tone="blue" />
         </div>
       </ModulePageLayout>
 

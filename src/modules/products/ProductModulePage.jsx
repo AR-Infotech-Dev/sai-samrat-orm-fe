@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Download, Upload } from "lucide-react";
 
 import { useAppSelector, useModuleFilters } from "../../store/hooks";
 import { getNextSortConfig } from "../../utils/sorting";
@@ -10,18 +11,24 @@ import ModulePagination from "../shared/ModulePagination";
 import DynamicFilter from "../../components/dynamic-filter";
 import ResizableTable from "../../components/table/ResizableTable";
 import useMenuPermissions from "@auth/utils/useMenuPermissions";
+import ActionButton from "../../components/ui/ActionButton";
+import { useAuth } from "@auth/components/AuthProvider";
 import { selectProductsRows } from "./data/products.slice";
 
 import ProductForm from "./components/ProductForm";
+import ProductImportFlyout from "./components/ProductImportFlyout";
 import ProductTableRow from "./components/ProductTableRow";
 import { productsModuleSchema } from "./data/module.schema";
 import { useProductsModule } from "./hooks/useProductsModule";
 import { useProductsTableConfig } from "./hooks/useProductsTableConfig";
 
 function ProductModulePage({ menu_id }) {
+  const { authSession } = useAuth();
+  const role_slug = authSession?.user?.role_slug;
   const resolvedMenuID = menu_id || productsModuleSchema.menu_id || null;
   const permissions = useMenuPermissions(resolvedMenuID);
   const [isFlyoutOpen, setIsFlyoutOpen] = useState(false);
+  const [isImportFlyoutOpen, setIsImportFlyoutOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
 
 
@@ -42,6 +49,7 @@ function ProductModulePage({ menu_id }) {
     handleToggleAllRows,
     handleDeleteSelected,
     handleDeleteRow,
+    handleExportsExcel,
   } = useProductsModule({ filterState });
   const {
     sortConfig,
@@ -93,7 +101,20 @@ function ProductModulePage({ menu_id }) {
                 onClearFilters={clearFilters}
               />
             }
-          />
+          >
+            {(role_slug == "admin" || role_slug == "super_admin") && permissions.canAdd && (
+              <ActionButton onClick={() => setIsImportFlyoutOpen(true)}>
+                <Download size={15} />
+                Import Data
+              </ActionButton>
+            )}
+            {(role_slug == "admin" || role_slug == "super_admin") && (
+              <ActionButton onClick={handleExportsExcel}>
+                <Upload size={15} />
+                Export Excel
+              </ActionButton>
+            )}
+          </ModuleControls>
         }
         table={
           <ResizableTable
@@ -145,6 +166,11 @@ function ProductModulePage({ menu_id }) {
         selectedProduct={selectedProduct}
         onAfterSave={getProductList}
         menu_id={resolvedMenuID}
+      />
+      <ProductImportFlyout
+        isOpen={isImportFlyoutOpen}
+        onClose={() => setIsImportFlyoutOpen(false)}
+        onImported={getProductList}
       />
     </>
   );

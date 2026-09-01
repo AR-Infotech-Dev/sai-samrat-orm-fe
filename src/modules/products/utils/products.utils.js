@@ -20,7 +20,10 @@ export function normalizeProductSavePayload(formData = {}) {
     unit: formData.unit || null,
     standard_rate: formData.standard_rate || null,
     gst_rate: formData.gst_rate || null,
-    weight: formData.gst_rate || null,
+    weight: formData.weight || null,
+    ready_stock: formData.ready_stock || null,
+    product_description: formData.product_description || null,
+    fg_code: formData.fg_code || null,
     status: formData.status || null,
   };
 

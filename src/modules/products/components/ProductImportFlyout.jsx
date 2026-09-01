@@ -5,11 +5,11 @@ import ActionButton from "../../../components/ui/ActionButton";
 import FlyoutPanel from "../../../components/ui/FlyoutPanel";
 import Spinner from "../../../components/ui/Spinner";
 import { downloadBlobResponse } from "../../../utils/download.utils";
-import { downloadCustomerImportTemplate, importCustomerWorkbook } from "../data/customers.service";
+import { downloadProductImportTemplate, importProductWorkbook } from "../data/products.service";
 
-const workbookSheets = ["Customers"];
+const workbookSheets = ["Products"];
 
-function CustomerImportFlyout({ isOpen, onClose, onImported }) {
+function ProductImportFlyout({ isOpen, onClose, onImported }) {
   const fileInputRef = useRef(null);
   const [file, setFile] = useState(null);
   const [importing, setImporting] = useState(false);
@@ -21,60 +21,62 @@ function CustomerImportFlyout({ isOpen, onClose, onImported }) {
 
   const fileName = useMemo(() => file?.name || "No file selected", [file]);
 
-  const handleClose = () => {
-    if (importing) return;
+  const resetState = () => {
     setFile(null);
     setUploadProgress(0);
     setImportStage("");
     setResult(null);
     setPreviewReady(false);
+  };
+
+  const handleClose = () => {
+    if (importing) return;
+    resetState();
     onClose?.();
   };
 
   const handleTemplateDownload = async () => {
     setTemplateDownloading(true);
-    const response = await downloadCustomerImportTemplate();
+    const response = await downloadProductImportTemplate();
     setTemplateDownloading(false);
-    if (!response?.success || !downloadBlobResponse(response, "customer-import-template.xlsx")) {
-      toast.error(response?.message || "Unable to download import template.");
+    if (!response?.success || !downloadBlobResponse(response, "product-import-template.xlsx")) {
+      toast.error(response?.message || "Unable to download product import template.");
     }
   };
 
   const handleImport = async (mode = "preview") => {
     if (!file) {
-      toast.error("Please select customer Excel file.");
+      toast.error("Please select product Excel file.");
       return;
     }
 
     setImporting(true);
     setUploadProgress(0);
     setImportStage("Uploading file...");
-    const res = await importCustomerWorkbook({
+    const res = await importProductWorkbook({
       file,
       mode,
       onUploadProgress: (progressEvent) => {
         if (!progressEvent.total) return;
         const nextProgress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
         setUploadProgress(Math.min(nextProgress, 100));
-        if (nextProgress >= 100) {
-          setImportStage("Processing file...");
-        }
+        if (nextProgress >= 100) setImportStage("Processing file...");
       },
     });
     setImporting(false);
 
     if (!res.success) {
       setImportStage("");
-      toast.error(res.message || "Unable to import customers.");
+      toast.error(res.message || "Unable to import products.");
       return;
     }
 
-    setUploadProgress(100);
     const isPreview = mode === "preview";
+    setUploadProgress(100);
     setImportStage(isPreview ? "Preview ready" : "Import complete");
     setResult(res);
     setPreviewReady(isPreview);
-    toast.success(res.message || (isPreview ? "Import preview generated." : "Customers imported successfully."));
+    toast.success(res.message || (isPreview ? "Product import preview generated." : "Products imported successfully."));
     if (!isPreview) onImported?.();
   };
 
@@ -82,8 +84,8 @@ function CustomerImportFlyout({ isOpen, onClose, onImported }) {
     <FlyoutPanel
       isOpen={isOpen}
       onClose={handleClose}
-      title="Import Customer Data"
-      subtitle="Download the single-sheet Excel template, fill customer and contact person details, then upload it here."
+      title="Import Product Data"
+      subtitle="Download the Excel template, fill product data, then upload it here."
       closeButton={
         <button className="flyout-close" onClick={handleClose} aria-label="Close import panel">
           <X size={18} />
@@ -107,8 +109,8 @@ function CustomerImportFlyout({ isOpen, onClose, onImported }) {
             <FileSpreadsheet size={20} />
           </span>
           <div>
-            <h3>Customer Excel Template</h3>
-            <p>Use one Customers sheet. Add multiple contact numbers with comma separation.</p>
+            <h3>Product Excel Template</h3>
+            <p>Use this exact format for importing products into database.</p>
           </div>
           <ActionButton disabled={templateDownloading} variant="ghostPrimary" onClick={handleTemplateDownload}>
             {templateDownloading ? <Spinner /> : <Download size={15} />}
@@ -127,7 +129,7 @@ function CustomerImportFlyout({ isOpen, onClose, onImported }) {
           <button type="button" className="customer-import-dropzone" onClick={() => fileInputRef.current?.click()}>
             <Upload size={22} />
             <strong>{fileName}</strong>
-            <span>Click to choose the customer import file</span>
+            <span>Click to choose the product import file</span>
           </button>
 
           <input
@@ -202,4 +204,4 @@ function CustomerImportFlyout({ isOpen, onClose, onImported }) {
   );
 }
 
-export default CustomerImportFlyout;
+export default ProductImportFlyout;

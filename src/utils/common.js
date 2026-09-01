@@ -70,11 +70,26 @@ export const formatRelativeTime = (dateString) => {
   return `${years}yr${years > 1 ? "s" : ""} ago`;
 };
 export const formatNumber = (value) => new Intl.NumberFormat("en-IN").format(Number(value) || 0);
-export const formatCurrency = (value) => new Intl.NumberFormat("en-IN", {
-  style: "currency",
-  currency: "INR",
+export const getCurrencySymbol = (currency = "INR") => {
+  const normalized = String(currency || "INR").trim().toUpperCase();
+  const currencyMap = {
+    INR: "₹",
+    "₹": "₹",
+    USD: "$",
+    "$": "$",
+    EUR: "€",
+    "€": "€",
+    GBP: "£",
+    "£": "£",
+    JPY: "¥",
+    "¥": "¥",
+  };
+
+  return currencyMap[normalized] || currencyMap[currency] || currency || "₹";
+};
+export const formatCurrency = (value, currency = "INR") => `${getCurrencySymbol(currency)} ${new Intl.NumberFormat("en-IN", {
   minimumFractionDigits: 2,
   maximumFractionDigits: 2,
-}).format(Number(value) || 0);
+}).format(Number(value) || 0)}`;
 
 

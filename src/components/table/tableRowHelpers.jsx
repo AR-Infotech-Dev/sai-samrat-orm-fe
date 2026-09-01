@@ -2,6 +2,7 @@
 import { Edit3, Star, Trash2 } from "lucide-react";
 import moment from "moment";
 import { isAmcActive } from "@utils/amc";
+import { formatCurrency } from "@utils/common";
 
 export const DEFAULT_COLUMN_WIDTH = 800;
 
@@ -324,7 +325,7 @@ function renderValueCell(column, row, index, selectionProps) {
     case "date":
       return value ? changeTimeFormat(value) : "-";
     case "currency":
-      return value ? `Rs ${Number(value).toLocaleString("en-IN")}` : "Rs 0";
+      return formatCurrency(value, row?.currency || "INR");
     case "customerProducts":
     case "json":
       return renderCustomerProductsCell(value);

@@ -15,6 +15,9 @@ export const productsModuleSchema = {
     delete: "/products/delete",
     create: "/products/create",
     edit: "/products",
+    importTemplate: "/products/import-template",
+    import: "/products/import",
+    export: "/products/export",
     definitions: "/system/getDefinations",
     definitionsFallback: "/system/getstructure",
   },
@@ -46,12 +49,15 @@ export const productsModuleSchema = {
       gst_rate: null,
       is_tally_synced: null,
       company_id: null,
+      weight: null,
+      fg_code: null,
+      product_desscription: null,
+      ready_stock: null,
       last_tally_sync_at: null,
       created_by: null,
       modified_by: null,
       created_date: null,
       modified_date: null,
-      weight: null,
       status: 'active',
     },
     sections: [
@@ -108,6 +114,19 @@ export const productsModuleSchema = {
               { value: "delete", label: "Delete" },
             ], gridSpan: 6
           },
+        ],
+      },
+      {
+        columns: 3,
+        fields: [
+          { name: "ready_stock", label: "Ready Stock", type: "number", placeholder: "Enter ready stock", gridSpan: 4 },
+          { name: "fg_code", label: "FG Code", type: "text", placeholder: "Enter fg code", gridSpan: 4 },
+        ],
+      },
+      {
+        columns: 1,
+        fields: [
+          { name: "product_description", label: "Description", type: "textarea", rows: 3, placeholder: "Enter product description", gridSpan: 12 },
         ],
       },
     ],

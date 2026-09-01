@@ -212,8 +212,10 @@ export const categoryModuleSchema = {
     ],
   },
   validationSchema: z.object({
-    categoryName: z.preprocess( (value) => value ?? "", z.string().trim().min(1, "Category name is required") ),
-    slug: z.string().trim().min(1, "Slug is required"),
+    categoryName: z.preprocess((value) => value ?? "", z.string().trim().min(1, "Category name is required")),
+    slug: z.string().trim().min(1, "Slug is required").regex(/^[₹$€£¥₽₩฿₺₴₦₱₫₪₭₮₡₲₵₸₼₾]$/u, {
+      message: "Please enter one valid currency symbol",
+    }),
     is_parent: z.enum(["yes", "no"]),
     parent_id: z.any().optional(),
     cat_color: z.string().nullable().optional(),

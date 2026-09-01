@@ -1,6 +1,24 @@
 ﻿import { formatCurrency, formatDate, formatNumber } from '@/utils/common';
 import React from 'react';
 
+const getCurrencySymbol = (currency = "INR") => {
+  const normalized = String(currency || "INR").trim().toUpperCase();
+  const currencyMap = {
+    INR: "₹",
+    "₹": "₹",
+    USD: "$",
+    "$": "$",
+    EUR: "€",
+    "€": "€",
+    GBP: "£",
+    "£": "£",
+    JPY: "¥",
+    "¥": "¥",
+  };
+
+  return currencyMap[normalized] || currencyMap[currency] || currency || "₹";
+};
+
 const DetailCell = ({ label, value, highlight }) => (
   <div className="rounded-xs  bg-slate-50 px-2.5 py-1 gap">
     <p className="text-[8px] font-medium uppercase text-slate-400">{label}</p>
@@ -11,6 +29,9 @@ const DetailCell = ({ label, value, highlight }) => (
 const itemGridClass = "grid w-full grid-cols-[38px_minmax(170px,2fr)_minmax(100px,1fr)_80px_70px_100px_70px_130px] items-center";
 
 function OrderReviewHeader({ order = {}, items = [], remarks = "", actionLoading = false, onRemarksChange, onAction }) {
+  const currency = order?.currency || "INR";
+  const currencySymbol = getCurrencySymbol(currency);
+
   return (
     <div className="px-3">
       <div className="grid grid-cols-1 gap-2 lg:grid-cols-2">
@@ -22,7 +43,6 @@ function OrderReviewHeader({ order = {}, items = [], remarks = "", actionLoading
             <DetailCell label="Priority" value={order?.priority || "normal"} />
             <DetailCell label="Order Date" value={formatDate(order?.order_date)} />
             <DetailCell label="Expected Delivery" value={formatDate(order?.expected_delivery_date)} />
-            <DetailCell label="Sales Person" value={order?.sales_person_name || order?.sales_person_id} />
           </div>
         </section>
 
@@ -40,7 +60,7 @@ function OrderReviewHeader({ order = {}, items = [], remarks = "", actionLoading
       <section className="mt-2 overflow-hidden rounded-sm border border-slate-100 bg-white shadow-xs">
         <div className="flex items-center justify-between border-b border-slate-100 px-3 py-1.5">
           <h3 className="text-sm font-bold text-slate-800">Order Items</h3>
-          <p className="text-xs text-slate-400">All values in INR</p>
+          <p className="text-xs text-slate-400">All values in {currencySymbol}</p>
         </div>
 
         <div className="w-full overflow-hidden text-left text-sm">
@@ -50,9 +70,9 @@ function OrderReviewHeader({ order = {}, items = [], remarks = "", actionLoading
             <div className="px-2 py-2">Series</div>
             <div className="px-2 py-2 text-right">Weight</div>
             <div className="px-2 py-2 text-right">Qty</div>
-            <div className="px-2 py-2 text-right">Rate</div>
+            <div className="px-2 py-2 text-right">Rate ({currencySymbol})</div>
             <div className="px-2 py-2 text-right">GST</div>
-            <div className="px-2 py-2 text-right">Line Value</div>
+            <div className="px-2 py-2 text-right">Line Value ({currencySymbol})</div>
           </div>
 
           <div className="divide-y divide-slate-100">
@@ -63,9 +83,9 @@ function OrderReviewHeader({ order = {}, items = [], remarks = "", actionLoading
                 <div className="truncate px-2 py-1.5 text-slate-500">{item.brand_snapshot || item.brand || "-"}</div>
                 <div className="px-2 py-1.5 text-right text-slate-500">{formatNumber(item.weight)}</div>
                 <div className="px-2 py-1.5 text-right font-semibold text-slate-700">{formatNumber(item.order_qty)}</div>
-                <div className="px-2 py-1.5 text-right text-slate-600">{formatCurrency(item.unit_rate)}</div>
+                <div className="px-2 py-1.5 text-right text-slate-600">{formatCurrency(item.unit_rate, currency)}</div>
                 <div className="px-2 py-1.5 text-right text-slate-600">{Number(item.gst_rate || 0)}%</div>
-                <div className="px-2 py-1.5 text-right font-bold text-slate-800">{formatCurrency(item.line_value)}</div>
+                <div className="px-2 py-1.5 text-right font-bold text-slate-800">{formatCurrency(item.line_value, currency)}</div>
               </div>
             ))}
           </div>
@@ -78,8 +98,8 @@ function OrderReviewHeader({ order = {}, items = [], remarks = "", actionLoading
           <div className="mt-2 space-y-1.5 text-sm">
             <div className="flex justify-between"><span className="text-slate-500">Total Items</span><strong>{formatNumber(items.length)}</strong></div>
             <div className="flex justify-between"><span className="text-slate-500">Total Qty</span><strong>{formatNumber(order?.total_order_qty)}</strong></div>
-            <div className="flex justify-between"><span className="text-slate-500">Subtotal</span><strong>{formatCurrency(order?.total_order_value)}</strong></div>
-            <div className="border-t border-dashed border-slate-200 pt-1.5 flex justify-between"><span className="font-semibold text-slate-700">Grand Total</span><strong className="text-md text-orange-600">{formatCurrency(order?.total_value_in_inr)}</strong></div>
+            <div className="flex justify-between"><span className="text-slate-500">Subtotal</span><strong>{formatCurrency(order?.total_order_value, currency)}</strong></div>
+            <div className="border-t border-dashed border-slate-200 pt-1.5 flex justify-between"><span className="font-semibold text-slate-700">Grand Total</span><strong className="text-md text-orange-600">{formatCurrency(order?.total_value_in_inr, currency)}</strong></div>
           </div>
         </section>
 
@@ -107,4 +127,3 @@ function OrderReviewHeader({ order = {}, items = [], remarks = "", actionLoading
 }
 
 export default OrderReviewHeader;
-
