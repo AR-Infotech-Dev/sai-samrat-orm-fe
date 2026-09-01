@@ -74,6 +74,7 @@ export const ordersModuleSchema = {
     initialValues: {
       order_id: null,
       order_no: "",
+      order_code: "",
       company_id: null,
       customer_id: null,
       brand: "",

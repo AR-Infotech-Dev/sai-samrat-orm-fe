@@ -136,7 +136,6 @@ export const useOrderBookingForm = ({ isOpen, onClose, onAfterSave, selectedOrde
             toast.error("Please add at least one product with quantity");
             return;
         }
-
         try {
             setErrors({});
             setLoading(true);
