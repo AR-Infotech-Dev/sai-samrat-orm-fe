@@ -6,7 +6,7 @@ const FIXED_TABLE_COLUMNS = [
 
 export const ordersModuleSchema = {
   title: "Production",
-  description: "Track planned orders through production, procurement, QC and ready quantity.",
+  description: "Track planned orders through production, procurement and ready quantity.",
   menu_id: 20,
   primaryKey: "order_id",
   api: {
@@ -52,8 +52,6 @@ export const ordersModuleSchema = {
     { pmk_procure_qty: "PMK Procure" },
     { produced_qty: "Produced" },
     { procured_qty: "Procured" },
-    { qc_passed_qty: "QC Passed" },
-    { rework_qty: "Rework" },
     { production_ready_qty: "Ready Qty" },
     { production_pending_qty: "Pending Qty" },
     { production_status: "Production Status" },

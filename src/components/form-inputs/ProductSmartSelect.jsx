@@ -242,7 +242,7 @@ function ProductSmartSelect({ value, onSelect, disabled = false, apiUrl = "/prod
                             <span className="rounded bg-orange-50 text-xs px-1 py-0.5 text-orange-600 ml-2"> ₹ {formatIndianCurrency(product.unitRate || 0)} </span>
                           </p>
                           <span className="mt-0.5 block truncate text-[11px] text-slate-400">
-                            {product.productCode} • {product.model} • {product.weight || 0}Kg
+                            {product.productCode} • {product.product_type} • {product.weight || 0}Kg
                           </span>
                         </span>
                         {isSelected ? <Check size={14} className="mt-0.5 shrink-0 text-orange-500" /> : null}

@@ -61,7 +61,7 @@ function LoginForm() {
       toast.success("Login success");
       navigate("/dashboard");
     } catch (error) {
-      console.log(error);
+      console.error(error);
       toast.error(error.message);
     } finally {
       setLoading(false);

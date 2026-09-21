@@ -42,7 +42,7 @@ const PriceRow = ({ label, value, currency = "INR" }) => {
 };
 
 const OrderSummary = ({
-    orderNo = "Auto Generated",
+    orderCode = "-",
     totalItems = 4,
     totalQty = 1250,
     readyQty = 300,
@@ -61,17 +61,17 @@ const OrderSummary = ({
     onConfirmOrder,
     layout = "vertical",
 }) => {
+    const safeGstPercentage = Number.isFinite(Number(gstPercentage)) ? Number(gstPercentage) : 0;
     if (layout === "horizontal") {
         return (
             <aside className="w-full min-h-0 px-3 py-2">
                 <div className="mb-1.5 flex items-center justify-between gap-3">
                     <h2 className="text-sm font-bold text-[#373B41FF]"> Order Summary </h2>
                 </div>
-
                 <div className="grid items-start gap-6 md:grid-cols-3 md:divide-x md:divide-gray-200">
                     {/* Column 1 */}
                     <div className="md:pr-6">
-                        <SummaryRow icon={CircleDot} label="Order No" value={orderNo} valueClassName="text-blue-500" />
+                        <SummaryRow icon={CircleDot} label="Order Code" value={orderCode} valueClassName="text-blue-500" />
                         <SummaryRow icon={ShoppingCart} label="Total Qty" value={formatNumber(totalQty)} />
                         <SummaryRow icon={Package} label="Total Items" value={formatNumber(totalItems)} />
                     </div>
@@ -86,7 +86,7 @@ const OrderSummary = ({
                     <div className="flex flex-col gap-1 md:pl-6">
                         <div>
                             <PriceRow label="Subtotal" value={subtotal} currency={currency} />
-                            <PriceRow label={`GST (${gstPercentage}%)`} value={gstAmount} currency={currency} />
+                            <PriceRow label={`GST (${safeGstPercentage}%)`} value={gstAmount} currency={currency} />
                         </div>
                         <div className="flex justify-between border-t border-gray-200 py-1">
                             <span className="text-[13px] font-bold text-[#373B41]"> Grand Total </span>
@@ -102,7 +102,7 @@ const OrderSummary = ({
         <aside className="w-full min-h-0  max-w-[390px] px-5 py-3 shadow-black/30 sm:w-full md:w-full sm:px-6">
             <h2 className="mb-2.5 text-md font-bold text-[#373B41FF]"> Order Summary </h2>
             <div>
-                <SummaryRow icon={CircleDot} label="Order No" value={orderNo} valueClassName="text-blue-500" />
+                <SummaryRow icon={CircleDot} label="Order Code" value={orderCode} valueClassName="text-blue-500" />
                 <SummaryRow icon={Package} label="Total Items" value={formatNumber(totalItems)} />
                 <SummaryRow icon={ShoppingCart} label="Total Qty" value={formatNumber(totalQty)} />
                 <SummaryRow icon={Clock3} label="Ready Qty" value={formatNumber(readyQty)} valueClassName="text-emerald-500" />
@@ -112,7 +112,7 @@ const OrderSummary = ({
             <div className="my-3.5 border-t border-gray-200" />
             <div className="">
                 <PriceRow label="Subtotal" value={subtotal} currency={currency} />
-                <PriceRow label={`GST (${gstPercentage}%)`} value={gstAmount} currency={currency} />
+                <PriceRow label={`GST (${safeGstPercentage}%)`} value={gstAmount} currency={currency} />
                 <PriceRow label="Grand Total" value={grandTotal} currency={currency} highlighted />
             </div>
 

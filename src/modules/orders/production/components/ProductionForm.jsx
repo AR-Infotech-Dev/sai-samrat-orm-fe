@@ -6,7 +6,7 @@ import FlyoutPanel from "@components/ui/FlyoutPanel";
 import Spinner from "@components/ui/Spinner";
 import { getProductionOrderDetails, saveOrderProduction, startProductionOrder } from "../data/production.service";
 
-const productionGrid = "grid-cols-[24px_minmax(130px,1fr)_48px_54px_54px_78px_78px_58px_54px_78px_66px_84px]";
+const productionGrid = "grid-cols-[20px_minmax(80px,280px)_70px_70px_70px_70px_70px_80px_70px_84px]";
 
 const priorityOptions = [
   { value: "low", label: "Low" },
@@ -39,11 +39,9 @@ const formatCurrency = (value, currency = "INR") => `${getCurrencySymbol(currenc
 const dateValue = (value) => (value ? String(value).slice(0, 10) : "");
 
 const getTotalProducedQty = (item = {}) => toNumber(item.previous_produced_qty ?? item.produced_qty) + toNumber(item.new_produced_qty);
-const getTotalQcPassedQty = (item = {}) => toNumber(item.previous_qc_passed_qty ?? item.qc_passed_qty) + toNumber(item.new_qc_passed_qty);
-const getTotalReworkQty = (item = {}) => toNumber(item.previous_rework_qty ?? item.rework_qty) + toNumber(item.new_rework_qty);
 const getTotalProcuredQty = (item = {}) => toNumber(item.previous_procured_qty ?? item.procured_qty) + toNumber(item.new_procured_qty);
 
-const calculateReadyQty = (item = {}) => toNumber(item.available_stock_qty) + getTotalQcPassedQty(item) + getTotalProcuredQty(item);
+const calculateReadyQty = (item = {}) => toNumber(item.available_stock_qty) + getTotalProducedQty(item) + getTotalProcuredQty(item);
 const calculatePendingQty = (item = {}) => Math.max(toNumber(item.order_qty) - calculateReadyQty(item), 0);
 const calculateProductionStatus = (item = {}) => {
   if (item.production_status === "hold") return "hold";
@@ -51,7 +49,7 @@ const calculateProductionStatus = (item = {}) => {
   const readyQty = calculateReadyQty(item);
   if (orderQty > 0 && readyQty >= orderQty) return "ready";
   if (readyQty > 0) return "partially_ready";
-  if (getTotalProducedQty(item) > 0 || getTotalProcuredQty(item) > 0 || getTotalQcPassedQty(item) > 0) return "in_progress";
+  if (getTotalProducedQty(item) > 0 || getTotalProcuredQty(item) > 0) return "in_progress";
   return "not_started";
 };
 
@@ -82,22 +80,17 @@ const normalizeItem = (item = {}) => {
     product_code: item.product_code || item.product_code_snapshot || "-",
     series: item.series || item.brand_snapshot || item.brand || "-",
     weight: item.weight ?? "-",
+    fg_code: item.fg_code ?? "-",
     order_qty: toNumber(item.order_qty),
     available_stock_qty: toNumber(item.available_stock_qty),
     saipl_mfg_qty: toNumber(item.saipl_mfg_qty),
     pmk_procure_qty: toNumber(item.pmk_procure_qty),
     previous_produced_qty: toNumber(item.produced_qty),
     previous_procured_qty: toNumber(item.procured_qty),
-    previous_qc_passed_qty: toNumber(item.qc_passed_qty),
-    previous_rework_qty: toNumber(item.rework_qty),
     new_produced_qty: "",
     new_procured_qty: "",
-    new_qc_passed_qty: "",
-    new_rework_qty: "",
     produced_qty: toNumber(item.produced_qty),
     procured_qty: toNumber(item.procured_qty),
-    qc_passed_qty: toNumber(item.qc_passed_qty),
-    rework_qty: toNumber(item.rework_qty),
     ready_qty: toNumber(item.ready_qty),
     pending_qty: toNumber(item.pending_qty),
     expected_ready_date: dateValue(item.expected_ready_date),
@@ -113,7 +106,7 @@ const normalizeItem = (item = {}) => {
 
 const SummaryMetric = ({ index, icon: Icon, label, value, tone = "slate" }) => {
   const toneClass = { orange: "bg-orange-50 text-orange-600", green: "bg-emerald-50 text-emerald-600", red: "bg-red-50 text-red-600", blue: "bg-blue-50 text-blue-600", slate: "bg-slate-50 text-slate-500" }[tone];
-  return <div className={`flex items-center gap-2 rounded-lg ${ index != 1 ? 'border-l' : ''} border-slate-200 bg-white px-3 py-2`}><span className={`grid h-8 w-8 place-items-center rounded-full ${toneClass}`}><Icon size={15} /></span><span className="min-w-0"><span className="block text-[11px] font-medium text-slate-400">{label}</span><span className="block truncate text-sm font-bold text-slate-800">{value}</span></span></div>;
+  return <div className={`flex items-center gap-2 rounded-lg ${index != 1 ? 'border-l' : ''} border-slate-200 bg-white px-3 py-2`}><span className={`grid h-8 w-8 place-items-center rounded-full ${toneClass}`}><Icon size={15} /></span><span className="min-w-0"><span className="block text-[11px] font-medium text-slate-400">{label}</span><span className="block truncate text-sm font-bold text-slate-800">{value}</span></span></div>;
 };
 
 
@@ -221,7 +214,7 @@ function ProductionForm({ isOpen, onClose, selectedOrder, onAfterSave }) {
     });
     setItems((current) => current.map((item, itemIndex) => {
       if (itemIndex !== index) return item;
-      const numericFields = ["new_produced_qty", "new_procured_qty", "new_qc_passed_qty", "new_rework_qty"];
+      const numericFields = ["new_produced_qty", "new_procured_qty"];
       const next = { ...item, [field]: numericFields.includes(field) ? (value === "" ? "" : toNumber(value)) : value };
       if (field === "production_status" && value !== "hold") next.production_status = calculateProductionStatus({ ...next, production_status: "" });
       if (numericFields.includes(field)) next.production_status = calculateProductionStatus(next);
@@ -235,13 +228,10 @@ function ProductionForm({ isOpen, onClose, selectedOrder, onAfterSave }) {
     const errors = {};
     items.forEach((item, index) => {
       const producedQty = getTotalProducedQty(item);
-      const qcPassedQty = getTotalQcPassedQty(item);
-      const reworkQty = getTotalReworkQty(item);
       const procuredQty = getTotalProcuredQty(item);
       const readyQty = calculateReadyQty(item);
 
       if (producedQty > toNumber(item.saipl_mfg_qty)) errors[index] = { message: `${item.product_name}: Total produced qty cannot be greater than SAIPL MFG qty.` };
-      else if (qcPassedQty + reworkQty > producedQty) errors[index] = { message: `${item.product_name}: Total QC Passed + Rework cannot be greater than total produced qty.` };
       else if (procuredQty > toNumber(item.pmk_procure_qty)) errors[index] = { message: `${item.product_name}: Total procured qty cannot be greater than PMK qty.` };
       else if (readyQty > toNumber(item.order_qty)) errors[index] = { message: `${item.product_name}: Ready qty cannot be greater than order qty.` };
     });
@@ -251,14 +241,10 @@ function ProductionForm({ isOpen, onClose, selectedOrder, onAfterSave }) {
 
   const buildProductionPayloadItem = (item) => {
     const producedQty = getTotalProducedQty(item);
-    const qcPassedQty = getTotalQcPassedQty(item);
-    const reworkQty = getTotalReworkQty(item);
     const procuredQty = getTotalProcuredQty(item);
     const nextItem = {
       ...item,
       produced_qty: producedQty,
-      qc_passed_qty: qcPassedQty,
-      rework_qty: reworkQty,
       procured_qty: procuredQty,
     };
 
@@ -323,8 +309,7 @@ function ProductionForm({ isOpen, onClose, selectedOrder, onAfterSave }) {
         </button>
       }
       footer={
-        <div className="flex w-full items-center justify-between gap-2 bg-white px-4 py-2">
-          <span className="text-xs text-slate-400">Old qty readonly आहे. Input मध्ये फक्त आज add करायची qty टाका.</span>
+        <div className="flex w-full items-center justify-end gap-2 bg-white px-4 py-2">
           <div className="flex items-center gap-2">
             <ActionButton type="button" variant="flyoutSecondary" disabled={saving || starting} onClick={onClose}>Cancel</ActionButton>
             {order?.order_status === "planned" ?
@@ -332,14 +317,16 @@ function ProductionForm({ isOpen, onClose, selectedOrder, onAfterSave }) {
                 onClick={handleStart}> {starting ? <Spinner size="sm" /> : <><Factory size={14} /> Start Production</>
                 }
               </ActionButton> : null}
-            <ActionButton type="button" variant="flyoutPrimary" disabled={saving || fetching} onClick={handleSave}>{saving ? <Spinner size="sm" /> : <><Save size={14} /> Save Update</>}</ActionButton></div></div>
+            <ActionButton type="button" variant="flyoutPrimary" disabled={saving || fetching} onClick={handleSave}>{saving ? <Spinner size="sm" /> : <><Save size={14} /> Save Update</>}</ActionButton>
+          </div>
+        </div>
       }
     >
       <div className="flex h-full min-h-0 flex-col overflow-hidden bg-slate-50/70 px-3 py-1.5">
         {fetching ? <div className="grid h-full place-items-center"><Spinner /></div> : <>
           <section className="mb-1.5 shrink-0 rounded-sm border border-slate-100 bg-white p-3 shadow-sm">
             <div className="grid gap-3 lg:grid-cols-4">
-              <SummaryMetric index={1} icon={ShoppingBag} label="Order No" value={order?.order_no || "-"} tone="orange" />
+              <SummaryMetric index={1} icon={ShoppingBag} label="Order Code" value={order?.order_code || "-"} tone="orange" />
               <SummaryMetric index={2} icon={PackageCheck} label="Customer" value={order?.customer_name || "-"} tone="slate" />
               <SummaryMetric index={3} icon={CalendarDays} label="Expected Date" value={dateValue(order?.expected_delivery_date) || "-"} tone="blue" />
               <SummaryMetric index={4} icon={CheckCircle2} label="Order Status" value={order?.order_status || "planned"} tone="green" />
@@ -347,22 +334,19 @@ function ProductionForm({ isOpen, onClose, selectedOrder, onAfterSave }) {
           </section>
           <div className="grid min-h-0 flex-1 gap-3 lg:grid-cols-[minmax(0,1fr)]">
             <section className="flex min-h-0 min-w-0 flex-col overflow-hidden rounded-sm border border-slate-100 bg-white shadow-sm">
-              <div className="flex shrink-0 items-center justify-between px-3 py-2"><div><h3 className="text-sm font-bold text-slate-800">Item-wise Production</h3><p className="text-[11px] text-slate-400">Old qty दिसेल; input मध्ये फक्त new/add qty टाका. Save नंतर total update होईल.</p></div><span className="rounded-md bg-orange-50 px-2 py-1 text-[10px] font-bold text-orange-600">{items.length} Lines</span></div>
               <div className="px-3 min-h-0 min-w-0 flex-1 overflow-y-auto overflow-x-auto [scrollbar-width:thin]">
                 <div className={`grid ${productionGrid} items-center gap-1.5 border-b border-slate-200 bg-slate-50 px-2 py-2 text-[8px] font-bold uppercase leading-tight tracking-wide text-slate-500`}>
-                  <span>#</span><span>Product / Model</span><span className="text-center">Order</span><span className="text-center">Stock</span><span className="text-center">SAIPL</span><span className="text-center">Produced</span><span className="text-center">QC Pass</span><span className="text-center">Rework</span><span className="text-center">PMK</span><span className="text-center">Procured</span><span className="text-center">Ready / Pending</span><span>Status</span>
+                  <span>#</span><span>Product / Model</span><span className="text-center">Order</span><span className="text-center">Stock</span><span className="text-center">SAIPL</span><span className="text-center">Produced</span><span className="text-center">Out Source</span><span className="text-center">Procured</span><span className="text-center">Ready / Pending</span><span>Status</span>
                 </div>
                 <div className="divide-y divide-slate-100">
                   {items.map((item, index) => (
                     <div key={item.order_item_id ?? index} className={`grid ${productionGrid} items-center gap-1.5 px-2 py-1.5 text-[10px] text-slate-700 transition hover:bg-slate-50/70`}>
                       <span className="font-semibold text-slate-500">{index + 1}</span>
-                      <div className="min-w-0"><div className="truncate font-semibold text-slate-800">{item.product_name}</div><div className="truncate text-[8px] text-slate-400">{item.product_code} • {item.weight || 0}Kg</div></div>
+                      <div className="min-w-0"><div className="truncate font-semibold text-slate-800">{item.product_name}</div><div className="truncate text-[8px] text-slate-400">• {item.series || "-"} • {item.product_code || "-"} • {item.weight || 0}Kg • {item.fg_code || "-"}</div></div>
                       <span className="rounded bg-blue-50 px-1 py-1 text-center font-semibold text-blue-600">{formatNumber(item.order_qty)}</span>
                       <span className="rounded bg-emerald-50 px-1 py-1 text-center font-semibold text-emerald-600">{formatNumber(item.available_stock_qty)}</span>
                       <span className="rounded bg-orange-50 px-1 py-1 text-center font-semibold text-orange-600">{formatNumber(item.saipl_mfg_qty)}</span>
                       <AddQtyCell tone="orange" value={item.new_produced_qty} previousValue={item.previous_produced_qty} totalValue={getTotalProducedQty(item)} onChange={(event) => updateItem(index, "new_produced_qty", event.target.value)} />
-                      <AddQtyCell tone="emerald" value={item.new_qc_passed_qty} previousValue={item.previous_qc_passed_qty} totalValue={getTotalQcPassedQty(item)} onChange={(event) => updateItem(index, "new_qc_passed_qty", event.target.value)} />
-                      <AddQtyCell tone="red" value={item.new_rework_qty} previousValue={item.previous_rework_qty} totalValue={getTotalReworkQty(item)} onChange={(event) => updateItem(index, "new_rework_qty", event.target.value)} />
                       <span className="rounded bg-amber-50 px-1 py-1 text-center font-semibold text-amber-600">{formatNumber(item.pmk_procure_qty)}</span>
                       <AddQtyCell tone="amber" value={item.new_procured_qty} previousValue={item.previous_procured_qty} totalValue={getTotalProcuredQty(item)} onChange={(event) => updateItem(index, "new_procured_qty", event.target.value)} />
                       <div className="text-center leading-tight"><div className="font-bold text-emerald-600">{formatNumber(item.ready_qty)}</div><div className="font-bold text-red-500">{formatNumber(item.pending_qty)}</div></div>

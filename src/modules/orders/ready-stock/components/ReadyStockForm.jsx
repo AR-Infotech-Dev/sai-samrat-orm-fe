@@ -41,7 +41,7 @@ const normalizeItem = (item = {}) => ({
   weight: item.weight ?? "-",
   order_qty: toNumber(item.order_qty),
   planning_ready_qty: toNumber(item.planning_ready_qty),
-  qc_passed_qty: toNumber(item.qc_passed_qty),
+  produced_qty: toNumber(item.produced_qty),
   procured_qty: toNumber(item.procured_qty),
   total_ready_qty: toNumber(item.total_ready_qty),
   dispatched_qty: toNumber(item.dispatched_qty),
@@ -76,7 +76,7 @@ const ReadySummaryStrip = ({ totals }) => {
     { label: "Total Items", value: totals.totalItems, tone: "text-slate-800" },
     { label: "Order Qty", value: formatNumber(totals.orderQty), tone: "text-slate-800" },
     { label: "Stock Qty", value: formatNumber(totals.planningReadyQty), tone: "text-emerald-600" },
-    { label: "QC Pass", value: formatNumber(totals.qcPassedQty), tone: "text-blue-600" },
+    { label: "Produced", value: formatNumber(totals.producedQty), tone: "text-blue-600" },
     { label: "Procured", value: formatNumber(totals.procuredQty), tone: "text-amber-600" },
     { label: "Total Ready", value: formatNumber(totals.totalReadyQty), tone: "text-emerald-600" },
     { label: "Available", value: formatNumber(totals.availableQty), tone: "text-orange-600" },
@@ -106,14 +106,14 @@ function ReadyStockForm({ isOpen, onClose, selectedOrder, onCreateDispatch }) {
     acc.totalItems += 1;
     acc.orderQty += toNumber(item.order_qty);
     acc.planningReadyQty += toNumber(item.planning_ready_qty);
-    acc.qcPassedQty += toNumber(item.qc_passed_qty);
+    acc.producedQty += toNumber(item.produced_qty);
     acc.procuredQty += toNumber(item.procured_qty);
     acc.totalReadyQty += toNumber(item.total_ready_qty);
     acc.dispatchedQty += toNumber(item.dispatched_qty);
     acc.availableQty += toNumber(item.available_dispatch_qty);
     acc.pendingQty += toNumber(item.pending_qty);
     return acc;
-  }, { totalItems: 0, orderQty: 0, planningReadyQty: 0, qcPassedQty: 0, procuredQty: 0, totalReadyQty: 0, dispatchedQty: 0, availableQty: 0, pendingQty: 0 }), [items]);
+  }, { totalItems: 0, orderQty: 0, planningReadyQty: 0, producedQty: 0, procuredQty: 0, totalReadyQty: 0, dispatchedQty: 0, availableQty: 0, pendingQty: 0 }), [items]);
 
   const fetchOrder = async () => {
     if (!selectedOrder?.order_id) return;
@@ -149,7 +149,7 @@ function ReadyStockForm({ isOpen, onClose, selectedOrder, onCreateDispatch }) {
       isOpen={isOpen}
       onClose={onClose}
       title="Ready Stock"
-      subtitle={order?.order_no ? `${order.order_no} â€¢ ${order.customer_name || "Customer"}` : "Dispatch-ready stock view"}
+      subtitle={order?.order_no ? `${order.order_no} • ${order.customer_name || "Customer"}` : "Dispatch-ready stock view"}
       panelClassName="!w-[1000px] max-w-full"
       closeButton={<button className="flyout-close" onClick={onClose} aria-label="Close panel"><X size={18} /></button>}
       footer={(
@@ -169,7 +169,7 @@ function ReadyStockForm({ isOpen, onClose, selectedOrder, onCreateDispatch }) {
           <>
             <section className="mb-2 shrink-0 rounded-sm border border-slate-100 bg-white p-3 shadow-xs">
               <div className="grid gap-3 lg:grid-cols-4">
-                <SummaryMetric index={1} icon={ShoppingBag} label="Order No" value={order?.order_no || "-"} tone="orange" />
+                <SummaryMetric index={1} icon={ShoppingBag} label="Order Code" value={order?.order_code || "-"} tone="orange" />
                 <SummaryMetric index={2} icon={PackageCheck} label="Customer" value={order?.customer_name || "-"} tone="slate" />
                 <SummaryMetric index={3} icon={CalendarDays} label="Expected Date" value={dateValue(order?.expected_delivery_date) || "-"} tone="blue" />
                 <SummaryMetric index={4} icon={CheckCircle2} label="Order Status" value={order?.order_status || "ready"} tone="green" />
@@ -193,7 +193,7 @@ function ReadyStockForm({ isOpen, onClose, selectedOrder, onCreateDispatch }) {
                   <span>Product / Model</span>
                   <span className="text-center">Order</span>
                   <span className="text-center">Stock</span>
-                  <span className="text-center">QC Pass</span>
+                  <span className="text-center">Produced</span>
                   <span className="text-center">Procured</span>
                   <span className="text-center">Total Ready</span>
                   <span className="text-center">Dispatched</span>
@@ -208,11 +208,11 @@ function ReadyStockForm({ isOpen, onClose, selectedOrder, onCreateDispatch }) {
                       <span className="font-semibold text-slate-500">{index + 1}</span>
                       <div className="min-w-0">
                         <div className="truncate font-semibold text-slate-800">{item.product_name}</div>
-                        <div className="truncate text-[9px] text-slate-400">{item.product_code} â€¢ {item.weight || 0}Kg</div>
+                        <div className="truncate text-[9px] text-slate-400">{item.product_code} • {item.weight || 0}Kg</div>
                       </div>
                       <span className="rounded-md bg-blue-50 px-1 py-1.5 text-center font-semibold text-blue-600">{formatNumber(item.order_qty)}</span>
                       <span className="rounded-md bg-emerald-50 px-1 py-1.5 text-center font-semibold text-emerald-600">{formatNumber(item.planning_ready_qty)}</span>
-                      <span className="rounded-md bg-blue-50 px-1 py-1.5 text-center font-semibold text-blue-600">{formatNumber(item.qc_passed_qty)}</span>
+                      <span className="rounded-md bg-blue-50 px-1 py-1.5 text-center font-semibold text-blue-600">{formatNumber(item.produced_qty)}</span>
                       <span className="rounded-md bg-amber-50 px-1 py-1.5 text-center font-semibold text-amber-600">{formatNumber(item.procured_qty)}</span>
                       <span className="rounded-md bg-emerald-50 px-1 py-1.5 text-center font-bold text-emerald-700">{formatNumber(item.total_ready_qty)}</span>
                       <span className="rounded-md bg-slate-50 px-1 py-1.5 text-center font-semibold text-slate-500">{formatNumber(item.dispatched_qty)}</span>
@@ -225,7 +225,7 @@ function ReadyStockForm({ isOpen, onClose, selectedOrder, onCreateDispatch }) {
               </div>
 
               <div className="mt-2 shrink-0 rounded-sm bg-orange-50/60 px-3 py-2 text-xs text-orange-700">
-                <b>Rule:</b> Total Ready = Planning Stock + QC Pass + Procured. Available = Total Ready - Dispatched. Order Value: <b>{formatCurrency(order?.total_value_in_inr, currency)}</b>
+                <b>Rule:</b> Total Ready = Planning Stock + Produced + Procured. Available = Total Ready - Dispatched. Order Value: <b>{formatCurrency(order?.total_value_in_inr, currency)}</b>
               </div>
             </section>
           </>

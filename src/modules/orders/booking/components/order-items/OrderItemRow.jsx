@@ -23,7 +23,7 @@ const SelectInput = ({ value, options, onChange }) => (
     <select
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        className={`${fieldClassName} cursor-pointer pr-2 abcd`}
+        className={`${fieldClassName} cursor-pointer pr-2`}
     >
         {options.map((option) => (
             <option key={option} value={option}>
@@ -33,7 +33,7 @@ const SelectInput = ({ value, options, onChange }) => (
     </select>
 );
 
-function OrderItemRow({ index = 0, item = {}, currency = "INR", handleFieldChange, handleProductSelect, handleDeleteRow, className = "grid grid-cols-[28px_minmax(160px,1.8fr)_minmax(96px,1fr)_58px_64px_82px_58px_96px_34px]", }) {
+function OrderItemRow({ index = 0, item = {}, gstPercent = 18, currency = "INR", handleFieldChange, handleProductSelect, handleDeleteRow, className = "grid grid-cols-[28px_minmax(160px,1.8fr)_minmax(96px,1fr)_58px_64px_82px_58px_96px_34px]", }) {
     const lineValue = getLineValue(item);
     const currencySymbol = getCurrencySymbol(currency);
 
@@ -78,13 +78,19 @@ function OrderItemRow({ index = 0, item = {}, currency = "INR", handleFieldChang
                     className={`${fieldClassName} pl-5 text-xs`}
                 />
             </div>
-
-            <SelectInput
-                value={item.gst}
-                options={gstOptions}
-                onChange={(value) => handleFieldChange(item.id, "gst", value)}
-            />
-
+            <div className="relative min-w-0">
+                <input
+                    type="number"
+                    min="0"
+                    value={gstPercent}
+                    disabled
+                    onChange={(event) => handleFieldChange(item.id, "gst", event.target.value)}
+                    className={`${fieldClassName} pr-5 text-xs`}
+                />
+                <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-[10px] font-bold text-slate-400">
+                    %
+                </span>
+            </div>
             <p className="truncate text-xs font-semibold text-slate-700">
                 {currencySymbol} {formatIndianCurrency(lineValue)}
             </p>

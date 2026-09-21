@@ -38,7 +38,7 @@ function OrderReviewHeader({ order = {}, items = [], remarks = "", actionLoading
         <section className="rounded-sm border border-slate-100 bg-white p-2.5 shadow-xs">
           <h3 className="mb-1.5 text-sm font-bold text-slate-800">Order Header</h3>
           <div className="grid grid-cols-2 gap-0">
-            <DetailCell label="Order No" value={order?.order_no} highlight />
+            <DetailCell label="Order Code" value={order?.order_code} highlight />
             <DetailCell label="Status" value={order?.order_status || "waiting"} />
             <DetailCell label="Priority" value={order?.priority || "normal"} />
             <DetailCell label="Order Date" value={formatDate(order?.order_date)} />

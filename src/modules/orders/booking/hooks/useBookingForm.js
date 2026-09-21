@@ -117,7 +117,13 @@ export const useOrderBookingForm = ({ isOpen, onClose, onAfterSave, selectedOrde
             ...formData,
             [name]: value,
         };
-
+        if (name == 'order_type') {
+            const gst_rate = value == 'domestic' ? Number(18) : (value == 'export' ? Number(0) : Number(0.1));
+            nextData = {
+                ...nextData,
+                gst_rate: gst_rate,
+            }
+        }
         setFormData(nextData);
     };
     const handleSave = async ({ items = [], summary = {}, statusOverride } = {}) => {
@@ -176,7 +182,6 @@ export const useOrderBookingForm = ({ isOpen, onClose, onAfterSave, selectedOrde
             setLoading(false);
         }
     };
-
     return {
         loading,
         fetchingOrder,
@@ -189,5 +194,3 @@ export const useOrderBookingForm = ({ isOpen, onClose, onAfterSave, selectedOrde
         handleSave,
     }
 }
-
-

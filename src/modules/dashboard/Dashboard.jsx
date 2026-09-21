@@ -10,7 +10,7 @@ import "./styles/dashboard.css";
 const initialFilters = {
   customer_id: "",
   product_id: "",
-  order_id: "",
+  order_code: "",
   from_date: "",
   to_date: "",
   stage: "all",
@@ -59,7 +59,7 @@ function Dashboard() {
     <ModulePageLayout title="Order Lifecycle Dashboard" description="Track confirmation, planning, production, ready stock and dispatch in one simple view.">
       <div className="space-y-2">
         <div className="dashboard-filters rounded-sm border border-orange-100 bg-white shadow-xs">
-          <SmartSelectInput id="order_id" field={{ label: "Order" }} value={filters.order_id} config={orderSmartSelectConfig} onSelect={(value) => updateFilter("order_id", value)} />
+          <SmartSelectInput id="order_id" field={{ label: "Order" }} value={filters.order_code} config={orderSmartSelectConfig} onSelect={(value) => updateFilter("order_id", value)} />
           <SmartSelectInput id="customer_id" field={{ label: "Customer" }} value={filters.customer_id} config={customerSmartSelectConfig} onSelect={(value) => updateFilter("customer_id", value)} />
           <SmartSelectInput id="product_id" field={{ label: "Product / Model" }} value={filters.product_id} config={productSmartSelectConfig} onSelect={(value) => updateFilter("product_id", value)} />
           <label>

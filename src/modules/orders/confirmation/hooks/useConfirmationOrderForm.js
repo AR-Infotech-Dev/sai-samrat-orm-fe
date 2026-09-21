@@ -25,7 +25,7 @@ const mapApiOrderItems = (items = []) => {
     product: item.product ?? item.product_name ?? item.product_name_snapshot ?? null,
     brand: item.brand ?? null,
     weight: Number(item.weight ?? 0),
-    gst_rate: Number(item.gst_rate ?? 0),
+    gst_rate: Number(item.line_gst ?? 0),
     unit_rate: Number(item.unit_rate ?? 0),
     line_value: Number(item.line_value ?? 0),
     standard_rate: Number(item.standard_rate ?? 0),
