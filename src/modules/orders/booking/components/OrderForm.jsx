@@ -66,7 +66,7 @@ function OrderForm({ isOpen, onClose, selectedOrder, onAfterSave, menu_id }) {
               >
                 {loading ? <Spinner size="sm" /> : selectedOrder ? "Update Order" : "Book Order"}
               </ActionButton>
-              </>
+            </>
           }
         </div>
       }
@@ -74,7 +74,7 @@ function OrderForm({ isOpen, onClose, selectedOrder, onAfterSave, menu_id }) {
       <div className="flyout-form-shell h-full min-h-0 overflow-hidden bg-slate-50/70">
         <div className="ws-main-container h-full min-h-0 overflow-hidden !p-0">
           <div className="grid h-full min-h-0 grid-cols-1 gap-1 overflow-hidden p-0 lg:grid-cols-[280px_minmax(0,1fr)]">
-            <section className="min-h-0 overflow-y-auto bg-white p-3 shadow-xs [scrollbar-width:thin]">
+            <section className="min-h-0 overflow-y-auto bg-white p-3 shadow-xs [scrollbar-width:none]">
               <h2 className="mb-1.5 text-sm font-bold text-[#373B41FF]"> Order Details </h2>
               {fetchingOrder ? (
                 <div className="flex h-32 items-center justify-center"><Spinner /></div>
@@ -92,16 +92,17 @@ function OrderForm({ isOpen, onClose, selectedOrder, onAfterSave, menu_id }) {
             <div className="grid min-h-0 min-w-0 grid-rows-[minmax(0,1fr)_auto] gap-0 overflow-hidden">
               <div className="min-h-0 overflow-hidden">
                 <OrderItems
+                  formData={formData}
                   currency={formData.currency}
                   exchangeRate={formData.exchange_rate}
+                  gstPercentage={formData.gst_rate}
                   defaultItems={initialOrderItems}
                   onItemsChange={setOrderItems}
                 />
               </div>
-
               <section className="shrink-0 border border-slate-100 bg-white shadow-sm">
                 {currencyRateLoading ? <p className="px-3 pt-2 text-[10px] font-semibold text-orange-500">Updating live exchange rate...</p> : null}
-                <OrderSummary layout="horizontal" {...orderSummary} currency={formData.currency} gstPercentage={18} />
+                <OrderSummary layout="horizontal" orderCode={formData.order_code || '-'} {...orderSummary} currency={formData.currency} gstPercentage={formData.gst_rate} />
               </section>
             </div>
           </div>

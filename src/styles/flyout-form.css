@@ -1,22 +1,22 @@
 .flyout-overlay {
   position: absolute;
   right: 0;
+  padding-right: 8px;
   bottom: 0px;
   left: 0;
   z-index: 19;
-  z-index: 21;
+  height: 100%;
   display: flex;
+  align-items: center;
   justify-content: flex-end;
-  background: #0a102263;
+  background: #0d111d63;
 }
 
 .flyout-panel.open {
-  /* animation: slideOutRight 2s ease forwards; */
   animation: slideInRight .2s ease forwards;
 }
 
 .flyout-panel.close {
-  /* animation: slideInRight 2s ease forwards; */
   animation: slideOutRight .2s ease forwards;
 }
 
@@ -25,13 +25,12 @@
   flex-direction: column;
   position: relative;
   width: min(100%, 835px);
-  /* height: calc(105.7vh - var(--topbar-height));
-  max-height: calc(105.7vh - var(--topbar-height)); */
-  height: calc(106.9vh - var(--topbar-height));
-  max-height: calc(106.9vh - var(--topbar-height));
+  height: calc(100vh - 13px);
+  max-height: calc(100vh - 13px);
   background: #ffffff;
   box-shadow: -14px 0 36px var(--shadow-strong);
   overflow: hidden;
+  border-radius: 12px;
 }
 
 .flyout-close {
@@ -59,15 +58,6 @@
   }
 }
 
-/* @keyframes fadeOut {
-  from {
-    opacity: 1;
-  }
-  to {
-    opacity: 0;
-  }
-} */
-
 @keyframes slideOutRight {
   from {
     transform: translateX(0);
@@ -78,22 +68,12 @@
   }
 }
 
-
 .flyout-close {
-  position: absolute;
-  top: 6px;
-  left: -12px;
-  z-index: 999;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 30px;
-  height: 30px;
-  border: 1px solid #dfe3eb;
-  border-radius: 999px;
-  color: var(--text-primary);
-  background: #ffffff;
-  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.12);
+  width: 25px;
+  height: 25px;
 }
 
 .overlay_header {
@@ -101,7 +81,8 @@
   top: 0;
   z-index: 2;
   min-height: 35px;
-  padding: 0 24px 0 36px;
+  /* padding: 0 24px 0 36px; */
+  padding: 0 10px;
   background: rgba(255, 255, 255, 0.98);
   border: 1px solid var(--border-soft);
 }
@@ -125,6 +106,8 @@
   min-height: 0;
   overflow-y: auto;
   scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  scrollbar-color: #bdd8ff57 transparent;
   background: #ffffff;
 }
 
@@ -271,7 +254,7 @@
   display: flex;
   justify-content: flex-end;
   gap: 10px;
-  padding: 1px 24px;
+  padding: 5px 24px;
   background: rgba(255, 255, 255, 0.98);
   border-top: 1px solid var(--border-soft);
 }
@@ -339,26 +322,47 @@
 .ql-container {
   min-height: 150px;
   border-radius: 0 0 0px 0px;
-  border-color: var(--border-strong);
 }
 
-.ql-toolbar {
-  border-radius: 0px 0px 0 0;
-  border-color: var(--border-strong);
+.ql-toolbar.ql-snow {
+  background-color: #f3f4f6;
+  border: none !important;
+}
+
+.ql-container.ql-snow {
+  background-color: #f3f4f6;
+  border: none !important;
+}
+
+.flowups-rich-text-editor .ql-editor {
+  direction: ltr;
+  text-align: left;
+  unicode-bidi: plaintext;
+}
+
+.flowups-rich-text-editor .ql-editor p {
+  direction: ltr;
+  text-align: left;
 }
 
 
 @media (max-width: 900px) {
+  .flyout-form-shell {
+    padding: 10px 0px;
+  }
+
   .flyout-overlay {
     position: fixed;
     inset: 0;
     z-index: 90;
+
   }
 
   .flyout-panel {
     width: 100%;
     height: 100dvh;
     max-height: 100dvh;
+    border-radius: 0;
   }
 
   .overlay_header,
@@ -385,8 +389,8 @@
   }
 
   .overlay_header {
-    padding-left: 14px;
-    padding-right: 48px;
+    /* padding-left: 14px; */
+    /* padding-right: 48px; */
   }
 
   .tab-pane.panel_overflow {
@@ -463,4 +467,75 @@
 
 input .py-2 {
   padding: .3rem;
+}
+
+/* Keep the backdrop present until the panel finishes sliding out. */
+.flyout-overlay {
+  overflow: hidden;
+}
+
+.flyout-overlay.close {
+  animation: flyoutBackdropOut .2s ease forwards;
+}
+
+.flyout-overlay.close .flyout-panel {
+  pointer-events: none;
+}
+
+@keyframes flyoutBackdropOut {
+  from {
+    background-color: #0d111d63;
+  }
+
+  to {
+    background-color: transparent;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .flyout-panel.open,
+  .flyout-panel.close,
+  .flyout-overlay.close,
+  .flyout-close {
+    animation-duration: 1ms;
+  }
+}
+
+/* Shared flyout loading state fills the space between header and footer. */
+.flyout-panel>.flyout-body-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  scrollbar-gutter: auto;
+}
+
+.flyout-loading-illustration {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 6px;
+}
+
+.flyout-loading-illustration img {
+  display: block;
+  width: 200px;
+  max-width: 100%;
+  height: auto;
+}
+
+.flyout-loading-illustration .flyout-loading-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: #334155;
+}
+
+.flyout-loading-illustration .flyout-loading-description {
+  margin: 0;
+  font-size: 12px;
+  color: #64748b;
 }

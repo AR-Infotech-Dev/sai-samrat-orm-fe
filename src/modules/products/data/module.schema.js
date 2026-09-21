@@ -91,8 +91,7 @@ export const productsModuleSchema = {
               multi: false,
             },
           },
-
-          { name: "brand", label: "Brand", type: "text", placeholder: "Enter product brand", gridSpan: 4 },
+          { name: "fg_code", label: "FG Code", type: "text", placeholder: "Enter fg code", gridSpan: 4 },
         ],
       },
       {
@@ -119,8 +118,6 @@ export const productsModuleSchema = {
       {
         columns: 3,
         fields: [
-          { name: "ready_stock", label: "Ready Stock", type: "number", placeholder: "Enter ready stock", gridSpan: 4 },
-          { name: "fg_code", label: "FG Code", type: "text", placeholder: "Enter fg code", gridSpan: 4 },
         ],
       },
       {

@@ -85,6 +85,7 @@ function OrderHeaderForm({ sections = [], values = {}, onChange, onObjectSelect,
           onObjectSelect={(item) => onObjectSelect?.(field, item)}
           addNewFunction={addNewHandlers[field.name]}
           config={field.config}
+          formValues={values}
           error={errors[field.name]}
         />;
         break;

@@ -77,6 +77,7 @@ const normalizeItem = (item = {}) => {
     order_item_id: item.order_item_id,
     product_name: item.product_name || item.product_name_snapshot || "-",
     product_code: item.product_code || item.product_code_snapshot || "-",
+    fg_code: item.fg_code || "-",
     series: item.series || item.brand_snapshot || item.brand || "-",
     weight: item.weight ?? "-",
     order_qty: orderQty,
@@ -103,7 +104,7 @@ const statusOptions = [
   { label: "Hold", value: "hold" },
 ];
 
-const SummaryMetric = ({ index ,icon: Icon, label, value, tone = "slate" }) => {
+const SummaryMetric = ({ index, icon: Icon, label, value, tone = "slate" }) => {
   const toneClass = {
     orange: "bg-orange-50 text-orange-600",
     green: "bg-emerald-50 text-emerald-600",
@@ -113,11 +114,11 @@ const SummaryMetric = ({ index ,icon: Icon, label, value, tone = "slate" }) => {
   }[tone];
 
   return (
-    <div className={`flex items-center gap-2 ${index != 1 ? 'border-l': '' } border-slate-200 bg-white px-3 py-2`}>
+    <div className={`flex items-center gap-2 ${index != 1 ? 'border-l' : ''} border-slate-200 bg-white px-3 py-2`}>
       <span className={`grid h-8 w-8 place-items-center rounded-full ${toneClass}`}><Icon size={15} /></span>
       <span className="min-w-0">
         <span className="block text-[11px] font-medium text-slate-400">{label}</span>
-        <span className="block text-sm font-bold text-slate-800">{value}</span>
+        <span className="block text-sm font-bold text-slate-800 truncate">{value}</span>
       </span>
     </div>
   );
@@ -128,7 +129,7 @@ const PlanningSummaryStrip = ({ totals }) => {
     { label: "Total Items", value: totals.totalItems, tone: "text-slate-800" },
     { label: "Order Qty", value: formatNumber(totals.orderQty), tone: "text-slate-800" },
     { label: "SAIPL Qty", value: formatNumber(totals.saiplQty), tone: "text-emerald-600" },
-    { label: "PMK Qty", value: formatNumber(totals.pmkQty), tone: "text-blue-600" },
+    { label: "Outsource Qty", value: formatNumber(totals.pmkQty), tone: "text-blue-600" },
     { label: "Available Qty", value: formatNumber(totals.readyQty), tone: "text-amber-600" },
     { label: "Pending Qty", value: formatNumber(totals.pendingQty), tone: "text-red-500" },
   ];
@@ -243,7 +244,7 @@ function PlanningForm({ isOpen, onClose, selectedOrder, onAfterSave }) {
 
       if (orderQty <= 0) addRowError(errors, index, ["order_qty"], "Order qty cannot be zero.");
       if (saiplQty < 0 || pmkQty < 0 || readyQty < 0) addRowError(errors, index, ["saipl_qty", "pmk_qty", "ready_qty"], "Qty cannot be negative.");
-      if (plannedQty > orderQty) addRowError(errors, index, ["saipl_qty", "pmk_qty", "ready_qty"], "SAIPL + PMK + Available Stock cannot be greater than order qty.");
+      if (plannedQty > orderQty) addRowError(errors, index, ["saipl_qty", "pmk_qty", "ready_qty"], "SAIPL + Out source + Available Stock cannot be greater than order qty.");
       if (readyQty > orderQty) addRowError(errors, index, ["ready_qty"], "Available Stock qty cannot be greater than order qty.");
       if (status === "ready" && readyQty < orderQty) addRowError(errors, index, ["planning_status", "ready_qty"], "Ready status requires Available Stock = Order Qty.");
       if (status === "planned" && plannedQty < orderQty) addRowError(errors, index, ["planning_status"], "Planned status requires full quantity split.");
@@ -296,7 +297,7 @@ function PlanningForm({ isOpen, onClose, selectedOrder, onAfterSave }) {
       onClose={onClose}
       title="Order Planning"
       subtitle={order?.order_no ? `${order.order_no} • ${order.customer_name || "Customer"}` : "Plan order item rows"}
-      panelClassName="!w-[1000px] max-w-full"
+      panelClassName="!w-[1080px] max-w-full"
       closeButton={
         <button className="flyout-close" onClick={onClose} aria-label="Close panel">
           <X size={18} />
@@ -321,7 +322,7 @@ function PlanningForm({ isOpen, onClose, selectedOrder, onAfterSave }) {
           <>
             <section className="mb-1.5 shrink-0 rounded-sm border border-slate-100 bg-white p-3 shadow-sm">
               <div className="grid gap-3 lg:grid-cols-4">
-                <SummaryMetric index={1} icon={ShoppingBag} label="Order No" value={order?.order_no || "-"} tone="orange" />
+                <SummaryMetric index={1} icon={ShoppingBag} label="Order Code" value={order?.order_code || "-"} tone="orange" />
                 <SummaryMetric index={2} icon={PackageCheck} label="Customer" value={order?.customer_name || "-"} tone="slate" />
                 <SummaryMetric index={3} icon={CalendarDays} label="Expected Date" value={dateValue(order?.expected_delivery_date) || "-"} tone="blue" />
                 <SummaryMetric index={4} icon={Clock3} label="Priority" value={order?.priority || "normal"} tone="red" />
@@ -344,11 +345,11 @@ function PlanningForm({ isOpen, onClose, selectedOrder, onAfterSave }) {
                   <div className={`grid ${planningGrid} items-center gap-1.5 border-b border-slate-200 bg-slate-50 px-2 py-2 text-[8px] font-bold uppercase leading-tight tracking-wide text-slate-500`} >
                     <span>#</span>
                     <span>Product / Model</span>
-                    <span className="text-center"> Order <small className="block text-[7px] font-medium normal-case">Qty</small> </span>
-                    <span className="text-center"> SAIPL <small className="block text-[7px] font-medium normal-case">MFG</small> </span>
-                    <span className="text-center"> PMK <small className="block text-[7px] font-medium normal-case"> Procure </small> </span>
-                    <span className="text-center"> Available Stock <small className="block text-[7px] font-medium normal-case">Qty</small> </span>
-                    <span className="text-center"> Pending <small className="block text-[7px] font-medium normal-case">Qty</small> </span>
+                    <span className="text-left"> Order <small className="block text-[7px] font-medium normal-case">Qty</small> </span>
+                    <span className="text-left"> SAIPL <small className="block text-[7px] font-medium normal-case">MFG</small> </span>
+                    <span className="text-left"> Out Source <small className="block text-[7px] font-medium normal-case"> Procure </small> </span>
+                    <span className="text-left"> Available Stock </span>
+                    <span className="text-left"> Pending <small className="block text-[7px] font-medium normal-case">Qty</small> </span>
                     <span>Ready Date</span>
                     <span>Priority</span>
                     <span>Status</span>
@@ -361,7 +362,7 @@ function PlanningForm({ isOpen, onClose, selectedOrder, onAfterSave }) {
                         {/* Serial number */}
                         <span className="font-semibold text-slate-500"> {index + 1} </span>
                         {/* Product */}
-                        <div className="min-w-0"> <div className="truncate font-semibold text-slate-800"> {item.product_name || "-"} </div> <div className="truncate text-[8px] text-slate-400"> {item.product_code || "-"} • {item.weight || 0}Kg </div> {rowErrors[index]?.message ? <div className="mt-0.5 truncate text-[9px] font-semibold text-red-500" title={rowErrors[index].message}>{rowErrors[index].message}</div> : null} </div>
+                        <div className="min-w-0"> <div className="truncate font-semibold text-slate-800"> {item.product_name || "-"} </div> <div className="truncate text-[10px] text-slate-400"> • {item.series || "-"} • {item.product_code || "-"} • {item.weight || 0}Kg • {item.fg_code || "-"} </div> {rowErrors[index]?.message ? <div className="mt-0.5 truncate text-[9px] font-semibold text-red-500" title={rowErrors[index].message}>{rowErrors[index].message}</div> : null} </div>
                         {/* Order quantity */}
                         <span className="rounded bg-blue-50 px-1 py-1 text-center font-semibold text-blue-600"> {formatNumber(item.order_qty)} </span>
                         {/* SAIPL quantity */}

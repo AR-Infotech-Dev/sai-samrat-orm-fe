@@ -85,6 +85,7 @@ function DynamicModuleForm({ sections = [], values = {}, onChange, onObjectSelec
           onObjectSelect={(item) => onObjectSelect?.(field, item)}
           addNewFunction={addNewHandlers[field.name]}
           config={field.config}
+          formValues={values}
           error={errors[field.name]}
         />;
         break;

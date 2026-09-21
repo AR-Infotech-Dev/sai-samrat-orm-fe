@@ -36,10 +36,22 @@ export function getSelectedLabel(field, value, selectedOrder) {
 export function getOrderIdentifier(order = {}) {
   return order?.order_id;
 }
+
+export const getGstRateByOrderType = (orderType = "domestic") => {
+  if (orderType === "export") return 0;
+  if (orderType === "merchant_export") return 0.1;
+  return 18;
+};
+
 export function normalizeOrderData(selectedOrder = {}) {
+  const orderType = selectedOrder?.order_type || ordersModuleSchema.form.initialValues.order_type || "domestic";
+  const gstRate = selectedOrder?.gst_rate ?? getGstRateByOrderType(orderType);
+
   return {
     ...ordersModuleSchema.form.initialValues,
     ...selectedOrder,
+    order_type: orderType,
+    gst_rate: Number(gstRate),
     orderName: selectedOrder?.orderName || selectedOrder?.order_name || "",
     contactNo: selectedOrder?.contactNo || selectedOrder?.contactno || "",
     whatsappNo: selectedOrder?.whatsappNo || selectedOrder?.whatsappno || "",
@@ -109,7 +121,7 @@ export const productCatalog = [
 
 export const productOptions = productCatalog.map((item) => item.product);
 export const modelOptions = [...new Set(productCatalog.map((item) => item.model))];
-export const gstOptions = [0, 5, 12, 18, 28];
+export const gstOptions = [0, 0.1, 5, 12, 18, 28];
 export const formatCurrency = (amount, currency = "INR") => `${getCurrencySymbol(currency)} ${new Intl.NumberFormat("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2, }).format(Number(amount) || 0)}`;
 export const formatNumber = (value) => new Intl.NumberFormat("en-IN").format(value);
 
@@ -180,7 +192,7 @@ export function buildOrderSummary(items = [], orderHeader = {}) {
       const readyQty = Math.min(qty, readyStock);
       const pendingQty = Math.max(qty - readyStock, 0);
 
-      summary.orderNo = orderHeader.order_no || 'Auto Generated';
+      summary.orderNo = orderHeader.order_code || '-';
       summary.totalItems += item.product_id || item.product ? 1 : 0;
       summary.totalQty += qty;
       summary.readyQty += readyQty;

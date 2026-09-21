@@ -2,12 +2,12 @@ const tabKeys = ["all", "confirmation", "planning", "production", "ready_stock",
 
 const tableColumns = [
   { key: "sr", label: "#", width: "3%", align: "left" },
-  { key: "order_no", label: "Order No", width: "11%", align: "left" },
+  { key: "order_code", label: "Order Code", width: "11%", align: "left" },
   { key: "customer", label: "Customer", width: "12%", align: "left" },
   { key: "product", label: "Product / Model", width: "15%", align: "left" },
   { key: "order_qty", label: "Order", width: "5.5%", align: "right" },
   { key: "planned", label: "Plan", width: "5%", align: "right" },
-  { key: "pmk", label: "PMK", width: "5%", align: "right" },
+  { key: "pmk", label: "Out S.", width: "5%", align: "right" },
   { key: "produced", label: "Prod.", width: "5.5%", align: "right" },
   { key: "ready", label: "Ready", width: "5%", align: "right" },
   { key: "pending", label: "Pend.", width: "5%", align: "right" },
@@ -36,7 +36,7 @@ const alignClass = (align) => {
 };
 
 const formatNumber = (value) => Number(value || 0).toLocaleString("en-IN", { maximumFractionDigits: 2 });
-const formatCurrency = (value) => `₹ ${Number(value || 0).toLocaleString("en-IN", { maximumFractionDigits: 2 })}`;
+const formatCurrency = (value) => `₹ ${Math.round(Number(value || 0)).toLocaleString("en-IN", { maximumFractionDigits: 0 })}`;
 const formatDate = (value) => {
   if (!value) return "-";
   const date = new Date(value);
@@ -45,14 +45,21 @@ const formatDate = (value) => {
 };
 
 const summaryItems = [
-  ["total_orders", "Total Orders", "number"],
-  ["total_order_qty", "Total Booking Qty", "number"],
-  ["total_value", "Total Value", "currency"],
-  ["ready_qty", "Ready Qty", "green"],
-  ["pending_qty", "Pending Production", "red"],
-  ["dispatched_qty", "Dispatched Qty", "teal"],
-  ["pmk_qty", "PMK Outsourcing", "purple"],
+  { qtyKey: "total_orders", qtyLabel: "Total Orders", valueKey: "avg_order_value", valueLabel: "Avg Order Value", tone: "slate" },
+  { qtyKey: "total_order_qty", qtyLabel: "Total Booking Qty", valueKey: "total_value", valueLabel: "Booking Value", tone: "slate" },
+  { qtyKey: "ready_qty", qtyLabel: "Ready Qty", valueKey: "ready_value", valueLabel: "Ready Value", tone: "green" },
+  { qtyKey: "pending_qty", qtyLabel: "Pending Production", valueKey: "pending_value", valueLabel: "Pending Value", tone: "red" },
+  { qtyKey: "dispatched_qty", qtyLabel: "Dispatched Qty", valueKey: "dispatched_value", valueLabel: "Dispatched Value", tone: "teal" },
+  { qtyKey: "pmk_qty", qtyLabel: "Outsourcing", valueKey: "pmk_value", valueLabel: "Outsource Value", tone: "purple" },
 ];
+
+const summaryToneClass = (tone) => {
+  if (tone === "green") return "text-emerald-600";
+  if (tone === "red") return "text-red-600";
+  if (tone === "teal") return "text-cyan-700";
+  if (tone === "purple") return "text-violet-600";
+  return "text-slate-900";
+};
 
 const getCellStyle = (columnKey) => {
   const column = tableColumns.find((item) => item.key === columnKey);
@@ -100,13 +107,21 @@ function LifecycleOrderTable({ data = {}, loading = false, activeTab = "all", on
 
   return (
     <section className="overflow-hidden rounded-sm border border-orange-100 bg-white shadow-xs">
-      <div className="grid grid-cols-7 border-b border-slate-200 bg-white">
-        {summaryItems.map(([key, label, type]) => (
-          <div key={key} className="min-h-[50px] min-w-0 border-r border-slate-200 px-3 py-2 last:border-r-0">
-            <p className="truncate text-[10px] font-bold text-slate-500">{label}</p>
-            <p className={`mt-1 truncate text-lg font-black tabular-nums ${type === "currency" ? "text-slate-900" : type === "green" ? "text-emerald-600" : type === "red" ? "text-red-600" : type === "teal" ? "text-cyan-700" : type === "purple" ? "text-violet-600" : "text-slate-900"}`}>
-              {type === "currency" ? formatCurrency(summary[key]) : formatNumber(summary[key])}
-            </p>
+      <div className="grid grid-cols-2 border-b border-slate-200 bg-white md:grid-cols-3 xl:grid-cols-6">
+        {summaryItems.map((item) => (
+          <div key={item.qtyKey} className="min-h-[82px] min-w-0 border-r border-b border-slate-200 px-3 py-2 last:border-r-0 xl:border-b-0">
+            <div className="border-b border-slate-100 pb-1.5">
+              <p className="truncate text-[10px] font-bold text-slate-500">{item.qtyLabel}</p>
+              <p className={`mt-1 truncate text-lg font-black tabular-nums ${summaryToneClass(item.tone)}`}>
+                {formatNumber(summary[item.qtyKey])}
+              </p>
+            </div>
+            <div className="pt-1.5">
+              <p className="truncate text-[10px] font-bold text-slate-400">{item.valueLabel}</p>
+              <p className={`mt-0.5 truncate text-sm font-black tabular-nums ${summaryToneClass(item.tone)}`}>
+                {formatCurrency(summary[item.valueKey])}
+              </p>
+            </div>
           </div>
         ))}
       </div>
@@ -150,7 +165,7 @@ function LifecycleOrderTable({ data = {}, loading = false, activeTab = "all", on
             {rows.map((row, index) => (
               <tr key={`${row.order_id}-${row.order_item_id}`} className="lifecycle-table-row" style={{ height: 42, maxHeight: 42, borderBottom: "1px solid #edf2f7" }}>
                 <td className="text-slate-500 tabular-nums" style={getCellStyle("sr")}>{index + 1}</td>
-                <td style={getCellStyle("order_no")}><TruncateCol title={row.order_no} className="font-extrabold text-orange-600">{row.order_no || "-"}</TruncateCol></td>
+                <td style={getCellStyle("order_no")}><TruncateCol title={row.order_code} className="font-extrabold text-orange-600">{row.order_code || "-"}</TruncateCol></td>
                 <td style={getCellStyle("customer")}><TruncateCol title={row.customer_name} className="font-semibold text-slate-700">{row.customer_name || "-"}</TruncateCol></td>
                 <td style={{ ...getCellStyle("product"), whiteSpace: "normal" }}>
                   <TruncateCol title={row.product_name} className="font-extrabold leading-[1.1] text-slate-800">{row.product_name || "-"}</TruncateCol>
@@ -195,7 +210,3 @@ function LifecycleOrderTable({ data = {}, loading = false, activeTab = "all", on
 }
 
 export default LifecycleOrderTable;
-
-
-
-

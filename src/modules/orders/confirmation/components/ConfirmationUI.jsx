@@ -165,7 +165,7 @@ const OrderReviewDrawer = ({ isOpen, order, remarks, actionLoading, onClose, onR
             <section className="rounded-xl border border-slate-100 bg-white p-3 shadow-sm">
               <h3 className="mb-3 text-sm font-bold text-slate-800">Order Header</h3>
               <div className="grid grid-cols-2 gap-2">
-                <DetailCell label="Order No" value={order?.order_no} highlight />
+                <DetailCell label="Order Code" value={order?.order_code} highlight />
                 <DetailCell label="Status" value={order?.order_status || "waiting"} />
                 <DetailCell label="Priority" value={order?.priority || "normal"} />
                 <DetailCell label="Order Date" value={formatDate(order?.order_date)} />

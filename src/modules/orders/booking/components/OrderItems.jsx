@@ -4,7 +4,12 @@ import OrderItemsHeader from "./order-items/OrderItemsHeader";
 import OrderItemRow from "./order-items/OrderItemRow";
 import { convertInrToCurrency, getCurrencySymbol } from "../utils/booking.utils";
 
-const createBlankRow = () => ({
+const getSafeGstRate = (value) => {
+  const numericValue = Number(value);
+  return Number.isFinite(numericValue) ? numericValue : 0;
+};
+
+const createBlankRow = (gstRate = 0) => ({
   id: Date.now(),
   product_id: null,
   product: null,
@@ -15,26 +20,44 @@ const createBlankRow = () => ({
   unitRate: 0,
   unitRateInInr: 0,
   standard_rate: 0,
-  gst: 0,
+  gst: getSafeGstRate(gstRate),
   readyStock: 0,
   pendingStock: 0,
 });
 
-const normalizeRows = (rows = []) => (Array.isArray(rows) && rows.length ? rows : [createBlankRow()]);
+const normalizeRows = (rows = [], gstRate = 0) => {
+  const normalizedGstRate = getSafeGstRate(gstRate);
+  const sourceRows = Array.isArray(rows) && rows.length ? rows : [createBlankRow(normalizedGstRate)];
+  return sourceRows.map((row) => ({
+    ...row,
+    gst: normalizedGstRate,
+  }));
+};
 
 const rowGridClass = "grid grid-cols-[28px_minmax(160px,1.8fr)_minmax(96px,1fr)_58px_64px_82px_58px_96px_34px]";
 
-const OrderItems = ({ currency = "INR", exchangeRate = 1, defaultItems = [], onItemsChange }) => {
+const OrderItems = ({ currency = "INR", formData, exchangeRate = 1, defaultItems = [], onItemsChange }) => {
   const [items, setItems] = useState(() => normalizeRows());
   const defaultItemsSignatureRef = useRef("");
   const currencySignatureRef = useRef("");
   const currencySymbol = getCurrencySymbol(currency);
+  const headerGstRate = getSafeGstRate(formData?.gst_rate);
 
   const updateItems = (updatedItems) => {
     setItems(updatedItems);
     onItemsChange?.(updatedItems);
   };
+  useEffect(() => {
+    setItems((currentItems) => {
+      const nextItems = currentItems.map((item) => ({
+        ...item,
+        gst: headerGstRate,
+      }));
 
+      onItemsChange?.(nextItems);
+      return nextItems;
+    });
+  }, [headerGstRate]);
   const handleFieldChange = (rowId, field, value) => {
     const numericFields = ["weight", "qty", "unitRate", "gst"];
     const numericValue = value === "" ? "" : Number(value);
@@ -65,12 +88,12 @@ const OrderItems = ({ currency = "INR", exchangeRate = 1, defaultItems = [], onI
             product_id: product.product_id,
             product: product.product,
             productCode: product.productCode,
-            model: product.model,
+            model: product.product_type,
             weight: product.weight,
             unitRate: convertInrToCurrency(product.unitRate, exchangeRate),
             unitRateInInr: product.unitRate,
             standard_rate: product.unitRate,
-            gst: product.gst,
+            gst: headerGstRate,
             readyStock: product.readyStock,
             pendingStock: product.pendingStock,
           }
@@ -80,7 +103,7 @@ const OrderItems = ({ currency = "INR", exchangeRate = 1, defaultItems = [], onI
   };
 
   const handleAddRow = () => {
-    updateItems([...items, createBlankRow()]);
+    updateItems([...items, createBlankRow(headerGstRate)]);
   };
 
   const handleDeleteRow = (rowId) => {
@@ -91,9 +114,9 @@ const OrderItems = ({ currency = "INR", exchangeRate = 1, defaultItems = [], onI
     const defaultItemsSignature = JSON.stringify(defaultItems || []);
     if (defaultItemsSignatureRef.current === defaultItemsSignature) return;
     defaultItemsSignatureRef.current = defaultItemsSignature;
-    const nextItems = normalizeRows(defaultItems);
+    const nextItems = normalizeRows(defaultItems, headerGstRate);
     updateItems(nextItems);
-  }, [defaultItems]);
+  }, [defaultItems, headerGstRate]);
 
   useEffect(() => {
     const rate = Number(exchangeRate) || 1;
@@ -117,7 +140,7 @@ const OrderItems = ({ currency = "INR", exchangeRate = 1, defaultItems = [], onI
 
   useEffect(() => {
     if (!items.length) {
-      updateItems([createBlankRow()]);
+      updateItems([createBlankRow(headerGstRate)]);
     }
   }, [items]);
 
@@ -155,6 +178,7 @@ const OrderItems = ({ currency = "INR", exchangeRate = 1, defaultItems = [], onI
                 item={item}
                 className={rowGridClass}
                 currency={currency}
+                gstPercent={item.gst}
                 handleDeleteRow={handleDeleteRow}
                 handleFieldChange={handleFieldChange}
                 handleProductSelect={handleProductSelect}

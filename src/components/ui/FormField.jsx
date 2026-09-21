@@ -1,25 +1,13 @@
-import Input  from "../form-inputs/Input";
+import Input from "../form-inputs/Input";
 
 function FormField({ field, value, onChange, onClear }) {
-  {console.log(field)}
-
   switch (field.type) {
     case 'text':
-        return (<Input  />)
+      return (<Input />)
       break;
-  
     default:
       break;
   }
-
-  // const label = (
-    
-  //   <label className="form-label" htmlFor={field.name}>
-  //     {field.label}
-  //     {field.required ? <span className="error"> *</span> : null}
-  //   </label>
-  // );
-
   if (field.type === "assignee") {
     return (
       <div className="form-group form-float">
@@ -30,7 +18,7 @@ function FormField({ field, value, onChange, onClear }) {
               id={field.name}
               className="form-control"
               name={field.name}
-              
+
               value={value}
               onChange={onChange}
               placeholder={field.placeholder ?? ""}
@@ -99,15 +87,3 @@ function FormField({ field, value, onChange, onClear }) {
 }
 
 export default FormField;
-
-
-// import React from 'react'
-
-// function FormField({field, value, onChange, onClea}) {
-//   return (
-//     <>
-//     </>
-//   )
-// }
-
-// export default FormField

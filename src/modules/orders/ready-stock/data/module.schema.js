@@ -20,7 +20,7 @@ export const ordersModuleSchema = {
     modelName: "order",
   },
   staticJoined: [],
-  defaultColumns: ["order_no", "customer_id", "ready_stock_status", "expected_delivery_date", "total_items", "item_total_qty", "planning_ready_qty", "qc_passed_qty", "procured_qty", "total_ready_qty", "dispatched_qty", "available_dispatch_qty", "pending_qty", "priority",],
+  defaultColumns: ["order_no", "customer_id", "ready_stock_status", "expected_delivery_date", "total_items", "item_total_qty", "planning_ready_qty", "produced_qty", "procured_qty", "total_ready_qty", "dispatched_qty", "available_dispatch_qty", "pending_qty", "priority",],
   skipFields: ["created_by", "created_date", "modified_by", "modified_date", "status", "remarks", "excel_row_no", "source"],
   tableCellConfig: [
     { column_name: "customer_id", type: "person" },
@@ -36,7 +36,7 @@ export const ordersModuleSchema = {
     { total_items: "Items" },
     { item_total_qty: "Order Qty" },
     { planning_ready_qty: "Stock Qty" },
-    { qc_passed_qty: "QC Pass" },
+    { produced_qty: "Produced" },
     { procured_qty: "Procured" },
     { total_ready_qty: "Total Ready" },
     { dispatched_qty: "Dispatched" },
@@ -221,4 +221,3 @@ export const ordersFallbackColumns = [
     tableCellConfig: ordersModuleSchema.tableCellConfig,
   }),
 ];
-

@@ -159,6 +159,7 @@ select option:checked {
   background-color: #FF8D4B !important;
   color: #fff !important;
 }
+
 #root {
   height: 100vh;
   min-height: 100vh;
@@ -247,6 +248,7 @@ select option:checked {
   background: var(--primary-50);
   box-shadow: none;
 }
+
 .sidebar-sections {
   display: flex;
   flex: 1;
@@ -333,6 +335,7 @@ select option:checked {
   background: var(--surface-soft);
   color: var(--primary);
 }
+
 .sidebar-item:focus,
 .sidebar-item:focus-visible {
   outline: none !important;
@@ -3820,6 +3823,7 @@ table input[type="checkbox"]:focus-visible {
     align-items: stretch;
   }
 
+
   .flyout-close {
     left: auto;
     right: 18px;
@@ -5165,7 +5169,7 @@ table input[type="checkbox"]:focus-visible {
 /* LOADING BAR */
 .topbar-shell {
   position: relative;
-  z-index: 20;
+  z-index: 19;
 }
 
 .global-loading-bar {
@@ -6426,6 +6430,7 @@ table input[type="checkbox"]:focus-visible {
     max-width: 72px;
   }
 }
+
 /* Dashboard-only collapsible sidebar */
 .app-frame.sidebar-collapsed {
   grid-template-columns: 42px 1fr;
@@ -6478,7 +6483,7 @@ table input[type="checkbox"]:focus-visible {
 
 .dashboard-mini-sidebar .sidebar-item span:not(.sidebar-icon):not(.item-count),
 .dashboard-mini-sidebar .sidebar-label,
-.dashboard-mini-sidebar .sidebar-group-toggle > svg {
+.dashboard-mini-sidebar .sidebar-group-toggle>svg {
   display: none;
 }
 

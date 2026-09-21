@@ -106,8 +106,8 @@ export const orderSmartSelectConfig = {
   label: "Order",
   placeholder: "Select Order",
   apiUrl: "",
-  check: "order_no",
-  list: "order_id,order_no",
+  check: "order_code",
+  list: "order_id,order_code",
   preload: true,
   cache: true,
   showRecent: true,
@@ -117,6 +117,6 @@ export const orderSmartSelectConfig = {
   customParameters: {},
   getValue: (order) => order.order_id,
   getLabel: (order) => {
-    return order.order_no || "Unnamed order";
+    return order.order_code || "Unnamed order";
   },
 };

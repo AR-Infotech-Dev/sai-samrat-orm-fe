@@ -18,6 +18,8 @@ import {
 const DEFAULT_MODULES = buildDefaultModules();
 
 export function useAccessControlModule({ currentUser = {} }) {
+  const isSuperAdmin = currentUser?.role_slug === "super_admin";
+  const currentCompanyId = isSuperAdmin ? "" : currentUser?.company_id || currentUser?.default_company || "";
   const [selectedIdentity, setSelectedIdentity] = useState(null);
   const [loadingMenus, setLoadingMenus] = useState(false);
   const [loadingPermissions, setLoadingPermissions] = useState(false);
