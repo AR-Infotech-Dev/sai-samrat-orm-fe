@@ -104,6 +104,12 @@ export const ordersModuleSchema = {
       {
         columns: 3,
         fields: [
+          { name: "order_code", label: "Order Code", type: "text", placeholder: "Order Code", gridSpan: 12, required: true, readOnlyWhen: (values) => Boolean(values.order_status !== "draft"), },
+        ],
+      },
+      {
+        columns: 3,
+        fields: [
           {
             name: "order_type",
             label: "Order Type",
@@ -152,8 +158,17 @@ export const ordersModuleSchema = {
       {
         columns: 3,
         fields: [
-          { name: "pi_number", label: "PI No", type: "text", required: false, placeholder: "PI Number", gridSpan: 12, readOnlyWhen: (values) => Boolean(values.order_status !== "draft"), },
+          { name: "pi_number", label: "PI No", type: "text", required: true, placeholder: "PI Number", gridSpan: 12, readOnlyWhen: (values) => Boolean(values.order_status !== "draft"), },
         ]
+      },
+      {
+        columns: 3,
+        fields: [
+          {
+            name: "brand", label: "Brand", type: "text", required: true, placeholder: "Brand", gridSpan: 12,
+            readOnlyWhen: (values) => Boolean(values.order_status !== "draft"),
+          },
+        ],
       },
       {
         columns: 3,
@@ -197,24 +212,6 @@ export const ordersModuleSchema = {
         columns: 3,
         fields: [
           {
-            name: "brand", label: "Brand", type: "text", required: true, placeholder: "Brand", gridSpan: 12,
-            readOnlyWhen: (values) => Boolean(values.order_status !== "draft"),
-          },
-        ],
-      },
-      {
-        columns: 3,
-        fields: [
-          {
-            name: "order_code", label: "Order Code", type: "text", placeholder: "Order Code", gridSpan: 12, required: true,
-            readOnlyWhen: (values) => Boolean(values.order_status !== "draft"),
-          },
-        ],
-      },
-      {
-        columns: 3,
-        fields: [
-          {
             name: "currency",
             label: "Currency",
             type: "select",
@@ -240,6 +237,10 @@ export const ordersModuleSchema = {
     ],
   },
   validationSchema: z.object({
+    order_type: z.string().nullable().refine((val) => val !== null && val.trim() !== "", { message: "Order type required", }),
+    order_code: z.string().nullable().refine((val) => val !== null && val.trim() !== "", { message: "Order code required", }),
+    pi_number: z.string().nullable().refine((val) => val !== null && val.trim() !== "", { message: "PI number required", }),
+    brand: z.string().nullable().refine((val) => val !== null && val.trim() !== "", { message: "Brand required", }),
     customer_id: z.coerce.number({ required_error: "Customer is required", invalid_type_error: "Customer is required", }).int("Invalid customer").positive("Customer is required"),
     order_date: z.coerce.date().nullable()
       .refine((val) => val !== null, {
@@ -247,6 +248,13 @@ export const ordersModuleSchema = {
       })
       .refine((val) => val && val <= new Date(), {
         message: "Order date cannot be in the future",
+      }),
+    expected_delivery_date: z.coerce.date().nullable()
+      .refine((val) => val !== null, {
+        message: "Expected delivery date is required",
+      })
+      .refine((val) => val && val >= new Date(), {
+        message: "Expected delivery date cannot be in the past",
       }),
   })
 };

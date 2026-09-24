@@ -98,14 +98,14 @@ export const productsModuleSchema = {
         columns: 3,
         fields: [
           { name: "unit", label: "Unit", type: "text", placeholder: "Enter unit", gridSpan: 4 },
-          { name: "standard_rate", label: "Rate", type: "text", placeholder: "Enter rate", gridSpan: 4 },
+          { name: "standard_rate", label: "Rate", type: "number", required: true, placeholder: "Enter rate", gridSpan: 4 },
           { name: "weight", label: "Weight", type: "text", placeholder: "Enter weight (kg)", gridSpan: 4 },
         ],
       },
       {
         columns: 2,
         fields: [
-          { name: "gst_rate", label: "Gst Rate", type: "text", placeholder: "Enter product brand", gridSpan: 4 },
+          { name: "gst_rate", label: "Gst Rate", type: "number", required: true, placeholder: "Enter product brand", gridSpan: 4 },
           {
             name: "status", label: "Status", type: "radio", options: [
               { value: "active", label: "Active" },
@@ -132,6 +132,8 @@ export const productsModuleSchema = {
     product_name: z.string().nullable().refine((val) => val !== null && val.trim() !== "", { message: "Product name is required", }),
     product_type: z.coerce.number().min(1, "Product type required"),
     product_code: z.string().nullable().refine((val) => val !== null && val.trim() !== "", { message: "Product code required", }),
+    standard_rate: z.coerce.number().min(1, "Rate required"),
+    gst_rate: z.coerce.number().min(1, "GST rate required"),
   }),
 };
 
