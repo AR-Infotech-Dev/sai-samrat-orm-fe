@@ -6,6 +6,7 @@ import { API_BASE_URL } from '@api/config';
 import { Check } from 'lucide-react';
 import DefaultLabel from './DefaultLabel';
 import ValidationError from './ValidationError';
+import { getFormInputClass, FORM_DROPDOWN_CLASS } from './formInput.styles';
 const cacheStore = new Map();
 function StatusIndicator({ status }) {
   return (
@@ -156,7 +157,11 @@ const SmartSelectInput = ({ id, field = {}, value, onSelect, onObjectSelect, con
             ...effectiveCustomParameters,
           },
         });
-        data = Array.isArray(res?.data) ? res.data : [];
+        data = Array.isArray(res?.data)
+          ? res.data
+          : Array.isArray(res?.data?.data)
+            ? res.data.data
+            : [];
       }
 
       // Ignore a slower response from an older search request.
@@ -213,7 +218,12 @@ const SmartSelectInput = ({ id, field = {}, value, onSelect, onObjectSelect, con
       requestIdRef.current += 1;
       fetchingRef.current = false;
       setLoading(false);
-      setOptions(cacheStore.get(key) || []);
+      const cachedOptions = cache ? cacheStore.get(key) : null;
+      if (cachedOptions) {
+        setOptions(cachedOptions);
+      } else if (searchText) {
+        setOptions([]);
+      }
       return undefined;
     }
 
@@ -243,6 +253,13 @@ const SmartSelectInput = ({ id, field = {}, value, onSelect, onObjectSelect, con
       const nextPage = Number(page) + 1;
       setPage(nextPage);
       fetchOptions(nextPage, usesRemoteSearch ? inputValue : '');
+    }
+  };
+  const handleOpenDropdown = () => {
+    if (isLocked) return;
+    setShowDropdown(true);
+    if (!options.length && !fetchingRef.current) {
+      fetchOptions(0, '', { replace: true });
     }
   };
   useEffect(() => {
@@ -493,9 +510,9 @@ const SmartSelectInput = ({ id, field = {}, value, onSelect, onObjectSelect, con
       )}
       <div ref={containerRef} className="relative w-full">
         {multi ? (
-          <div onClick={() => { if (!isLocked) { setShowDropdown(true); inputRef.current?.focus(); } }}
+          <div onClick={() => { if (!isLocked) { handleOpenDropdown(); inputRef.current?.focus(); } }}
             aria-disabled={isLocked}
-            className={`flex min-h-[34px] w-full flex-wrap gap-1 rounded border bg-gray-100 px-3 py-1.5 text-sm transition-all focus-within:outline-none focus-within:ring-2 focus-within:ring-purple-100 ${isLocked ? "cursor-not-allowed opacity-70" : ""} ${error ? "border-red-400 text-red-600" : "border-gray-50 text-gray-600"}`}>
+            className={`${getFormInputClass(error, "flex min-h-[34px] flex-wrap gap-1")} ${isLocked ? "cursor-not-allowed opacity-70" : ""}`}>
             {internalValue.map((v, i) => (
               <span key={i} className="bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-sm">
                 {v.label}
@@ -518,7 +535,7 @@ const SmartSelectInput = ({ id, field = {}, value, onSelect, onObjectSelect, con
                   onObjectSelect?.({});
                 }
               }}
-              className="border-gray-50 text-gray-600 bg-gray-200 min-w-[120px] flex-grow border-none bg-transparent text-sm outline-none focus:outline-none"
+              className="min-w-[120px] flex-grow border-none bg-transparent text-sm text-slate-700 outline-none focus:outline-none"
               value={inputValue}
               onChange={(e) => !isLocked && setInputValue(e.target.value)}
               disabled={isLocked}
@@ -536,11 +553,11 @@ const SmartSelectInput = ({ id, field = {}, value, onSelect, onObjectSelect, con
               ref={inputRef}
               value={inputValue || internalValue?.label || ''}
               onChange={(e) => !isLocked && setInputValue(e.target.value)}
-              onFocus={() => !isLocked && setShowDropdown(true)}
+              onFocus={handleOpenDropdown}
               placeholder={placeholder}
               disabled={isLocked}
               readOnly={isLocked}
-              className={`w-full rounded border border-gray-50 text-gray-600 bg-gray-100 px-3 py-1.5 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-purple-100 disabled:cursor-not-allowed disabled:opacity-70 ${error ? "border-red-400 text-red-600" : "border-gray-50 text-gray-600"}`}
+              className={getFormInputClass(error, "pr-10")}
             />
             {internalValue && !isLocked && (
               <button type="button" onClick={handleClear}
@@ -552,8 +569,8 @@ const SmartSelectInput = ({ id, field = {}, value, onSelect, onObjectSelect, con
         )}
 
         {showDropdown && !isLocked && (!dropdownPortal || dropdownPosition) && createPortal(
-          <div ref={dropdownRef} className={`${dropdownPortal ? "fixed z-1000" : "absolute left-0 right-0 top-full z-50 mt-1"} max-h-60 rounded-sm border border-gray-300 bg-white text-sm shadow-lg `} style={dropdownPortal ? dropdownPosition : undefined} >
-            <div className="flex pr-2 pt-1 bg-blue-50 rounded-t-sm p-2 h-10 align-center justify-between">
+          <div ref={dropdownRef} className={`${dropdownPortal ? "fixed z-1000" : "absolute left-0 right-0 top-full z-50 mt-1"} max-h-60 ${FORM_DROPDOWN_CLASS}`} style={dropdownPortal ? dropdownPosition : undefined} >
+            <div className="flex h-10 items-center justify-between rounded-t-md border-b border-slate-100 bg-slate-50 p-2 pr-2">
               {loading
                 ? (<div className="p-3 text-sm text-gray-500">Loading...</div>)
                 : (<button onClick={handleRefresh} className="hover:underline text-blue-600">Refresh List</button>)

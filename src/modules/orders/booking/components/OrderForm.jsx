@@ -13,7 +13,7 @@ import { Badge } from "@/components/ui/badge";
 
 function OrderForm({ isOpen, onClose, selectedOrder, onAfterSave, menu_id }) {
   const [orderItems, setOrderItems] = useState([]);
-  const { loading, fetchingOrder, formData, initialOrderItems, errors, currencyRateLoading, handleClose, handleChange, handleSave } = useOrderBookingForm({ isOpen, onClose, selectedOrder, onAfterSave });
+  const { loading, fetchingOrder, formData, initialOrderItems, piItems, errors, currencyRateLoading, handleClose, handleChange, handleObjectSelect, handleSave } = useOrderBookingForm({ isOpen, onClose, selectedOrder, onAfterSave });
   const orderSummary = useMemo(() => buildOrderSummary(orderItems, formData), [orderItems, formData]);
   const saveContext = { items: orderItems, summary: orderSummary };
 
@@ -83,6 +83,7 @@ function OrderForm({ isOpen, onClose, selectedOrder, onAfterSave, menu_id }) {
                   sections={ordersModuleSchema.form.sections}
                   values={formData}
                   onChange={handleChange}
+                  onObjectSelect={handleObjectSelect}
                   errors={errors}
                   menuId={menu_id}
                 />
@@ -97,6 +98,7 @@ function OrderForm({ isOpen, onClose, selectedOrder, onAfterSave, menu_id }) {
                   exchangeRate={formData.exchange_rate}
                   gstPercentage={formData.gst_rate}
                   defaultItems={initialOrderItems}
+                  piItems={piItems}
                   onItemsChange={setOrderItems}
                 />
               </div>

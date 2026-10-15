@@ -1,5 +1,6 @@
 import React from 'react';
 import DefaultLabel from './DefaultLabel';
+import { getFormInputClass } from './formInput.styles';
 
 
 const Select = ({ field, value, onChange, className = '', ...rest }) => {
@@ -32,7 +33,7 @@ const Select = ({ field, value, onChange, className = '', ...rest }) => {
         disabled={isLocked}
         multiple={isMulti}
         size={isMulti ? Math.min(Math.max(options.length, 2), 5) : undefined}
-        className={`border border-gray-200 text-gray-600 bg-slate-50 px-3 py-1.5 rounded text-sm focus:outline-none focus:ring-2 focus:ring-purple-100 disabled:cursor-not-allowed disabled:opacity-70 ${className}`}
+        className={getFormInputClass(false, className)}
         {...rest}
       >
         {!isMulti && <option value="">{field.placeholder || `Select ${field.label}`}</option>}

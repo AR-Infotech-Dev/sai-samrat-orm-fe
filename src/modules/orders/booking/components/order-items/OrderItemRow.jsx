@@ -1,6 +1,7 @@
 import { Trash2 } from "lucide-react";
 import { gstOptions, formatIndianCurrency, getCurrencySymbol, getLineValue } from "../../utils/booking.utils";
 import ProductSmartSelect from "@components/form-inputs/ProductSmartSelect";
+import PiItemSmartSelect from "./PiItemSmartSelect";
 const fieldClassName = `
   h-8 w-full min-w-0 rounded-md border border-slate-200 bg-slate-50 px-2
   text-xs font-medium text-slate-700 outline-none transition
@@ -8,14 +9,15 @@ const fieldClassName = `
   focus:border-orange-400 focus:bg-white focus:ring-2 focus:ring-orange-400/15
 `;
 
-const TextInput = ({ value, type = "text", placeholder, onChange, min }) => (
+const TextInput = ({ value, type = "text", placeholder, onChange, min, disabled = false }) => (
     <input
         type={type}
         value={value}
         min={min}
+        disabled={disabled}
         placeholder={placeholder}
         onChange={(event) => onChange(event.target.value)}
-        className={`${fieldClassName} text-xs`}
+        className={`${fieldClassName} text-xs ${disabled ? "cursor-not-allowed opacity-80" : ""}`}
     />
 );
 
@@ -33,22 +35,48 @@ const SelectInput = ({ value, options, onChange }) => (
     </select>
 );
 
-function OrderItemRow({ index = 0, item = {}, gstPercent = 18, currency = "INR", handleFieldChange, handleProductSelect, handleDeleteRow, className = "grid grid-cols-[28px_minmax(160px,1.8fr)_minmax(96px,1fr)_58px_64px_82px_58px_96px_34px]", }) {
+function OrderItemRow({
+    index = 0,
+    item = {},
+    gstPercent = 18,
+    currency = "INR",
+    piMode = false,
+    piItems = [],
+    selectedPiItemIds = [],
+    handleFieldChange,
+    handleProductSelect,
+    handlePiItemSelect,
+    handleDeleteRow,
+    className = "grid grid-cols-[28px_minmax(160px,1.8fr)_minmax(96px,1fr)_58px_64px_82px_58px_96px_34px]",
+}) {
     const lineValue = getLineValue(item);
     const currencySymbol = getCurrencySymbol(currency);
 
     return (
         <div className={`items-center gap-2 px-2.5 py-2 transition hover:bg-orange-50/30 ${className}`}>
             <span className="text-xs font-semibold text-slate-500">{index + 1}</span>
-            <ProductSmartSelect
-                value={item.product}
-                onSelect={(product) => handleProductSelect?.(item.id, product)}
-            />
+            {piMode ? (
+                <PiItemSmartSelect
+                    value={item.product}
+                    piItems={piItems}
+                    selectedPiItemIds={selectedPiItemIds}
+                    currentPiItemId={item.pi_item_id}
+                    currency={currency}
+                    disabled={!piItems.length}
+                    onSelect={(piItem) => handlePiItemSelect?.(item.id, piItem)}
+                />
+            ) : (
+                <ProductSmartSelect
+                    value={item.product}
+                    onSelect={(product) => handleProductSelect?.(item.id, product)}
+                />
+            )}
 
             <TextInput
                 type="text"
                 placeholder={'Series'}
                 value={item.model}
+                disabled={piMode}
                 onChange={(value) => handleFieldChange(item.id, "model", value)}
             />
 
@@ -56,6 +84,7 @@ function OrderItemRow({ index = 0, item = {}, gstPercent = 18, currency = "INR",
                 type="number"
                 min="0"
                 value={item.weight}
+                disabled={piMode}
                 onChange={(value) => handleFieldChange(item.id, "weight", value)}
             />
 
@@ -74,8 +103,9 @@ function OrderItemRow({ index = 0, item = {}, gstPercent = 18, currency = "INR",
                     type="number"
                     min="0"
                     value={item.unitRate}
+                    disabled={piMode}
                     onChange={(event) => handleFieldChange(item.id, "unitRate", event.target.value)}
-                    className={`${fieldClassName} pl-5 text-xs`}
+                    className={`${fieldClassName} pl-5 text-xs ${piMode ? "cursor-not-allowed opacity-80" : ""}`}
                 />
             </div>
             <div className="relative min-w-0">

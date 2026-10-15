@@ -2,7 +2,15 @@ import { useEffect, useState } from "react";
 import ModulePageLayout from "@shared/ModulePageLayout";
 import { Download, RefreshCw, RotateCcw, Search } from "lucide-react";
 import SmartSelectInput from "@/components/form-inputs/smartSelectInput";
-import LifecycleOrderTable from "./components/LifecycleOrderTable";
+import { useAuth } from "@auth/components/AuthProvider";
+import ColumnArranger from "@/components/table/ColumnArranger";
+import LifecycleOrderTable, {
+  getDashboardColumnStorageKey,
+  getStoredVisibleColumnKeys,
+  normalizeVisibleColumnKeys,
+  setStoredVisibleColumnKeys,
+  tableColumns,
+} from "./components/LifecycleOrderTable";
 import { getDashboard } from "./data/dashboard.service";
 import { customerSmartSelectConfig, orderSmartSelectConfig, productSmartSelectConfig } from "./utils/dashboard.utils";
 import "./styles/dashboard.css";
@@ -19,10 +27,18 @@ const initialFilters = {
 const cleanFilters = (filters = {}) => Object.fromEntries(Object.entries(filters).filter(([, value]) => value !== "" && value !== null && value !== undefined && value !== "all"));
 
 function Dashboard() {
+  const { authSession } = useAuth();
+  const roleSlug = authSession?.user?.role_slug || "user";
+  const columnStorageKey = getDashboardColumnStorageKey(roleSlug);
   const [dashboardData, setDashboardData] = useState(null);
   const [filters, setFilters] = useState(initialFilters);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [visibleColumnKeys, setVisibleColumnKeys] = useState(() => {
+    const storedKeys = getStoredVisibleColumnKeys(getDashboardColumnStorageKey(roleSlug));
+    return normalizeVisibleColumnKeys(storedKeys, roleSlug);
+  });
+  const [isColumnMenuOpen, setIsColumnMenuOpen] = useState(false);
 
   const updateFilter = (key, value) => setFilters((prev) => ({ ...prev, [key]: value || "" }));
 
@@ -55,10 +71,28 @@ function Dashboard() {
     loadDashboard(initialFilters);
   }, []);
 
+  useEffect(() => {
+    const storedKeys = getStoredVisibleColumnKeys(columnStorageKey);
+    setVisibleColumnKeys(normalizeVisibleColumnKeys(storedKeys, roleSlug));
+  }, [columnStorageKey, roleSlug]);
+
+  const handleApplyColumnKeys = (nextColumnKeys = []) => {
+    const normalizedKeys = normalizeVisibleColumnKeys(nextColumnKeys, roleSlug);
+    setVisibleColumnKeys(normalizedKeys);
+    setStoredVisibleColumnKeys(columnStorageKey, normalizedKeys);
+  };
+
   return (
-    <ModulePageLayout title="Order Lifecycle Dashboard" description="Track confirmation, planning, production, ready stock and dispatch in one simple view.">
-      <div className="space-y-2">
-        <div className="dashboard-filters rounded-sm border border-orange-100 bg-white shadow-xs">
+    <ModulePageLayout controlsCardClassName="dashboard-module-card">
+      <div className="dashboard-page-content relative flex h-full min-h-0 flex-col gap-0.5">
+        <ColumnArranger
+          setIsColumnMenuOpen={setIsColumnMenuOpen}
+          isColumnMenuOpen={isColumnMenuOpen}
+          columns={tableColumns}
+          visibleColumnKeys={visibleColumnKeys}
+          onApplyColumnKeys={handleApplyColumnKeys}
+        />
+        <div className="dashboard-filters rounded-sm border border-slate-100 bg-white p-2 shadow-xs mb-0.5">
           <SmartSelectInput id="order_id" field={{ label: "Order" }} value={filters.order_code} config={orderSmartSelectConfig} onSelect={(value) => updateFilter("order_id", value)} />
           <SmartSelectInput id="customer_id" field={{ label: "Customer" }} value={filters.customer_id} config={customerSmartSelectConfig} onSelect={(value) => updateFilter("customer_id", value)} />
           <SmartSelectInput id="product_id" field={{ label: "Product / Model" }} value={filters.product_id} config={productSmartSelectConfig} onSelect={(value) => updateFilter("product_id", value)} />
@@ -96,11 +130,17 @@ function Dashboard() {
             </button> */}
           </div>
         </div>
-
         {error ? <div className="rounded-sm border border-red-100 bg-red-50 px-3 py-2 text-xs font-semibold text-red-500">{error}</div> : null}
         {dashboardData?.meta?.usesDispatchTables === false ? <div className="rounded-sm border border-amber-100 bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-600">Dispatch tables not found, dispatch qty is shown as 0.</div> : null}
-
-        <LifecycleOrderTable data={dashboardData} loading={loading} activeTab={filters.stage || "all"} onTabChange={handleTabChange} />
+        <LifecycleOrderTable
+          data={dashboardData}
+          loading={loading}
+          activeTab={filters.stage || "all"}
+          onTabChange={handleTabChange}
+          roleSlug={roleSlug}
+          visibleColumnKeys={visibleColumnKeys}
+          onToggleColumnMenu={() => setIsColumnMenuOpen((current) => !current)}
+        />
       </div>
     </ModulePageLayout>
   );

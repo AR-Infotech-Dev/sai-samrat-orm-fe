@@ -31,7 +31,7 @@ function FlyoutPanel({ isOpen, onClose, title, subtitle, closeButton, children, 
 
   return (
     <>
-      <div className={`flyout-overlay ${isOpen ? "open" : "close"}`} onClick={isOpen ? onClose : undefined}>
+      <div className={`flyout-overlay ${isOpen ? "open" : "close"}`}>
         <aside
           className={`flyout-panel ${isOpen ? "open" : "close"} ${panelClassName}`}
           onClick={(event) => event.stopPropagation()}

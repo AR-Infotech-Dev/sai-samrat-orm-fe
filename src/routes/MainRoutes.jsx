@@ -23,6 +23,7 @@ const OrderPlanningPage = lazy(() => import("@modules/orders/planning/OrderPlann
 const ProductionPage = lazy(() => import("@modules/orders/production/OrdersModulePage"));
 const ReadyStockPage = lazy(() => import("@modules/orders/ready-stock/OrdersModulePage"));
 const DispatchPage = lazy(() => import("@/modules/orders/dispatch/DispatchModulePage"));
+const ProformaInvoicePage = lazy(() => import("@modules/orders/proforma-invoice/ProformaInvoicePage"));
 
 const withPermission = (menuId, element) => (
   <PermissionRoute menuId={menuId}>{element}</PermissionRoute>
@@ -50,6 +51,9 @@ const menuRouteComponents = {
   "/production": ProductionPage,
   "/ready-stock": ReadyStockPage,
   "/dispatch": DispatchPage,
+  "/proforma-invoice": ProformaInvoicePage,
+  "/orders/proforma-invoice": ProformaInvoicePage,
+  "/pi": ProformaInvoicePage,
 };
 
 function DefaultMenuRedirect() {

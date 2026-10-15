@@ -105,7 +105,7 @@ export const productsModuleSchema = {
       {
         columns: 2,
         fields: [
-          { name: "gst_rate", label: "Gst Rate", type: "number", required: true, placeholder: "Enter product brand", gridSpan: 4 },
+          { name: "gst_rate", label: "Gst Rate", type: "number", required: true, placeholder: "Enter GST rate", gridSpan: 4 },
           {
             name: "status", label: "Status", type: "radio", options: [
               { value: "active", label: "Active" },

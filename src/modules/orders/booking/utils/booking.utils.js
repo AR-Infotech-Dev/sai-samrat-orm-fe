@@ -37,6 +37,30 @@ export function getOrderIdentifier(order = {}) {
   return order?.order_id;
 }
 
+export const formatDateInputValue = (date = new Date()) => {
+  const parsedDate = date instanceof Date ? date : new Date(date);
+  if (Number.isNaN(parsedDate.getTime())) return "";
+  const year = parsedDate.getFullYear();
+  const month = String(parsedDate.getMonth() + 1).padStart(2, "0");
+  const day = String(parsedDate.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
+export const addMonthsForInputDate = (date = new Date(), months = 1) => {
+  const parsedDate = date instanceof Date ? new Date(date) : new Date(date);
+  if (Number.isNaN(parsedDate.getTime())) return "";
+  parsedDate.setMonth(parsedDate.getMonth() + Number(months || 0));
+  return formatDateInputValue(parsedDate);
+};
+
+export const getDefaultOrderDates = () => {
+  const today = new Date();
+  return {
+    order_date: formatDateInputValue(today),
+    expected_delivery_date: addMonthsForInputDate(today, 1),
+  };
+};
+
 export const getGstRateByOrderType = (orderType = "domestic") => {
   if (orderType === "export") return 0;
   if (orderType === "merchant_export") return 0.1;

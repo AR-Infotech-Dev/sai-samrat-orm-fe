@@ -2,6 +2,7 @@ import { buildFallbackColumnsFromKeys } from "@utils/moduleStructure";
 import { optional, readonly, z } from "zod";
 import { currencyOptions } from "../utils/booking.utils";
 import CustomerRowTemplate from "../../shared/components/CustomerRowTemplate";
+import ProformaInvoiceRowTemplate from "../../shared/components/ProformaInvoiceRowTemplate";
 
 const FIXED_TABLE_COLUMNS = [
   { key: "select", className: "check-col", checkbox: true, width: 42, minWidth: 42, resizable: false },
@@ -47,14 +48,13 @@ export const ordersModuleSchema = {
       options: [],
     },
   ],
-  defaultColumns: ["order_code", "order_status", "customer_id", "brand", "order_date", "priority", "currency", "total_order_value", "total_order_qty"],
+  defaultColumns: ["order_code", "order_status", "customer_id", "brand", "order_date", "currency", "total_order_value", "total_order_qty"],
   skipFields: ['order_no', 'company_id', 'excel_row_no'],
   tableCellConfig: [
     { column_name: "name", type: "person" },
     { column_name: "orderName", type: "person" },
     { column_name: "roleID", type: "tag" },
     { column_name: "order_status", type: "badge", color_field: "order_status_color" },
-    { column_name: "priority", type: "badge", color_field: "priority_color" },
     { column_name: "status", type: "badge", color_field: "status_color" },
   ],
   columnMappings: [
@@ -78,7 +78,10 @@ export const ordersModuleSchema = {
       order_code: "",
       company_id: null,
       customer_id: null,
+      customer_name: "",
       brand: "",
+      pi_id: null,
+      pi_number: "",
       order_date: "",
       order_month: "",
       order_week: "",
@@ -158,7 +161,49 @@ export const ordersModuleSchema = {
       {
         columns: 3,
         fields: [
-          { name: "pi_number", label: "PI No", type: "text", required: true, placeholder: "PI Number", gridSpan: 12, readOnlyWhen: (values) => Boolean(values.order_status !== "draft"), },
+          {
+            name: "pi_number",
+            label: "PI No",
+            type: "smartSelectInput",
+            required: true,
+            placeholder: "Select PI Number",
+            gridSpan: 12,
+            disabledWhen: (values) => !values.customer_id || Boolean(values.order_status !== "draft"),
+            config: {
+              type: "proforma_invoice",
+              source: "proforma_invoices",
+              apiUrl: "/system/searchList",
+              placeholder: "Select Customer first, then PI",
+              check: "pi_no,brand",
+              list: "pi_id,pi_no,customer_id,brand,order_type,pi_date,currency,exchange_rate,total_qty,total_value,gst_rate,pi_status",
+              valueKey: "pi_no",
+              labelKey: "pi_no",
+              preload: true,
+              cache: false,
+              getExtraParams: (values) => ({
+                customer_id: values.customer_id,
+              }),
+              customParameters: {
+                require_customer: true,
+              },
+              multi: false,
+              RowTemp: ProformaInvoiceRowTemplate,
+              getValue: (item) => item.pi_no,
+              getLabel: (item) => item.pi_no,
+              selectedOption: (value, values) => value ? {
+                value,
+                label: value,
+                original: {
+                  pi_id: values.pi_id,
+                  pi_no: value,
+                  customer_id: values.customer_id,
+                  customer_name: values.customer_name,
+                  brand: values.brand,
+                  currency: values.currency,
+                },
+              } : null,
+            },
+          },
         ]
       },
       {
@@ -186,39 +231,13 @@ export const ordersModuleSchema = {
         columns: 3,
         fields: [
           {
-            name: "priority",
-            label: "Order Priority",
-            type: "smartSelect",
-            id: "priority",
-            gridSpan: 12,
-            readOnlyWhen: (values) => Boolean(values.order_status !== "draft"),
-            config: {
-              apiUrl: "/system/searchSlugList",
-              tableName: "categories",
-              selectFields: "category_id,categoryName,slug",
-              searchField: "categoryName",
-              labelKey: "categoryName",
-              slug: 'order-priority',
-              isCompanyWise: true,
-              status: 'active',
-              valueKey: "slug",
-              placeholder: "Select Order Priority",
-              multi: false,
-            },
-          },
-        ],
-      },
-      {
-        columns: 3,
-        fields: [
-          {
             name: "currency",
             label: "Currency",
             type: "select",
             gridSpan: 12,
             alwaysVisible: true,
-            alwaysEditable: true,
-            readOnlyWhen: (values) => Boolean(values.order_status !== "draft"),
+            alwaysEditable: false,
+            readOnlyWhen: () => true,
             options: currencyOptions
           },
         ],

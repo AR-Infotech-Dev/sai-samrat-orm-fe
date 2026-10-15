@@ -6,10 +6,11 @@ import NotificationBell from "./ui/NotificationBell";
 import LoadingBar from "./LoadingBar";
 import { useAuth } from "@auth/components/AuthProvider";
 import Clock from "@components/ui/Clock"
+import { APP_NAME } from "@api/config";
 
 const getCompanyName = (user = {}) => user?.company_name || "";
 
-function TopBar({ onLogout, onMenuToggle, isMenuOpen = false }) {
+function TopBar({ onLogout, onMenuToggle, isMenuOpen = false, showMenuButton = false }) {
   const navigate = useNavigate();
   const { authSession } = useAuth() || {};
 
@@ -67,13 +68,17 @@ function TopBar({ onLogout, onMenuToggle, isMenuOpen = false }) {
         <div className="topbar-left">
           <button
             type="button"
-            className="mobile-menu-button"
+            className={`mobile-menu-button ${showMenuButton ? "is-visible" : ""}`}
             onClick={onMenuToggle}
             aria-label={isMenuOpen ? "Close navigation menu" : "Open navigation menu"}
             aria-expanded={isMenuOpen}
           >
             <Menu size={19} />
           </button>
+          <div className="topbar-brand" title={APP_NAME}>
+            <img src="/logo.png" alt={APP_NAME} className="topbar-logo" />
+            <span className="topbar-brand-fallback">{APP_NAME}</span>
+          </div>
           <div className="topbar-greeting p-2">
             <h5 className="relative text-slate-600 font-bold text-sm">Welcome back, {user?.name || "User"}
               <span className="ml-1 absolute animate-bounce">👋</span>

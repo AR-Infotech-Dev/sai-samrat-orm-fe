@@ -1,7 +1,7 @@
 ﻿import { toast } from "react-toastify";
 import { useEffect, useState } from "react";
-import { getCurrencyCode, getOrderIdentifier, normalizeOrderData } from "../utils/booking.utils";
-import { getCurrencyExchangeRates, getOrderBookingDetails, saveOrderBooking } from "../data/booking.service";
+import { addMonthsForInputDate, getCurrencyCode, getDefaultOrderDates, getOrderIdentifier, normalizeOrderData } from "../utils/booking.utils";
+import { getCurrencyExchangeRates, getOrderBookingDetails, getProformaInvoiceItemsForBooking, saveOrderBooking } from "../data/booking.service";
 import { ordersModuleSchema } from "../data/module.schema";
 
 const getValidOrderItems = (items = []) => {
@@ -20,6 +20,8 @@ const mapApiOrderItems = (items = [], order = {}) => {
         id: item.order_item_id || `${item.order_id || "order"}-${index}`,
         order_item_id: item.order_item_id || null,
         product_id: item.product_id || null,
+        pi_item_id: item.pi_item_id || null,
+        available_qty: Number(item.available_qty ?? item.order_qty ?? 0),
         product: item.product_name_snapshot || item.product_name || null,
         productCode: item.product_code_snapshot || item.product_code || null,
         model: item.brand_snapshot || item.brand || null,
@@ -34,11 +36,21 @@ const mapApiOrderItems = (items = [], order = {}) => {
     }));
 };
 
+const extractRows = (response) => {
+    if (Array.isArray(response?.data)) return response.data;
+    if (Array.isArray(response?.data?.data)) return response.data.data;
+    return [];
+};
+
 export const useOrderBookingForm = ({ isOpen, onClose, onAfterSave, selectedOrder }) => {
     const [loading, setLoading] = useState(false);
     const [fetchingOrder, setFetchingOrder] = useState(false);
-    const [formData, setFormData] = useState(ordersModuleSchema.form.initialValues);
+    const [formData, setFormData] = useState(() => ({
+        ...ordersModuleSchema.form.initialValues,
+        ...getDefaultOrderDates(),
+    }));
     const [initialOrderItems, setInitialOrderItems] = useState([]);
+    const [piItems, setPiItems] = useState([]);
     const [errors, setErrors] = useState({});
     const [currencyRateLoading, setCurrencyRateLoading] = useState(false);
     const mode = selectedOrder ? "edit" : "create";
@@ -53,10 +65,17 @@ export const useOrderBookingForm = ({ isOpen, onClose, onAfterSave, selectedOrde
                 const orderData = res?.data;
                 setFormData(normalizeOrderData(orderData));
                 setInitialOrderItems(mapApiOrderItems(orderData?.items, orderData));
+                if (orderData?.pi_id) {
+                    const piItemResponse = await getProformaInvoiceItemsForBooking(orderData.pi_id);
+                    setPiItems(extractRows(piItemResponse));
+                } else {
+                    setPiItems([]);
+                }
             } catch (error) {
                 toast.error("Unable to fetch order details");
                 setFormData(normalizeOrderData(selectedOrder));
                 setInitialOrderItems(mapApiOrderItems(selectedOrder?.items, selectedOrder));
+                setPiItems([]);
             } finally {
                 setFetchingOrder(false);
             }
@@ -64,8 +83,12 @@ export const useOrderBookingForm = ({ isOpen, onClose, onAfterSave, selectedOrde
         // EDIT MODE
         if (selectedOrder && isOpen) { fetchOrderDetails(); return; }
         // CREATE MODE
-        setFormData(ordersModuleSchema.form.initialValues);
+        setFormData({
+            ...ordersModuleSchema.form.initialValues,
+            ...getDefaultOrderDates(),
+        });
         setInitialOrderItems([]);
+        setPiItems([]);
     }, [selectedOrder, isOpen, orderID]);
 
     useEffect(() => {
@@ -106,8 +129,12 @@ export const useOrderBookingForm = ({ isOpen, onClose, onAfterSave, selectedOrde
     }, [formData.currency, isOpen]);
 
     const handleClose = () => {
-        setFormData(ordersModuleSchema.form.initialValues);
+        setFormData({
+            ...ordersModuleSchema.form.initialValues,
+            ...getDefaultOrderDates(),
+        });
         setInitialOrderItems([]);
+        setPiItems([]);
         setErrors({});
         onClose();
     }
@@ -117,14 +144,76 @@ export const useOrderBookingForm = ({ isOpen, onClose, onAfterSave, selectedOrde
             ...formData,
             [name]: value,
         };
+        if (name === "order_date") {
+            nextData.expected_delivery_date = addMonthsForInputDate(value, 1);
+        }
         if (name == 'order_type') {
             const gst_rate = value == 'domestic' ? Number(18) : (value == 'export' ? Number(0) : Number(0.1));
+            const currency = value === "domestic" ? "INR" : "USD";
             nextData = {
                 ...nextData,
                 gst_rate: gst_rate,
+                currency,
+                exchange_rate: currency === "INR" ? 1 : nextData.exchange_rate,
+                customer_id: null,
+                customer_name: "",
+                pi_id: null,
+                pi_number: "",
             }
         }
+        if (name === "customer_id") {
+            nextData = {
+                ...nextData,
+                pi_id: null,
+                pi_number: "",
+            };
+            setPiItems([]);
+            setInitialOrderItems([]);
+        }
         setFormData(nextData);
+    };
+    const handleObjectSelect = async (field, item) => {
+        const selected = item?.original || item || {};
+        if (field?.name === "customer_id") {
+            setFormData((current) => ({
+                ...current,
+                customer_id: selected?.customer_id || item?.value || null,
+                customer_name: selected?.name || item?.label || "",
+                pi_id: null,
+                pi_number: "",
+            }));
+            setPiItems([]);
+            setInitialOrderItems([]);
+            return;
+        }
+
+        if (field?.name !== "pi_number") return;
+
+        const piId = selected?.pi_id || null;
+        setFormData((current) => ({
+            ...current,
+            pi_id: piId,
+            pi_number: selected?.pi_no || item?.value || "",
+            brand: selected?.brand || current.brand,
+            order_type: selected?.order_type || current.order_type,
+            currency: selected?.currency || current.currency,
+            exchange_rate: selected?.exchange_rate || current.exchange_rate,
+            gst_rate: selected?.gst_rate ?? current.gst_rate,
+        }));
+        setInitialOrderItems([]);
+        if (!piId) {
+            setPiItems([]);
+            return;
+        }
+
+        try {
+            const response = await getProformaInvoiceItemsForBooking(piId);
+            const rows = extractRows(response);
+            setPiItems(rows);
+        } catch (error) {
+            setPiItems([]);
+            toast.error(error.message || "Unable to fetch PI items");
+        }
     };
     const handleSave = async ({ items = [], summary = {}, statusOverride } = {}) => {
         const result = ordersModuleSchema.validationSchema.safeParse(formData);
@@ -139,8 +228,25 @@ export const useOrderBookingForm = ({ isOpen, onClose, onAfterSave, selectedOrde
 
         const validItems = getValidOrderItems(items);
         if (!validItems.length) {
-            toast.error("Please add at least one product with quantity");
+            toast.error(formData.pi_id ? "Please add at least one PI item with quantity" : "Please add at least one product with quantity");
             return;
+        }
+        if (formData.pi_id) {
+            const missingPiItem = validItems.find((item) => !item.pi_item_id);
+            if (missingPiItem) {
+                toast.error("Please select item from PI list");
+                return;
+            }
+
+            const overBookedItem = validItems.find((item) => {
+                const qty = Number(item.qty || 0);
+                const availableQty = Number(item.available_qty || 0);
+                return qty > availableQty;
+            });
+            if (overBookedItem) {
+                toast.error(`Qty cannot be more than PI remaining qty (${overBookedItem.available_qty})`);
+                return;
+            }
         }
         try {
             setErrors({});
@@ -169,8 +275,12 @@ export const useOrderBookingForm = ({ isOpen, onClose, onAfterSave, selectedOrde
                     res?.message ||
                     `Order ${mode === "create" ? "created" : "updated"} successfully`
                 );
-                setFormData(ordersModuleSchema.form.initialValues);
+                setFormData({
+                    ...ordersModuleSchema.form.initialValues,
+                    ...getDefaultOrderDates(),
+                });
                 setInitialOrderItems([]);
+                setPiItems([]);
                 onClose();
                 onAfterSave?.();
                 return;
@@ -187,10 +297,12 @@ export const useOrderBookingForm = ({ isOpen, onClose, onAfterSave, selectedOrde
         fetchingOrder,
         formData,
         initialOrderItems,
+        piItems,
         errors,
         currencyRateLoading,
         handleClose,
         handleChange,
+        handleObjectSelect,
         handleSave,
     }
 }

@@ -12,6 +12,10 @@ const getSafeGstRate = (value) => {
 const createBlankRow = (gstRate = 0) => ({
   id: Date.now(),
   product_id: null,
+  pi_item_id: null,
+  available_qty: 0,
+  pi_qty: 0,
+  booked_qty: 0,
   product: null,
   productCode: null,
   model: null,
@@ -36,12 +40,14 @@ const normalizeRows = (rows = [], gstRate = 0) => {
 
 const rowGridClass = "grid grid-cols-[28px_minmax(160px,1.8fr)_minmax(96px,1fr)_58px_64px_82px_58px_96px_34px]";
 
-const OrderItems = ({ currency = "INR", formData, exchangeRate = 1, defaultItems = [], onItemsChange }) => {
+const OrderItems = ({ currency = "INR", formData, exchangeRate = 1, defaultItems = [], piItems = [], onItemsChange }) => {
   const [items, setItems] = useState(() => normalizeRows());
   const defaultItemsSignatureRef = useRef("");
   const currencySignatureRef = useRef("");
+  const bookingSourceKeyRef = useRef("");
   const currencySymbol = getCurrencySymbol(currency);
   const headerGstRate = getSafeGstRate(formData?.gst_rate);
+  const piMode = Boolean(formData?.pi_id || formData?.pi_number);
 
   const updateItems = (updatedItems) => {
     setItems(updatedItems);
@@ -60,19 +66,53 @@ const OrderItems = ({ currency = "INR", formData, exchangeRate = 1, defaultItems
   }, [headerGstRate]);
   const handleFieldChange = (rowId, field, value) => {
     const numericFields = ["weight", "qty", "unitRate", "gst"];
-    const numericValue = value === "" ? "" : Number(value);
+    let numericValue = value === "" ? "" : Number(value);
+    updateItems(
+      items.map((item) =>
+        item.id === rowId
+          ? (() => {
+            if (piMode && field === "qty" && numericValue !== "") {
+              const availableQty = Number(item.available_qty || 0);
+              if (availableQty > 0) numericValue = Math.min(Number(numericValue) || 0, availableQty);
+            }
+            return {
+              ...item,
+              [field]: numericFields.includes(field) ? numericValue : value,
+              ...(field === "unitRate" && numericValue !== ""
+                ? {
+                  unitRateInInr: Number(exchangeRate) > 0 ? Math.round((numericValue / Number(exchangeRate)) * 100) / 100 : numericValue,
+                  standard_rate: Number(exchangeRate) > 0 ? Math.round((numericValue / Number(exchangeRate)) * 100) / 100 : numericValue,
+                }
+                : {}),
+            };
+          })()
+          : item
+      )
+    );
+  };
+
+  const handlePiItemSelect = (rowId, piItem) => {
     updateItems(
       items.map((item) =>
         item.id === rowId
           ? {
             ...item,
-            [field]: numericFields.includes(field) ? numericValue : value,
-            ...(field === "unitRate" && numericValue !== ""
-              ? {
-                unitRateInInr: Number(exchangeRate) > 0 ? Math.round((numericValue / Number(exchangeRate)) * 100) / 100 : numericValue,
-                standard_rate: Number(exchangeRate) > 0 ? Math.round((numericValue / Number(exchangeRate)) * 100) / 100 : numericValue,
-              }
-              : {}),
+            pi_item_id: piItem.pi_item_id,
+            pi_qty: Number(piItem.piQty ?? piItem.qty ?? 0),
+            booked_qty: Number(piItem.bookedQty ?? piItem.booked_qty ?? 0),
+            available_qty: Number(piItem.availableQty ?? piItem.available_qty ?? 0),
+            product_id: piItem.product_id,
+            product: piItem.product,
+            productCode: piItem.productCode,
+            model: piItem.model,
+            weight: piItem.weight,
+            qty: Number(piItem.availableQty ?? piItem.available_qty ?? 0),
+            unitRate: Number(piItem.unitRate ?? piItem.unit_rate ?? 0),
+            unitRateInInr: Number(piItem.unitRateInInr ?? piItem.unit_rate_in_inr ?? piItem.unit_rate ?? 0),
+            standard_rate: Number(piItem.unitRateInInr ?? piItem.unit_rate_in_inr ?? piItem.unit_rate ?? 0),
+            gst: getSafeGstRate(piItem.gst ?? piItem.gst_rate ?? headerGstRate),
+            readyStock: piItem.readyStock || 0,
+            pendingStock: piItem.pendingStock || 0,
           }
           : item
       )
@@ -119,6 +159,14 @@ const OrderItems = ({ currency = "INR", formData, exchangeRate = 1, defaultItems
   }, [defaultItems, headerGstRate]);
 
   useEffect(() => {
+    const bookingSourceKey = `${formData?.customer_id || ""}:${formData?.pi_id || ""}`;
+    if (bookingSourceKeyRef.current === bookingSourceKey) return;
+    bookingSourceKeyRef.current = bookingSourceKey;
+    if (Array.isArray(defaultItems) && defaultItems.length) return;
+    updateItems(normalizeRows([], headerGstRate));
+  }, [formData?.customer_id, formData?.pi_id, headerGstRate]);
+
+  useEffect(() => {
     const rate = Number(exchangeRate) || 1;
     const currencySignature = `${currency}:${rate}`;
     if (currencySignatureRef.current === currencySignature) return;
@@ -144,6 +192,10 @@ const OrderItems = ({ currency = "INR", formData, exchangeRate = 1, defaultItems
     }
   }, [items]);
 
+  const selectedPiItemIds = items
+    .map((item) => item.pi_item_id)
+    .filter(Boolean);
+
   return (
     <section className="flex h-full min-h-0 flex-col overflow-visible border border-slate-100 bg-white px-2.5 py-2 shadow-sm">
       <div className="mb-1 flex shrink-0 flex-wrap items-center justify-between gap-2 pb-2">
@@ -158,10 +210,11 @@ const OrderItems = ({ currency = "INR", formData, exchangeRate = 1, defaultItems
           <button
             type="button"
             onClick={handleAddRow}
+            disabled={piMode && !piItems.length}
             className="inline-flex h-6 items-center justify-center gap-1.5 rounded-md border border-orange-200 bg-orange-50 px-2.5 text-xs font-semibold text-orange-600 transition hover:border-orange-400 hover:bg-orange-100"
           >
             <Plus size={12} strokeWidth={2.5} />
-            Add Product Line
+            {piMode ? "Add PI Item Line" : "Add Product Line"}
           </button>
         </div>
       </div>
@@ -179,9 +232,13 @@ const OrderItems = ({ currency = "INR", formData, exchangeRate = 1, defaultItems
                 className={rowGridClass}
                 currency={currency}
                 gstPercent={item.gst}
+                piMode={piMode}
+                piItems={piItems}
+                selectedPiItemIds={selectedPiItemIds}
                 handleDeleteRow={handleDeleteRow}
                 handleFieldChange={handleFieldChange}
                 handleProductSelect={handleProductSelect}
+                handlePiItemSelect={handlePiItemSelect}
               />
             ))}
           </div>

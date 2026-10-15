@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { NavLink } from "react-router-dom";
-import { Accessibility, BriefcaseBusiness, Building2, ChevronDown, ContactRound, FileText, Folder, Gauge, LayoutGrid, Mail, Map, MenuSquare, NotepadText, Package, ShieldCheck, Sparkles, Ticket, Users, Workflow, X, } from "lucide-react";
+import { Accessibility, BriefcaseBusiness, Building2, ChevronDown, ContactRound, FileText, Folder, Gauge, LayoutGrid, Mail, Map, Menu, MenuSquare, NotepadText, Package, ShieldCheck, Sparkles, Ticket, Users, Workflow, X, } from "lucide-react";
 import { useAuth } from "@auth/components/AuthProvider";
 import { APP_NAME } from "@api/config";
 import { getStoredMenuList, getStoredPermissions } from "@auth/utils/authStorage";
@@ -53,7 +53,7 @@ const buildSidebar = (menus = [], permissions = {}, user = {}) =>
   })
     .filter(Boolean);
 
-function Sidebar({ onSelectModule, isMobileOpen = false, onClose, isDashboardCollapsed = false }) {
+function Sidebar({ onSelectModule, isMobileOpen = false, onClose, onToggle, isSidebarCollapsed = false }) {
   const { authSession } = useAuth();
   const [menus, setMenus] = useState(() => getStoredMenuList());
   const [loading, setLoading] = useState(() => !getStoredMenuList().length);
@@ -98,15 +98,17 @@ function Sidebar({ onSelectModule, isMobileOpen = false, onClose, isDashboardCol
         aria-label="Close navigation menu"
         tabIndex={isMobileOpen ? 0 : -1}
       />
-      <aside className={`sidebar ${isMobileOpen ? "mobile-open" : ""} ${isDashboardCollapsed ? "dashboard-mini-sidebar" : ""}`}>
+      <aside className={`sidebar ${isMobileOpen ? "mobile-open" : ""}`}>
         <div className="sidebar-brand" title={APP_NAME}>
-          <img
-            // src="/logo 1.png"
-            src="/logo.png"
-            alt={APP_NAME}
-            className="sidebar-logo"
-          />
-          <span className="sidebar-brand-fallback">{APP_NAME}</span>
+          <button
+            type="button"
+            className="sidebar-hamburger"
+            onClick={onToggle}
+            aria-label={isSidebarCollapsed ? "Expand navigation menu" : "Collapse navigation menu"}
+            aria-expanded={!isSidebarCollapsed}
+          >
+            <Menu size={18} />
+          </button>
           <button
             type="button"
             className="sidebar-mobile-close"

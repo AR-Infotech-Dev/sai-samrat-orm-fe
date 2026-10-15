@@ -141,9 +141,18 @@ function OrderHeaderForm({ sections = [], values = {}, onChange, onObjectSelect,
                   getConditionalFlag(field, "readonly") ||
                   getConditionalFlag(field, "readOnlyWhen") ||
                   getConditionalFlag(field, "readonlyWhen");
+                const resolvedConfig = field.config
+                  ? {
+                    ...field.config,
+                    selectedOption: typeof field.config.selectedOption === "function"
+                      ? field.config.selectedOption(values[field.name], values)
+                      : field.config.selectedOption,
+                  }
+                  : field.config;
                 const resolvedField = {
                   ...field,
                   options: typeof field.options === "function" ? field.options(values) : field.options,
+                  config: resolvedConfig,
                   disabled: isDisabled,
                   readOnly: isReadOnly || !canEditField,
                 };

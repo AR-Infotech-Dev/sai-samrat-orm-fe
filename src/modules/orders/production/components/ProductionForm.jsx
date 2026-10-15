@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
-import { CalendarDays, CheckCircle2, Factory, PackageCheck, Save, ShoppingBag, X } from "lucide-react";
+import { CalendarDays, CheckCircle2, PackageCheck, Save, ShoppingBag, X } from "lucide-react";
 import ActionButton from "@components/ui/ActionButton";
 import FlyoutPanel from "@components/ui/FlyoutPanel";
 import Spinner from "@components/ui/Spinner";
-import { getProductionOrderDetails, saveOrderProduction, startProductionOrder } from "../data/production.service";
+import { getProductionOrderDetails, saveOrderProduction } from "../data/production.service";
 
 const productionGrid = "grid-cols-[20px_minmax(80px,280px)_70px_70px_70px_70px_70px_80px_70px_84px]";
 
@@ -164,7 +164,6 @@ function ProductionForm({ isOpen, onClose, selectedOrder, onAfterSave }) {
   const [items, setItems] = useState([]);
   const [fetching, setFetching] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [starting, setStarting] = useState(false);
   const [rowErrors, setRowErrors] = useState({});
 
   const totals = useMemo(() => items.reduce((acc, item) => {
@@ -256,21 +255,6 @@ function ProductionForm({ isOpen, onClose, selectedOrder, onAfterSave }) {
     };
   };
 
-  const handleStart = async () => {
-    try {
-      setStarting(true);
-      const res = await startProductionOrder(selectedOrder.order_id);
-      if (!res.success) { toast.error(res.message || "Unable to start production"); return; }
-      toast.success(res.message || "Production started");
-      setOrder((current) => ({ ...current, order_status: "production" }));
-      onAfterSave?.();
-    } catch (error) {
-      toast.error(error.message || "Unable to start production");
-    } finally {
-      setStarting(false);
-    }
-  };
-
   const handleSave = async () => {
     const validationErrors = validateItems();
     setRowErrors(validationErrors);
@@ -311,12 +295,7 @@ function ProductionForm({ isOpen, onClose, selectedOrder, onAfterSave }) {
       footer={
         <div className="flex w-full items-center justify-end gap-2 bg-white px-4 py-2">
           <div className="flex items-center gap-2">
-            <ActionButton type="button" variant="flyoutSecondary" disabled={saving || starting} onClick={onClose}>Cancel</ActionButton>
-            {order?.order_status === "planned" ?
-              <ActionButton type="button" className="flex gap-1.5 items-center " variant="flyoutSecondary" disabled={saving || starting}
-                onClick={handleStart}> {starting ? <Spinner size="sm" /> : <><Factory size={14} /> Start Production</>
-                }
-              </ActionButton> : null}
+            <ActionButton type="button" variant="flyoutSecondary" disabled={saving} onClick={onClose}>Cancel</ActionButton>
             <ActionButton type="button" variant="flyoutPrimary" disabled={saving || fetching} onClick={handleSave}>{saving ? <Spinner size="sm" /> : <><Save size={14} /> Save Update</>}</ActionButton>
           </div>
         </div>
