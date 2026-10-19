@@ -1,6 +1,12 @@
 ﻿import { makeRequest } from "@/api/httpClient";
 
-const BASE_URL = "/orders/planning";
+const BASE_URL = "/production-notes/planning";
+
+export const getPlanningDefinitions = (menuId) => makeRequest("/system/getDefinations", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: { menu_id: menuId, table: "production_notes" },
+});
 
 export const getPlanningItems = async ({ page = 1, searchText = "", status = "all", priority = "all", orderBy = "expected_delivery_date", order = "ASC" } = {}) => {
   return makeRequest(BASE_URL, {

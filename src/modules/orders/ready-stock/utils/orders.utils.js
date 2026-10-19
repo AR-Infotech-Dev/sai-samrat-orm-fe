@@ -34,7 +34,7 @@ export function getSelectedLabel(field, value, selectedOrder) {
   return value;
 }
 export function getOrderIdentifier(order = {}) {
-  return order?.order_id;
+  return order?.production_note_id;
 }
 export function normalizeOrderData(selectedOrder = {}) {
   return {
@@ -144,7 +144,7 @@ export function buildOrderSummary(items = [], orderHeader = {}) {
       const readyQty = Math.min(qty, readyStock);
       const pendingQty = Math.max(qty - readyStock, 0);
 
-      summary.orderNo = orderHeader.order_no || 'Auto Generated';
+      summary.orderNo = orderHeader.production_note_no || 'Auto Generated';
       summary.totalItems += item.product_id || item.product ? 1 : 0;
       summary.totalQty += qty;
       summary.readyQty += readyQty;

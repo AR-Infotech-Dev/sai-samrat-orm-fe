@@ -8,7 +8,7 @@ import { useConfirmationOrderForm } from "../hooks/useConfirmationOrderForm";
 import { confirmOrder, holdOrder, sendBackOrder } from "../data/confirmation.service";
 import OrderReviewHeader from "./OrderReviewHeader";
 import { Badge } from "@/components/ui/badge";
-import ProformaInvoiceFlyout from "./ProformaInvoiceFlyout";
+import ProductionNotePreview from "../../booking/components/ProductionNotePreview";
 
 function OrderForm({ isOpen, onClose, selectedOrder, onAfterSave }) {
   const [remarks, setRemarks] = useState("");
@@ -22,7 +22,7 @@ function OrderForm({ isOpen, onClose, selectedOrder, onAfterSave }) {
   };
 
   const runAction = async (action) => {
-    const orderId = formData?.order_id || selectedOrder?.order_id;
+    const orderId = formData?.production_note_id || selectedOrder?.production_note_id;
     if (!orderId) {
       toast.error("Order id not found");
       return;
@@ -34,12 +34,12 @@ function OrderForm({ isOpen, onClose, selectedOrder, onAfterSave }) {
     }
 
     if (action === "confirm") {
-      const allowed = window.confirm(`Confirm order ${formData?.order_no || ""}?`);
+      const allowed = await confirmAction(`Confirm production note ${formData?.production_note_no || ""}?`);
       if (!allowed) return;
     }
 
     if (action === "send-back") {
-      const allowed = window.confirm(`Send back order ${formData?.order_no || ""}?`);
+      const allowed = await confirmAction(`Send back production note ${formData?.production_note_no || ""}?`);
       if (!allowed) return;
     }
 
@@ -56,7 +56,7 @@ function OrderForm({ isOpen, onClose, selectedOrder, onAfterSave }) {
         return;
       }
 
-      toast.success(res?.message || "Order updated successfully");
+      toast.success(res?.message || "Production note updated successfully");
       setRemarks("");
       onAfterSave?.();
       handleClose();
@@ -79,19 +79,19 @@ function OrderForm({ isOpen, onClose, selectedOrder, onAfterSave }) {
           <div className="flex gap-1.5 justify-between items-center">
             <>
               <p className="pr-3 mr-3 border-r border-gray-300">
-                Read-only confirmation review
+                {formData.production_note_no || "Auto Generated"} | {formData.production_code || "-"} | {formData.pi_number || "-"}
               </p>
-              {formData.order_status &&
+              {formData.production_note_status &&
                 <Badge
                   variant="outline"
                   className="rounded-full border px-2 py-0.5 text-[10px] font-semibold capitalize"
                   style={{
-                    color: formData.order_status_color || "#FF8D4B",
-                    borderColor: `${formData.order_status_color || "#FF8D4B"}33`,
-                    backgroundColor: `${formData.order_status_color || "#FF8D4B"}14`,
+                    color: formData.production_note_status_color || "#FF8D4B",
+                    borderColor: `${formData.production_note_status_color || "#FF8D4B"}33`,
+                    backgroundColor: `${formData.production_note_status_color || "#FF8D4B"}14`,
                   }}
                 >
-                  {formData.order_status.charAt(0).toUpperCase() + formData.order_status.slice(1)}
+                  {formData.production_note_status.charAt(0).toUpperCase() + formData.production_note_status.slice(1)}
                 </Badge>
               }
             </>
@@ -104,10 +104,10 @@ function OrderForm({ isOpen, onClose, selectedOrder, onAfterSave }) {
           </button>
         }
         footer={
-          <div className="flex w-full flex-wrap items-center justify-between gap-2 border-t border-slate-100 bg-white px-3 py-2">
+          <div className="flex w-full flex-wrap items-center justify-between gap-2  bg-white px-3 py-2">
             <button type="button" disabled={fetchingOrder || actionLoading} onClick={() => setIsProformaOpen(true)} className="inline-flex h-8 items-center gap-1.5 rounded-sm border border-orange-200 bg-orange-50 px-3 text-xs font-bold text-orange-600 shadow-xs hover:bg-orange-100 disabled:opacity-60">
               <FileText size={14} />
-              Preview PI
+              Preview Production Note
             </button>
             <div className="flex flex-wrap items-center gap-2">
               <ActionButton type="button" variant="flyoutSecondary" disabled={actionLoading} onClick={closePanel}>Cancel</ActionButton>
@@ -141,13 +141,13 @@ function OrderForm({ isOpen, onClose, selectedOrder, onAfterSave }) {
           </div>
         </div>
       </FlyoutPanel>
-      <ProformaInvoiceFlyout
-        isOpen={isProformaOpen}
+      <ProductionNotePreview
         onClose={() => setIsProformaOpen(false)}
-        order={formData || selectedOrder}
+        order={isProformaOpen ? { ...selectedOrder, ...formData } : null}
       />
     </>
   );
 }
 
 export default OrderForm;
+import { confirmAction } from "@utils/confirmAction";

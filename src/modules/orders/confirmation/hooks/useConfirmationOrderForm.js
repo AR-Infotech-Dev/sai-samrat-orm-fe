@@ -8,14 +8,14 @@ const mapApiOrderItems = (items = []) => {
   if (!Array.isArray(items)) return [];
 
   return items.map((item = {}) => ({
-    order_item_id: item.order_item_id ?? null,
+    production_note_item_id: item.production_note_item_id ?? null,
     company_id: item.company_id ?? null,
-    order_id: item.order_id ?? null,
+    production_note_id: item.production_note_id ?? null,
     product_id: item.product_id ?? null,
     product_code_snapshot: item.product_code_snapshot ?? null,
     product_name_snapshot: item.product_name_snapshot ?? null,
     brand_snapshot: item.brand_snapshot ?? null,
-    order_qty: Number(item.order_qty ?? 0),
+    production_note_qty: Number(item.production_note_qty ?? 0),
     item_status: item.item_status ?? null,
     expected_delivery_date: item.expected_delivery_date ?? null,
     remarks: item.remarks ?? null,
@@ -45,14 +45,14 @@ export const useConfirmationOrderForm = ({ isOpen, onClose, selectedOrder }) => 
         setFetchingOrder(true);
         const res = await getConfirmationOrderDetails(orderID);
         if (!res?.success) {
-          toast.error(res?.message || "Unable to fetch order details");
+          toast.error(res?.message || "Unable to fetch production note details");
           return;
         }
         const orderData = res?.data || {};
         setFormData(normalizeOrderData(orderData));
         setInitialOrderItems(mapApiOrderItems(orderData?.items));
       } catch (error) {
-        toast.error(error.message || "Unable to fetch order details");
+        toast.error(error.message || "Unable to fetch production note details");
         setFormData(normalizeOrderData(selectedOrder));
         setInitialOrderItems(mapApiOrderItems(selectedOrder?.items));
       } finally {

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Eye } from "lucide-react";
+import { Eye, Edit3, Send, CheckCircle2 } from "lucide-react";
 import { proformaModuleSchema } from "./data/module.schema";
 import { useProformaTableConfig } from "./hooks/useProformaTableConfig";
 import { useProformaModule } from "./hooks/useProformaModule";
@@ -15,6 +15,7 @@ import ResizableTable from "@components/table/ResizableTable";
 import useMenuPermissions from "@auth/utils/useMenuPermissions";
 import ProformaForm from "./components/ProformaForm";
 import ProformaTableRow from "./components/ProformaTableRow";
+import { getPiLifecycleStatus } from "./utils/proforma.utils";
 import ProformaPreviewFlyout from "./components/ProformaPreviewFlyout";
 
 function ProformaInvoicePage({ menu_id }) {
@@ -26,7 +27,7 @@ function ProformaInvoicePage({ menu_id }) {
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const piList = useAppSelector(selectProformaRows);
   const { filterState, setSearchText, applyFilterPayload, setSort, clearFilters } = useModuleFilters("proforma-invoice", piList);
-  const { pagination, page, loading, deleting, selectedRowIds, getProformaList, handlePageChange, handleToggleRow, handleToggleAllRows, handleDeleteSelected, handleDeleteRow } = useProformaModule({ filterState });
+  const { pagination, page, loading, deleting, selectedRowIds, getProformaList, handlePageChange, handleToggleRow, handleToggleAllRows, handleDeleteSelected, handleDeleteRow, handleLifecycle } = useProformaModule({ filterState });
   const { sortConfig, resolvedColumns, defaultVisibleColumnKeys, resolvedFilterFields } = useProformaTableConfig({ resolvedMenuID, filterState });
 
   const handleSortChange = (columnKey) => {
@@ -93,18 +94,21 @@ function ProformaInvoicePage({ menu_id }) {
             defaultVisibleColumnKeys={defaultVisibleColumnKeys}
             sortConfig={sortConfig}
             onSortChange={handleSortChange}
-            editRow={permissions.canEdit ? (row) => {
-              setSelectedPi(row);
-              setIsFlyoutOpen(true);
-            } : undefined}
             onDeleteRow={permissions.canDelete ? handleDeleteRow : undefined}
-            rowActions={[{ key: "preview", label: "Preview", icon: Eye, onClick: openPreview }]}
+            rowActions={[
+              { key: "preview", label: "Preview", icon: Eye, onClick: openPreview },
+              (row) => permissions.canEdit && getPiLifecycleStatus(row) === "draft" ? { key: "edit", label: "Edit", icon: Edit3, onClick: (record) => { setSelectedPi(record); setIsFlyoutOpen(true); } } : null,
+              (row) => getPiLifecycleStatus(row) === "draft" ? { key: "submit", label: "Submit for Approval", icon: Send, onClick: (record) => handleLifecycle(record, "submit") } : null,
+              (row) => getPiLifecycleStatus(row) === "waiting" ? { key: "approve", label: "Approve", icon: CheckCircle2, onClick: (record) => handleLifecycle(record, "approve") } : null,
+            ]}
             allowSelection={permissions.canDelete}
             selectedRowIds={selectedRowIds}
             onToggleRow={handleToggleRow}
             onToggleAllRows={handleToggleAllRows}
             renderRow={(row, index, columns, table) => (
-              <ProformaTableRow row={row} index={index} columns={columns} table={table} />
+              <ProformaTableRow row={row} index={index} columns={columns} table={table}
+                onEdit={permissions.canEdit && getPiLifecycleStatus(row) === "draft" ? () => { setSelectedPi(row); setIsFlyoutOpen(true); } : undefined}
+              />
             )}
           />
         }

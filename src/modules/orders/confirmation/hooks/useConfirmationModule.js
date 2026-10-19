@@ -22,7 +22,7 @@ export const useOrderConfirmationModule = ({ filterState }) => {
 
   const getOrderList = async () => {
     const action = await dispatch(fetchOrderConfirmations({ filterState, page }));
-    if (fetchOrderConfirmations.rejected.match(action)) toast.error(action.payload || "Error while fetching order confirmations");
+    if (fetchOrderConfirmations.rejected.match(action)) toast.error(action.payload || "Error while fetching production note confirmations");
   };
 
   const handlePageChange = (pageNumber) => dispatch(setOrderConfirmationPage(pageNumber));
@@ -37,7 +37,7 @@ export const useOrderConfirmationModule = ({ filterState }) => {
 
   const handleToggleAllRows = (checked) => {
     if (!checked) { dispatch(clearOrderConfirmationSelection()); return; }
-    dispatch(setOrderConfirmationSelection(orderList.map((row) => row?.order_id).filter(Boolean)));
+    dispatch(setOrderConfirmationSelection(orderList.map((row) => row?.production_note_id).filter(Boolean)));
   };
 
   return {

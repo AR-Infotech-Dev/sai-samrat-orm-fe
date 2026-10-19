@@ -36,14 +36,17 @@ function ProformaForm({ isOpen, onClose, selectedPi, onAfterSave }) {
       panelClassName="!w-[1080px] max-w-full"
       closeButton={<button className="flyout-close" onClick={onClose} aria-label="Close panel"><X size={18} /></button>}
       footer={
-        <div className="flex w-full items-center justify-between gap-3 border-t border-slate-100 bg-white px-4 py-2">
+        <div className="flex w-full items-center justify-between gap-3  bg-white px-4 py-2">
           <div className="text-[11px] font-semibold text-slate-500">
             {currencyRateLoading ? "Updating live exchange rate..." : `Grand Total: ${formatCurrency(summary.total_value, formData.currency)}`}
           </div>
           <div className="flex items-center gap-2">
             <ActionButton type="button" variant="flyoutSecondary" disabled={loading} onClick={onClose}>Cancel</ActionButton>
-            <ActionButton type="button" variant="flyoutPrimary" disabled={loading || fetching} onClick={handleSave}>
-              {loading ? <Spinner size="sm" /> : selectedPi ? "Update PI" : "Create PI"}
+            <ActionButton type="button" variant="flyoutSecondary" disabled={loading || fetching} onClick={() => handleSave("draft")}>
+              Save Draft
+            </ActionButton>
+            <ActionButton type="button" variant="flyoutPrimary" disabled={loading || fetching} onClick={() => handleSave("waiting")}>
+              {loading ? <Spinner size="sm" /> : "Create PI"}
             </ActionButton>
           </div>
         </div>

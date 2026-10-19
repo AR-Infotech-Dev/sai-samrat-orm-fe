@@ -5,17 +5,16 @@ import TopBar from "@components/TopBar";
 import AppShell from "@components/layout/AppShell";
 import { useAuth } from "@auth/components/AuthProvider";
 
-const isDashboardPath = (pathname) => pathname === "/" || pathname.replace(/\/$/, "").endsWith("/dashboard");
 
 function AppLayout() {
   const { logout } = useAuth();
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(() => isDashboardPath(location.pathname));
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(true);
 
   useEffect(() => {
     setIsMobileMenuOpen(false);
-    setIsSidebarCollapsed(isDashboardPath(location.pathname));
+    setIsSidebarCollapsed(true);
   }, [location.pathname]);
 
   useEffect(() => {
@@ -44,7 +43,6 @@ function AppLayout() {
           <Sidebar
             isMobileOpen={isMobileMenuOpen}
             isSidebarCollapsed={isSidebarCollapsed}
-            onToggle={() => setIsSidebarCollapsed((current) => !current)}
             onClose={() => {
               setIsMobileMenuOpen(false);
             }}

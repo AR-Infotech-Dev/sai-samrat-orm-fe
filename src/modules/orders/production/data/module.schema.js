@@ -6,16 +6,16 @@ const FIXED_TABLE_COLUMNS = [
 
 export const ordersModuleSchema = {
   title: "Production",
-  description: "Track planned orders through production, procurement and ready quantity.",
+  description: "Track planned production notes through production, procurement and ready quantity.",
   menu_id: 20,
-  primaryKey: "order_id",
+  primaryKey: "production_note_id",
   api: {
-    list: "/orders/production",
+    list: "/production-notes/production",
     definitions: "/system/getDefinations",
     definitionsFallback: "/system/getstructure",
   },
   defaultColumns: [
-    "order_no",
+    "production_note_no",
     "customer_id",
     "production_status",
     "production_pending_qty",
@@ -33,16 +33,16 @@ export const ordersModuleSchema = {
   skipFields: [
     'company_id',
     'source',
-    'order_week',
+    'production_note_week',
   ],
   tableCellConfig: [
     { column_name: "customer_id", type: "person" },
-    { column_name: "order_status", type: "badge", color_field: "order_status_color" },
+    { column_name: "production_note_status", type: "badge", color_field: "production_note_status_color" },
     { column_name: "production_status", type: "badge" },
     { column_name: "priority", type: "badge", color_field: "priority_color" },
   ],
   columnMappings: [
-    { order_no: "Order No" },
+    { production_note_no: "Production Note No" },
     { customer_id: "Customer Name" },
     { expected_delivery_date: "Expected Date" },
     { total_items: "Items" },

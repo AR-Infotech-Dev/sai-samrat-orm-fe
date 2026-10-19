@@ -25,19 +25,20 @@ function OrderForm({ isOpen, onClose, selectedOrder, onAfterSave, menu_id }) {
     <FlyoutPanel
       isOpen={isOpen}
       onClose={handleClose}
-      title={selectedOrder ? "Edit Order" : "Create Order"}
+      title={selectedOrder ? "Edit Production Note" : "Create Production Note"}
       subtitle={
         <div className="flex gap-1.5">
-          {formData.order_status &&
+          <span className="text-xs text-slate-500">{formData.production_note_no || "Auto Generated"} | {formData.production_code || "-"} | {formData.pi_number || "-"}</span>
+          {formData.production_note_status &&
             <Badge
               variant="outline"
               className="rounded-full border px-2 py-0.5 text-[10px] font-semibold capitalize"
               style={{
-                color: formData.order_status_color || "#FF8D4B",
-                borderColor: `${formData.order_status_color || "#FF8D4B"}33`,
-                backgroundColor: `${formData.order_status_color || "#FF8D4B"}14`,
+                color: formData.production_note_status_color || "#FF8D4B",
+                borderColor: `${formData.production_note_status_color || "#FF8D4B"}33`,
+                backgroundColor: `${formData.production_note_status_color || "#FF8D4B"}14`,
               }}
-            >{formData.order_status.charAt(0).toUpperCase() + formData.order_status.slice(1)}</Badge>}
+            >{formData.production_note_status.charAt(0).toUpperCase() + formData.production_note_status.slice(1)}</Badge>}
         </div>
       }
       panelClassName="!w-[1080px] max-w-full"
@@ -47,8 +48,8 @@ function OrderForm({ isOpen, onClose, selectedOrder, onAfterSave, menu_id }) {
         </button>
       }
       footer={
-        <div className="flex w-full items-center justify-end gap-2 border-t border-slate-100 bg-white px-4 py-2">
-          {formData.order_status == "draft" &&
+        <div className="flex w-full items-center justify-end gap-2  bg-white px-4 py-2">
+          {formData.production_note_status == "draft" &&
             <>
               <ActionButton
                 type="button"
@@ -64,7 +65,7 @@ function OrderForm({ isOpen, onClose, selectedOrder, onAfterSave, menu_id }) {
                 disabled={loading}
                 onClick={() => handleSave({ ...saveContext, statusOverride: "waiting" })}
               >
-                {loading ? <Spinner size="sm" /> : selectedOrder ? "Update Order" : "Book Order"}
+                {loading ? <Spinner size="sm" /> : selectedOrder ? "Update Production Note" : "Create Production Note"}
               </ActionButton>
             </>
           }
@@ -75,7 +76,7 @@ function OrderForm({ isOpen, onClose, selectedOrder, onAfterSave, menu_id }) {
         <div className="ws-main-container h-full min-h-0 overflow-hidden !p-0">
           <div className="grid h-full min-h-0 grid-cols-1 gap-1 overflow-hidden p-0 lg:grid-cols-[280px_minmax(0,1fr)]">
             <section className="min-h-0 overflow-y-auto bg-white p-3 shadow-xs [scrollbar-width:none]">
-              <h2 className="mb-1.5 text-sm font-bold text-[#373B41FF]"> Order Details </h2>
+              <h2 className="mb-1.5 text-sm font-bold text-[#373B41FF]"> Production Note Details </h2>
               {fetchingOrder ? (
                 <div className="flex h-32 items-center justify-center"><Spinner /></div>
               ) : (
@@ -104,7 +105,7 @@ function OrderForm({ isOpen, onClose, selectedOrder, onAfterSave, menu_id }) {
               </div>
               <section className="shrink-0 border border-slate-100 bg-white shadow-sm">
                 {currencyRateLoading ? <p className="px-3 pt-2 text-[10px] font-semibold text-orange-500">Updating live exchange rate...</p> : null}
-                <OrderSummary layout="horizontal" orderCode={formData.order_code || '-'} {...orderSummary} currency={formData.currency} gstPercentage={formData.gst_rate} />
+                <OrderSummary layout="horizontal" orderCode={formData.production_code || '-'} {...orderSummary} currency={formData.currency} gstPercentage={formData.gst_rate} />
               </section>
             </div>
           </div>

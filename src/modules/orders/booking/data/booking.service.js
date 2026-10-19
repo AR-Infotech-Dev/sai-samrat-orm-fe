@@ -1,8 +1,14 @@
 ﻿import { makeRequest } from "@/api/httpClient";
 import { ordersModuleSchema } from "./module.schema";
 
-export const getProductionNotePreview = (id) => makeRequest(`/orders/${id}/production-note/preview`, { method: "GET" });
-export const getProductionNotePdf = (id) => makeRequest(`/orders/${id}/production-note/pdf`, { method: "GET", responseType: "blob", timeout: 60000 });
+export const getProductionNoteDefinitions = (menuId) => makeRequest("/system/getDefinations", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: { menu_id: menuId, table: "production_notes" },
+});
+
+export const getProductionNotePreview = (id) => makeRequest(`/production-notes/${id}/production-note/preview`, { method: "GET" });
+export const getProductionNotePdf = (id) => makeRequest(`/production-notes/${id}/production-note/pdf`, { method: "GET", responseType: "blob", timeout: 60000 });
 
 export const getOrderBookings = async ({ filterState, page }) => {
   return makeRequest(ordersModuleSchema.api.list, {

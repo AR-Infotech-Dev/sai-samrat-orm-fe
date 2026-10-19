@@ -1,5 +1,3 @@
-import { isAmcActive } from "@utils/amc";
-
 function OrderTableRow({ row, index, columns, table }) {
   const rowKey = table.getRowIdentifier(row) ?? row?.name ?? index;
   return (

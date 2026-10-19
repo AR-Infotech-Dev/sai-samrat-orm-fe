@@ -1,11 +1,4 @@
-﻿import {
-    AlertCircle,
-    CircleDot,
-    Clock3,
-    Info,
-    Package,
-    ShoppingCart,
-} from "lucide-react";
+import { CircleDot, Clock3, Package, ShoppingCart } from "lucide-react";
 import { formatCurrency, formatNumber } from "../utils/booking.utils";
 
 const SummaryRow = ({ icon: Icon, label, value, valueClassName = "text-slate-600", }) => {
@@ -66,12 +59,12 @@ const OrderSummary = ({
         return (
             <aside className="w-full min-h-0 px-3 py-2">
                 <div className="mb-1.5 flex items-center justify-between gap-3">
-                    <h2 className="text-sm font-bold text-[#373B41FF]"> Order Summary </h2>
+                    <h2 className="text-sm font-bold text-[#373B41FF]"> Production Note Summary </h2>
                 </div>
                 <div className="grid items-start gap-6 md:grid-cols-3 md:divide-x md:divide-gray-200">
                     {/* Column 1 */}
                     <div className="md:pr-6">
-                        <SummaryRow icon={CircleDot} label="Order Code" value={orderCode} valueClassName="text-blue-500" />
+                        <SummaryRow icon={CircleDot} label="Production Code" value={orderCode} valueClassName="text-blue-500" />
                         <SummaryRow icon={ShoppingCart} label="Total Qty" value={formatNumber(totalQty)} />
                         <SummaryRow icon={Package} label="Total Items" value={formatNumber(totalItems)} />
                     </div>
@@ -100,9 +93,9 @@ const OrderSummary = ({
 
     return (
         <aside className="w-full min-h-0  max-w-[390px] px-5 py-3 shadow-black/30 sm:w-full md:w-full sm:px-6">
-            <h2 className="mb-2.5 text-md font-bold text-[#373B41FF]"> Order Summary </h2>
+            <h2 className="mb-2.5 text-md font-bold text-[#373B41FF]"> Production Note Summary </h2>
             <div>
-                <SummaryRow icon={CircleDot} label="Order Code" value={orderCode} valueClassName="text-blue-500" />
+                <SummaryRow icon={CircleDot} label="Production Code" value={orderCode} valueClassName="text-blue-500" />
                 <SummaryRow icon={Package} label="Total Items" value={formatNumber(totalItems)} />
                 <SummaryRow icon={ShoppingCart} label="Total Qty" value={formatNumber(totalQty)} />
                 <SummaryRow icon={Clock3} label="Ready Qty" value={formatNumber(readyQty)} valueClassName="text-emerald-500" />

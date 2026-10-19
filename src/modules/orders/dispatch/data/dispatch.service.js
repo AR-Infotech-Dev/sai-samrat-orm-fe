@@ -1,6 +1,12 @@
 import { makeRequest } from "@/api/httpClient";
 
-const BASE_URL = "/orders/dispatch";
+const BASE_URL = "/production-notes/dispatch";
+
+export const getModuleDefinitions = (menuId) => makeRequest("/system/getDefinations", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: { menu_id: menuId, table: "dispatches" },
+});
 
 export const getDispatches = async ({ filterState, page }) => makeRequest(BASE_URL, {
   method: "POST",

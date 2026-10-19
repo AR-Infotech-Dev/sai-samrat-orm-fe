@@ -1,9 +1,15 @@
+import LoadingBar from "../LoadingBar";
 import SpinnerIllustration from "./SpinnerIllustration";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
+import { registerFlyoutLoader } from "@context/flyoutLoadingStore";
 
 function FlyoutPanel({ isOpen, onClose, title, subtitle, closeButton, children, footer, panelClassName = "", loading = false }) {
 
   const [isPresent, setIsPresent] = useState(isOpen);
+  const flyoutId = useId();
+  useLayoutEffect(() => {
+    if (isOpen) return registerFlyoutLoader(flyoutId);
+  }, [isOpen, flyoutId]);
   const lastOpenContent = useRef({ title, subtitle, closeButton, children, footer, loading });
 
   useLayoutEffect(() => {
@@ -41,10 +47,11 @@ function FlyoutPanel({ isOpen, onClose, title, subtitle, closeButton, children, 
             }
           }}
         >
-          <div className="overlay_header">
+          <div className="overlay_header relative">
+            <LoadingBar flyoutId={flyoutId} loading={content.loading} />
             <div className="ws_container">
               <h2 className="page_title">{content.title}</h2>
-              <div className="flex gap-1">
+              <div className="flex gap-1 items-center">
                 {content.subtitle && <p className="text-xs text-slate-500">{content.subtitle}</p>}
                 {content.closeButton}
               </div>

@@ -1,5 +1,5 @@
 import { formatCurrency, formatNumber, getCurrencySymbol } from "@/utils/common";
-import { CheckCircle2, Clock3, Eye, PauseCircle, RotateCcw, Search, Send, X } from "lucide-react";
+import { CheckCircle2, Clock3, Eye, PauseCircle, RotateCcw, X } from "lucide-react";
 
 const formatDate = (value) => {
   if (!value) return "-";
@@ -78,21 +78,21 @@ const ConfirmationTable = ({ rows, loading, selectedOrderId, onView, onQuickActi
           </thead>
           <tbody className="divide-y divide-slate-100">
             {rows.map((row, index) => {
-              const isSelected = String(row.order_id) === String(selectedOrderId);
+              const isSelected = String(row.production_note_id) === String(selectedOrderId);
               return (
-                <tr key={row.order_id || index} className={isSelected ? "bg-orange-50/50" : "hover:bg-slate-50/60"}>
+                <tr key={row.production_note_id || index} className={isSelected ? "bg-orange-50/50" : "hover:bg-slate-50/60"}>
                   <td className="px-3 py-3 text-slate-400">{index + 1}</td>
-                  <td className="px-3 py-3 font-semibold text-orange-600">{row.order_no || "-"}</td>
+                  <td className="px-3 py-3 font-semibold text-orange-600">{row.production_note_no || "-"}</td>
                   <td className="px-3 py-3">
                     <div className="font-semibold text-slate-700">{row.customer_name || row.customer_id || "-"}</div>
                     <div className="text-[11px] text-slate-400">{row.customer_mobile || row.customer_email || ""}</div>
                   </td>
-                  <td className="px-3 py-3 text-slate-600">{formatDate(row.order_date)}</td>
+                  <td className="px-3 py-3 text-slate-600">{formatDate(row.production_note_date)}</td>
                   <td className="px-3 py-3 text-right font-semibold text-slate-700">{formatNumber(row.total_items)}</td>
-                  <td className="px-3 py-3 text-right font-semibold text-slate-700">{formatNumber(row.total_order_qty)}</td>
+                  <td className="px-3 py-3 text-right font-semibold text-slate-700">{formatNumber(row.total_production_note_qty)}</td>
                   <td className="px-3 py-3 text-right font-bold text-slate-800">{formatCurrency(row.total_value_in_inr, row.currency)}</td>
                   <td className="px-3 py-3"><StatusChip tone={row.priority === "high" || row.priority === "urgent" ? "red" : "blue"}>{row.priority || "normal"}</StatusChip></td>
-                  <td className="px-3 py-3"><StatusChip tone={row.order_status === "hold" ? "amber" : "orange"}>{row.order_status || "waiting"}</StatusChip></td>
+                  <td className="px-3 py-3"><StatusChip tone={row.production_note_status === "hold" ? "amber" : "orange"}>{row.production_note_status || "waiting"}</StatusChip></td>
                   <td className="px-3 py-3">
                     <div className="flex items-center justify-end gap-1.5">
                       <button type="button" onClick={() => onView(row)} className="inline-flex h-8 items-center gap-1 rounded-md border border-blue-100 bg-blue-50 px-2 text-xs font-semibold text-blue-600 hover:bg-blue-100">
@@ -143,7 +143,7 @@ const OrderReviewDrawer = ({ isOpen, order, remarks, actionLoading, onClose, onR
   const totalItems = items.length || Number(order?.total_items || 0);
   const currency = order?.currency || "INR";
   const currencySymbol = getCurrencySymbol(currency);
-  const selectedSubtotal = items.reduce((total, item) => total + (Number(item.order_qty || 0) * Number(item.unit_rate || 0)), 0);
+  const selectedSubtotal = items.reduce((total, item) => total + (Number(item.production_note_qty || 0) * Number(item.unit_rate || 0)), 0);
   const selectedGrandTotal = items.reduce((total, item) => total + Number(item.line_value || 0), 0);
 
   return (
@@ -165,10 +165,10 @@ const OrderReviewDrawer = ({ isOpen, order, remarks, actionLoading, onClose, onR
             <section className="rounded-xl border border-slate-100 bg-white p-3 shadow-sm">
               <h3 className="mb-3 text-sm font-bold text-slate-800">Order Header</h3>
               <div className="grid grid-cols-2 gap-2">
-                <DetailCell label="Order Code" value={order?.order_code} highlight />
-                <DetailCell label="Status" value={order?.order_status || "waiting"} />
+                <DetailCell label="Production Code" value={order?.production_code} highlight />
+                <DetailCell label="Status" value={order?.production_note_status || "waiting"} />
                 <DetailCell label="Priority" value={order?.priority || "normal"} />
-                <DetailCell label="Order Date" value={formatDate(order?.order_date)} />
+                <DetailCell label="Production Note Date" value={formatDate(order?.production_note_date)} />
                 <DetailCell label="Expected Delivery" value={formatDate(order?.expected_delivery_date)} />
               </div>
             </section>
@@ -202,12 +202,12 @@ const OrderReviewDrawer = ({ isOpen, order, remarks, actionLoading, onClose, onR
               </div>
               <div className="divide-y divide-slate-100">
                 {items.map((item, index) => (
-                  <div className="grid w-full grid-cols-[42px_minmax(180px,2fr)_minmax(110px,1fr)_90px_80px_110px_80px_140px] items-center" key={item.order_item_id || index}>
+                  <div className="grid w-full grid-cols-[42px_minmax(180px,2fr)_minmax(110px,1fr)_90px_80px_110px_80px_140px] items-center" key={item.production_note_item_id || index}>
                     <div className="px-3 py-2 text-slate-400">{index + 1}</div>
                     <div className="truncate px-3 py-2 font-semibold text-slate-700">{item.product_name_snapshot || item.product_name || "-"}</div>
                     <div className="truncate px-3 py-2 text-slate-500">{item.brand_snapshot || item.brand || "-"}</div>
                     <div className="px-3 py-2 text-right text-slate-500">{formatNumber(item.weight)}</div>
-                    <div className="px-3 py-2 text-right font-semibold text-slate-700">{formatNumber(item.order_qty)}</div>
+                    <div className="px-3 py-2 text-right font-semibold text-slate-700">{formatNumber(item.production_note_qty)}</div>
                     <div className="px-3 py-2 text-right text-slate-600">{formatCurrency(item.unit_rate, currency)}</div>
                     <div className="px-3 py-2 text-right text-slate-600">{Number(item.gst_rate || 0)}%</div>
                     <div className="px-3 py-2 text-right font-bold text-slate-800">{formatCurrency(item.line_value, currency)}</div>
@@ -222,9 +222,9 @@ const OrderReviewDrawer = ({ isOpen, order, remarks, actionLoading, onClose, onR
               <h3 className="text-sm font-bold text-slate-800">Order Summary</h3>
               <div className="mt-3 space-y-2 text-sm">
                 <div className="flex justify-between"><span className="text-slate-500">Total Items</span><strong>{formatNumber(totalItems)}</strong></div>
-                <div className="flex justify-between"><span className="text-slate-500">Total Qty</span><strong>{formatNumber(order?.total_order_qty)}</strong></div>
-                <div className="flex justify-between"><span className="text-slate-500">Subtotal</span><strong>{formatCurrency(selectedSubtotal || order?.total_order_value, currency)}</strong></div>
-                <div className="border-t border-dashed border-slate-200 pt-2 flex justify-between"><span className="font-semibold text-slate-700">Grand Total</span><strong className="text-lg text-orange-600">{formatCurrency(selectedGrandTotal || order?.total_order_value, currency)}</strong></div>
+                <div className="flex justify-between"><span className="text-slate-500">Total Qty</span><strong>{formatNumber(order?.total_production_note_qty)}</strong></div>
+                <div className="flex justify-between"><span className="text-slate-500">Subtotal</span><strong>{formatCurrency(selectedSubtotal || order?.total_production_note_value, currency)}</strong></div>
+                <div className="border-t border-dashed border-slate-200 pt-2 flex justify-between"><span className="font-semibold text-slate-700">Grand Total</span><strong className="text-lg text-orange-600">{formatCurrency(selectedGrandTotal || order?.total_production_note_value, currency)}</strong></div>
               </div>
             </section>
             <RiskChecklist />
@@ -235,7 +235,7 @@ const OrderReviewDrawer = ({ isOpen, order, remarks, actionLoading, onClose, onR
           </div>
         </div>
 
-        <div className="shrink-0 border-t border-slate-100 bg-white p-4">
+        <div className="shrink-0  bg-white p-4">
           <label className="text-xs font-semibold text-slate-500">Remarks / Reason <span className="text-red-500">required for Hold or Send Back</span></label>
           <div className="mt-2 grid gap-3 lg:grid-cols-[minmax(0,1fr)_auto]">
             <textarea

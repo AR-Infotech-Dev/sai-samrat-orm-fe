@@ -1,6 +1,12 @@
 ﻿import { makeRequest } from "@/api/httpClient";
 
-const BASE_URL = "/orders/confirmation";
+const BASE_URL = "/production-notes/confirmation";
+
+export const getModuleDefinitions = (menuId) => makeRequest("/system/getDefinations", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: { menu_id: menuId, table: "production_notes" },
+});
 
 export const getConfirmationOrders = async ({ page = 1, searchText = "", filters = {}, status = "waiting", orderBy = "created_date", order = "DESC" } = {}) => {
   return makeRequest(BASE_URL, {

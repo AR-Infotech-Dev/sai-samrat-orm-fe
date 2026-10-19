@@ -59,7 +59,6 @@ export const getRedirectFilters = ({ label = '', redirectTo = '' }) => {
 export const customerSmartSelectConfig = {
   type: "customer",
   source: "customer",
-  label: "Customer",
   placeholder: "Select Customer",
   apiUrl: "",
   check: "name",
@@ -83,7 +82,6 @@ export const customerSmartSelectConfig = {
 export const productSmartSelectConfig = {
   type: "product",
   source: "products",
-  label: "product",
   placeholder: "Select products",
   apiUrl: "",
   check: "product_name",
@@ -102,12 +100,11 @@ export const productSmartSelectConfig = {
 };
 export const orderSmartSelectConfig = {
   type: "order",
-  source: "orders",
-  label: "Order",
-  placeholder: "Select Order",
+  source: "production_notes",
+  placeholder: "Select Production Note",
   apiUrl: "",
-  check: "order_code",
-  list: "order_id,order_code",
+  check: "production_code",
+  list: "production_note_id,production_code",
   preload: true,
   cache: true,
   showRecent: true,
@@ -115,8 +112,8 @@ export const orderSmartSelectConfig = {
   statusCheck: true,
   allowAddNew: false,
   customParameters: {},
-  getValue: (order) => order.order_id,
+  getValue: (order) => order.production_note_id,
   getLabel: (order) => {
-    return order.order_code || "Unnamed order";
+    return order.production_code || "Unnamed order";
   },
 };

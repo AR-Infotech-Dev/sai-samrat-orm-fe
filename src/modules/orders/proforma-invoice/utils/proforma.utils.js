@@ -74,6 +74,8 @@ export const buildPiSummary = (items = []) => items.reduce((summary, item) => {
   return summary;
 }, { total_qty: 0, subtotal: 0, gst_amount: 0, total_value: 0 });
 
+export const getPiLifecycleStatus = (data = {}) => String(data.pi_status_code || data.pi_status || "").trim().toLowerCase();
+
 export const normalizePiData = (data = {}) => {
   const orderType = data.order_type || proformaModuleSchema.initialValues.order_type;
   const gstRate = data.gst_rate ?? getGstRateByOrderType(orderType);
@@ -81,6 +83,7 @@ export const normalizePiData = (data = {}) => {
   return {
     ...proformaModuleSchema.initialValues,
     ...data,
+    pi_status: getPiLifecycleStatus(data) || "draft",
     order_type: orderType,
     currency,
     gst_rate: toNumber(gstRate),

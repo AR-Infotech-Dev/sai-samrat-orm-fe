@@ -1,11 +1,14 @@
 import { useEffect, useMemo, useState } from "react";
+import { getLatestReadyDate } from "../utils/planning.utils";
 import { toast } from "react-toastify";
-import { CalendarDays, CheckCircle2, Clock3, Factory, PackageCheck, Save, ShoppingBag, X } from "lucide-react";
+import { CalendarDays, Clock3, PackageCheck, Save, ShoppingBag, X } from "lucide-react";
 import ActionButton from "@components/ui/ActionButton";
 import FlyoutPanel from "@components/ui/FlyoutPanel";
 import Spinner from "@components/ui/Spinner";
 import { getPlanningOrderDetails, saveOrderPlanning } from "../data/planning.service";
-import { MessageSquareText } from "lucide-react";
+import "lucide-react";
+
+// const planningGrid = "grid-cols-[24px_minmax(120px,1fr)_42px_56px_56px_56px_58px_94px_64px_28px_84px]";
 
 // const planningGrid = "grid-cols-[24px_minmax(120px,1fr)_42px_56px_56px_56px_58px_94px_64px_28px_84px]";
 const planningGrid = "grid-cols-[24px_minmax(120px,1fr)_100px_64px_84px_60px_60px_60px_60px_60px]";
@@ -40,7 +43,7 @@ const toNumber = (value, fallback = 0) => {
 };
 
 const calculatePlanningStatus = (item = {}) => {
-  const orderQty = toNumber(item.order_qty);
+  const orderQty = toNumber(item.production_note_qty);
   const saiplQty = toNumber(item.saipl_qty);
   const pmkQty = toNumber(item.pmk_qty);
   const readyQty = toNumber(item.ready_qty);
@@ -55,7 +58,7 @@ const calculatePlanningStatus = (item = {}) => {
 };
 
 const calculatePlanningPendingQty = (item = {}) => {
-  const orderQty = toNumber(item.order_qty);
+  const orderQty = toNumber(item.production_note_qty);
   const plannedQty = toNumber(item.saipl_qty) + toNumber(item.pmk_qty) + toNumber(item.ready_qty);
   return Math.max(orderQty - plannedQty, 0);
 };
@@ -69,18 +72,18 @@ const formatCurrency = (value, currency = "INR") => `${getCurrencySymbol(currenc
 const formatNumber = (value) => new Intl.NumberFormat("en-IN", { maximumFractionDigits: 2 }).format(toNumber(value));
 const dateValue = (value) => (value ? String(value).slice(0, 10) : "");
 const normalizeItem = (item = {}) => {
-  const orderQty = toNumber(item.order_qty);
+  const orderQty = toNumber(item.production_note_qty);
   const readyQty = toNumber(item.ready_qty);
   const dispatchedQty = toNumber(item.dispatched_qty);
 
   return {
-    order_item_id: item.order_item_id,
+    production_note_item_id: item.production_note_item_id,
     product_name: item.product_name || item.product_name_snapshot || "-",
     product_code: item.product_code || item.product_code_snapshot || "-",
     fg_code: item.fg_code || "-",
     series: item.series || item.brand_snapshot || item.brand || "-",
     weight: item.weight ?? "-",
-    order_qty: orderQty,
+    production_note_qty: orderQty,
     unit_rate: toNumber(item.unit_rate),
     line_value: toNumber(item.line_value),
     gst_rate: toNumber(item.gst_rate, 18),
@@ -90,7 +93,7 @@ const normalizeItem = (item = {}) => {
     dispatched_qty: dispatchedQty,
     pending_qty: calculatePlanningPendingQty(item),
     expected_ready_date: dateValue(item.expected_ready_date),
-    planning_status: calculatePlanningStatus({ ...item, order_qty: orderQty, ready_qty: readyQty, dispatched_qty: dispatchedQty }),
+    planning_status: calculatePlanningStatus({ ...item, production_note_qty: orderQty, ready_qty: readyQty, dispatched_qty: dispatchedQty }),
     priority: item.priority || "normal",
     planning_note: item.planning_note || "",
   };
@@ -141,7 +144,7 @@ const PlanningSummaryStrip = ({ totals, productionCode }) => {
       <SummaryCell label="Available Stock" value={formatNumber(totals.readyQty)} tone="text-slate-600" />
       <SummaryCell label="Pending Qty" value={formatNumber(totals.pendingQty)} tone="text-red-500" />
     </div>
-    <section className="border-t border-slate-100 px-2 py-3 text-xs leading-relaxed text-slate-600" aria-live="polite">
+    <section className=" px-2 py-3 text-xs leading-relaxed text-slate-600" aria-live="polite">
       <h3 className="mb-2 font-semibold text-slate-800">Production summary for {productionCode || "-"}</h3>
       <ul className="list-disc space-y-1 pl-4">
         <li>Total order: <span className="font-semibold text-slate-800">{formatNumber(totals.orderQty)} batteries</span> across {formatNumber(totals.totalItems)} item lines.</li>
@@ -167,7 +170,7 @@ function PlanningForm({ isOpen, onClose, selectedOrder, onAfterSave }) {
     const readyQty = toNumber(item.ready_qty);
     const dispatchedQty = toNumber(item.dispatched_qty);
     acc.totalItems += 1;
-    acc.orderQty += toNumber(item.order_qty);
+    acc.orderQty += toNumber(item.production_note_qty);
     acc.saiplQty += toNumber(item.saipl_qty);
     acc.pmkQty += toNumber(item.pmk_qty);
     acc.readyQty += readyQty;
@@ -177,10 +180,10 @@ function PlanningForm({ isOpen, onClose, selectedOrder, onAfterSave }) {
   }, { totalItems: 0, orderQty: 0, saiplQty: 0, pmkQty: 0, readyQty: 0, pendingQty: 0, value: 0 }), [items]);
 
   const fetchOrder = async () => {
-    if (!selectedOrder?.order_id) return;
+    if (!selectedOrder?.production_note_id) return;
     try {
       setFetching(true);
-      const res = await getPlanningOrderDetails(selectedOrder.order_id);
+      const res = await getPlanningOrderDetails(selectedOrder.production_note_id);
       if (!res.success) {
         toast.error(res.message || "Unable to fetch order planning details");
         return;
@@ -203,7 +206,7 @@ function PlanningForm({ isOpen, onClose, selectedOrder, onAfterSave }) {
       setItems([]);
       setRowErrors({});
     }
-  }, [isOpen, selectedOrder?.order_id]);
+  }, [isOpen, selectedOrder?.production_note_id]);
 
   const updateItem = (index, field, value) => {
     setRowErrors((current) => {
@@ -244,14 +247,14 @@ function PlanningForm({ isOpen, onClose, selectedOrder, onAfterSave }) {
     const errors = {};
 
     items.forEach((item, index) => {
-      const orderQty = toNumber(item.order_qty);
+      const orderQty = toNumber(item.production_note_qty);
       const saiplQty = toNumber(item.saipl_qty);
       const pmkQty = toNumber(item.pmk_qty);
       const readyQty = toNumber(item.ready_qty);
       const plannedQty = saiplQty + pmkQty + readyQty;
       const status = calculatePlanningStatus(item);
 
-      if (orderQty <= 0) addRowError(errors, index, ["order_qty"], "Order qty cannot be zero.");
+      if (orderQty <= 0) addRowError(errors, index, ["production_note_qty"], "Order qty cannot be zero.");
       if (saiplQty < 0 || pmkQty < 0 || readyQty < 0) addRowError(errors, index, ["saipl_qty", "pmk_qty", "ready_qty"], "Qty cannot be negative.");
       if (plannedQty > orderQty) addRowError(errors, index, ["saipl_qty", "pmk_qty", "ready_qty"], "SAIPL + Out source + Available Stock cannot be greater than order qty.");
       if (readyQty > orderQty) addRowError(errors, index, ["ready_qty"], "Available Stock qty cannot be greater than order qty.");
@@ -283,7 +286,7 @@ function PlanningForm({ isOpen, onClose, selectedOrder, onAfterSave }) {
         pending_qty: calculatePlanningPendingQty(item),
         planning_status: calculatePlanningStatus(item),
       }));
-      const res = await saveOrderPlanning({ orderId: selectedOrder.order_id, items: planningItems });
+      const res = await saveOrderPlanning({ orderId: selectedOrder.production_note_id, items: planningItems });
       if (!res.success) {
         toast.error(res.message || "Unable to save planning");
         return;
@@ -305,7 +308,7 @@ function PlanningForm({ isOpen, onClose, selectedOrder, onAfterSave }) {
       isOpen={isOpen}
       onClose={onClose}
       title="Order Planning"
-      subtitle={order?.order_no ? `${order.order_no} • ${order.customer_name || "Customer"}` : "Plan order item rows"}
+      subtitle={order?.production_note_no ? `${order.production_note_no} • ${order.customer_name || "Customer"}` : "Plan order item rows"}
       panelClassName="!w-[1080px] max-w-full"
       closeButton={
         <button className="flyout-close" onClick={onClose} aria-label="Close panel">
@@ -331,9 +334,9 @@ function PlanningForm({ isOpen, onClose, selectedOrder, onAfterSave }) {
           <>
             <section className="mb-1.5 shrink-0 rounded-sm border border-slate-100 bg-white p-3 shadow-sm">
               <div className="grid gap-3 lg:grid-cols-4">
-                <SummaryMetric index={1} icon={ShoppingBag} label="Order Code" value={order?.order_code || "-"} tone="orange" />
+                <SummaryMetric index={1} icon={ShoppingBag} label="Production Code" value={order?.production_code || "-"} tone="orange" />
                 <SummaryMetric index={2} icon={PackageCheck} label="Customer" value={order?.customer_name || "-"} tone="slate" />
-                <SummaryMetric index={3} icon={CalendarDays} label="Expected Date" value={dateValue(order?.expected_delivery_date) || "-"} tone="blue" />
+                <SummaryMetric index={3} icon={CalendarDays} label="Expected Date" value={getLatestReadyDate(items) || dateValue(order?.expected_delivery_date) || "-"} tone="blue" />
                 <SummaryMetric index={4} icon={Clock3} label="Priority" value={order?.priority || "normal"} tone="red" />
               </div>
             </section>
@@ -367,7 +370,7 @@ function PlanningForm({ isOpen, onClose, selectedOrder, onAfterSave }) {
                   {/* Rows */}
                   <div className="divide-y divide-slate-100">
                     {items.map((item, index) => (
-                      <div key={item.order_item_id ?? index} className={`grid ${planningGrid} items-center gap-1.5 px-2 py-1.5 text-[10px] text-slate-700 transition hover:bg-slate-50/70`} >
+                      <div key={item.production_note_item_id ?? index} className={`grid ${planningGrid} items-center gap-1.5 px-2 py-1.5 text-[10px] text-slate-700 transition hover:bg-slate-50/70`} >
                         {/* Serial number */}
                         <span className="font-semibold text-slate-500"> {index + 1} </span>
                         {/* Product */}
@@ -388,7 +391,7 @@ function PlanningForm({ isOpen, onClose, selectedOrder, onAfterSave }) {
                           ))}
                         </select>
                         {/* Order quantity */}
-                        <span className="rounded bg-blue-50 px-1 py-1 text-center font-semibold text-blue-600"> {formatNumber(item.order_qty)} </span>
+                        <span className="rounded bg-blue-50 px-1 py-1 text-center font-semibold text-blue-600"> {formatNumber(item.production_note_qty)} </span>
                         {/* SAIPL quantity */}
                         <input type="number" min="0" value={item.saipl_qty ?? ""} onChange={(event) => updateItem(index, "saipl_qty", event.target.value)} className={`h-6 min-w-0 w-full rounded-md border border-emerald-200 bg-emerald-50/50 px-1 text-center text-[10px] outline-none focus:border-emerald-400 focus:bg-white focus:ring-1 focus:ring-emerald-100${errorInputClass(index, "saipl_qty")}`} />
                         {/* PMK quantity */}
@@ -405,7 +408,7 @@ function PlanningForm({ isOpen, onClose, selectedOrder, onAfterSave }) {
               </section>
             </div>
             <div className="grid shrink-0 gap-3 lg:grid-cols-[minmax(0,1fr)]">
-              <PlanningSummaryStrip totals={totals} productionCode={order?.order_code} />
+              <PlanningSummaryStrip totals={totals} productionCode={order?.production_code} />
             </div>
           </>
         )}

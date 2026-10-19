@@ -79,7 +79,7 @@ export const useCategoriesModule = ({ filterState }) => {
       return;
     }
 
-    if (!window.confirm("Delete this category?")) return;
+    if (!await confirmAction("Delete this category?")) return;
 
     const action = await dispatch(deleteCategoryItems([rowId]));
 
@@ -106,3 +106,4 @@ export const useCategoriesModule = ({ filterState }) => {
     handleDeleteRow,
   };
 };
+import { confirmAction } from "@utils/confirmAction";

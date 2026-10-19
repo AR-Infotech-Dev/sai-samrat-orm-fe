@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import ModulePageLayout from "@shared/ModulePageLayout";
-import { Download, RefreshCw, RotateCcw, Search } from "lucide-react";
+import { RefreshCw, RotateCcw, Search } from "lucide-react";
 import SmartSelectInput from "@/components/form-inputs/smartSelectInput";
 import { useAuth } from "@auth/components/AuthProvider";
 import ColumnArranger from "@/components/table/ColumnArranger";
@@ -18,7 +18,7 @@ import "./styles/dashboard.css";
 const initialFilters = {
   customer_id: "",
   product_id: "",
-  order_code: "",
+  production_code: "",
   from_date: "",
   to_date: "",
   stage: "all",
@@ -93,20 +93,21 @@ function Dashboard() {
           onApplyColumnKeys={handleApplyColumnKeys}
         />
         <div className="dashboard-filters rounded-sm border border-slate-100 bg-white p-2 shadow-xs mb-0.5">
-          <SmartSelectInput id="order_id" field={{ label: "Order" }} value={filters.order_code} config={orderSmartSelectConfig} onSelect={(value) => updateFilter("order_id", value)} />
-          <SmartSelectInput id="customer_id" field={{ label: "Customer" }} value={filters.customer_id} config={customerSmartSelectConfig} onSelect={(value) => updateFilter("customer_id", value)} />
-          <SmartSelectInput id="product_id" field={{ label: "Product / Model" }} value={filters.product_id} config={productSmartSelectConfig} onSelect={(value) => updateFilter("product_id", value)} />
+          <SmartSelectInput id="production_note_id" value={filters.production_code} config={orderSmartSelectConfig} onSelect={(value) => updateFilter("production_note_id", value)} />
+          <SmartSelectInput id="customer_id" value={filters.customer_id} config={customerSmartSelectConfig} onSelect={(value) => updateFilter("customer_id", value)} />
+          <SmartSelectInput id="product_id" value={filters.product_id} config={productSmartSelectConfig} onSelect={(value) => updateFilter("product_id", value)} />
           <label>
-            <span>From Date</span>
-            <input type="date" value={filters.from_date} onChange={(event) => updateFilter("from_date", event.target.value)} />
+            {/* <span>From Date</span> */}
+            <input type={filters.from_date ? "date" : "text"} placeholder="From Date" aria-label="From Date" onFocus={(event) => { event.currentTarget.type = "date"; }} onClick={(event) => { event.currentTarget.type = "date"; event.currentTarget.showPicker?.(); }} onBlur={(event) => { if (!event.currentTarget.value) event.currentTarget.type = "text"; }} value={filters.from_date} onChange={(event) => updateFilter("from_date", event.target.value)} />
           </label>
           <label>
-            <span>To Date</span>
-            <input type="date" value={filters.to_date} onChange={(event) => updateFilter("to_date", event.target.value)} />
+            {/* <span>To Date</span> */}
+            <input type={filters.to_date ? "date" : "text"} placeholder="To Date" aria-label="To Date" onFocus={(event) => { event.currentTarget.type = "date"; }} onClick={(event) => { event.currentTarget.type = "date"; event.currentTarget.showPicker?.(); }} onBlur={(event) => { if (!event.currentTarget.value) event.currentTarget.type = "text"; }} value={filters.to_date} onChange={(event) => updateFilter("to_date", event.target.value)} />
           </label>
           <label>
-            <span>Stage</span>
+            {/* <span>Stage</span> */}
             <select value={filters.stage} onChange={(event) => handleTabChange(event.target.value)}>
+              <option value="">Stage</option>
               <option value="all">All Stages</option>
               <option value="confirmation">Confirmation</option>
               <option value="planning">Planning</option>

@@ -2,7 +2,7 @@
 
 function OrderTableRow({ row, index, columns, table, onView, onQuickAction, quickActionLoadingId }) {
   const rowKey = table.getRowIdentifier(row) ?? row?.name ?? index;
-  const isActionLoading = String(quickActionLoadingId || "") === String(row?.order_id || "");
+  const isActionLoading = String(quickActionLoadingId || "") === String(row?.production_note_id || "");
 
   return (
     <tr key={rowKey} className="group">
@@ -14,7 +14,7 @@ function OrderTableRow({ row, index, columns, table, onView, onQuickAction, quic
           onClick={table.getRowClick(column, row)}
         >
           {column.isActionsColumn ? (
-            <div className="flex h-8 items-center justify-end gap-1.5">
+            <div className="table-row-actions flex h-8 items-center justify-end gap-1.5" onClick={(event) => event.stopPropagation()}>
               <button type="button" disabled={isActionLoading} onClick={() => onView(row)} className="inline-flex h-6 items-center gap-1 rounded-sm border border-blue-200 bg-blue-50 px-2 text-xs font-semibold text-blue-600 hover:bg-blue-100 disabled:opacity-60">
                 <Eye size={13} /> View
               </button>

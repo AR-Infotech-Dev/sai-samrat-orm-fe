@@ -70,9 +70,9 @@ export const useOrdersModule = ({ filterState }) => {
     };
 
     const handleDeleteRow = async (row) => {
-        const rowId = row.order_id;
+        const rowId = row.production_note_id;
         if (!rowId) { toast.error("Order id not found."); return; }
-        if (!window.confirm("Delete this Order?")) return;
+        if (!await confirmAction("Delete this Order?")) return;
 
         const action = await dispatch(deleteOrders([rowId]));
 
@@ -99,3 +99,4 @@ export const useOrdersModule = ({ filterState }) => {
         handleDeleteRow,
     }
 }
+import { confirmAction } from "@utils/confirmAction";

@@ -1,6 +1,8 @@
 import { makeRequest } from "@/api/httpClient";
 
 const BASE_URL = "/orders/proforma-invoice";
+export const submitProformaInvoice = (id) => makeRequest(`${BASE_URL}/${id}/submit`, { method: "POST", body: {} });
+export const approveProformaInvoice = (id) => makeRequest(`${BASE_URL}/${id}/approve`, { method: "POST", body: {} });
 
 export const getProformaInvoicePdf = (piId) => makeRequest(`${BASE_URL}/${piId}/pdf`, {
   method: "GET", responseType: "blob", timeout: 60000,

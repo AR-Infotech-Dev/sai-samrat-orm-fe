@@ -1,5 +1,5 @@
 import { buildFallbackColumnsFromKeys } from "@utils/moduleStructure";
-import { optional, readonly, z } from "zod";
+import { z } from "zod";
 import { currencyOptions } from "../utils/booking.utils";
 import CustomerRowTemplate from "../../shared/components/CustomerRowTemplate";
 import ProformaInvoiceRowTemplate from "../../shared/components/ProformaInvoiceRowTemplate";
@@ -9,10 +9,10 @@ const FIXED_TABLE_COLUMNS = [
   // { key: "favorite", className: "icon-col", width: 42, minWidth: 42, resizable: false },
 ];
 export const ordersModuleSchema = {
-  title: "Orders",
-  description: "Manage orders here.",
+  title: "Production Note",
+  description: "Create and manage production notes against proforma invoices.",
   menu_id: 20,
-  primaryKey: 'order_id',
+  primaryKey: 'production_note_id',
   api: {
     list: "/orders",
     delete: "/orders/delete",
@@ -48,48 +48,39 @@ export const ordersModuleSchema = {
       options: [],
     },
   ],
-  defaultColumns: ["order_code", "order_status", "customer_id", "brand", "order_date", "currency", "total_order_value", "total_order_qty"],
-  skipFields: ['order_no', 'company_id', 'excel_row_no'],
+  defaultColumns: ["production_code", "production_note_status", "customer_id", "brand", "production_note_date", "currency", "total_production_note_value", "total_production_note_qty"],
+  skipFields: ['production_note_no', 'company_id', 'excel_row_no'],
   tableCellConfig: [
     { column_name: "name", type: "person" },
     { column_name: "orderName", type: "person" },
     { column_name: "roleID", type: "tag" },
-    { column_name: "order_status", type: "badge", color_field: "order_status_color" },
+    { column_name: "production_note_status", type: "badge", color_field: "production_note_status_color" },
     { column_name: "status", type: "badge", color_field: "status_color" },
   ],
   columnMappings: [
-    { is_sys_order: "System Order" },
-    { isEmailSend: "Verification Email Sent" },
-    { contactNo: "Contact No" },
-    { whatsappNo: "Whatsapp No" },
-    { dateOfBirth: "Date Of Birth" },
-    { lastLogin: "Last Login" },
-    { company_id: "Assigned Company" },
-    { roleID: "Order Role" },
-    { is_approver: "Approval Privileges" },
-    { otp: "OTP" },
+
   ],
   savedFilters: [],
   form: {
     initialValues: {
-      order_id: null,
-      order_no: "",
+      production_note_id: null,
+      production_note_no: "",
       order_type: 'domestic',
-      order_code: "",
+      production_code: "",
       company_id: null,
       customer_id: null,
       customer_name: "",
       brand: "",
       pi_id: null,
       pi_number: "",
-      order_date: "",
-      order_month: "",
-      order_week: "",
+      production_note_date: "",
+      production_note_month: "",
+      production_note_week: "",
       expected_delivery_date: "",
-      order_status: "draft",
+      production_note_status: "draft",
       priority: "normal",
-      total_order_qty: 0,
-      total_order_value: 0,
+      total_production_note_qty: 0,
+      total_production_note_value: 0,
       gst_rate: 18,
       currency: "INR",
       exchange_rate: 1,
@@ -107,7 +98,7 @@ export const ordersModuleSchema = {
       {
         columns: 3,
         fields: [
-          { name: "order_code", label: "Order Code", type: "text", placeholder: "Order Code", gridSpan: 12, required: true, readOnlyWhen: (values) => Boolean(values.order_status !== "draft"), },
+          { name: "production_code", label: "Production Code", type: "text", placeholder: "Production Code", gridSpan: 12, required: true, readOnlyWhen: (values) => Boolean(values.production_note_status !== "draft"), },
         ],
       },
       {
@@ -121,7 +112,7 @@ export const ordersModuleSchema = {
             gridSpan: 12,
             alwaysVisible: true,
             alwaysEditable: true,
-            readOnlyWhen: (values) => Boolean(values.order_status !== "draft"),
+            readOnlyWhen: (values) => Boolean(values.production_note_status !== "draft"),
             options: [
               { value: "domestic", label: "Domestic" },
               { value: "export", label: "Export" },
@@ -140,7 +131,7 @@ export const ordersModuleSchema = {
             required: true,
             id: "customer_id",
             gridSpan: 12,
-            readOnlyWhen: (values) => Boolean(values.order_status !== "draft"),
+            readOnlyWhen: (values) => Boolean(values.production_note_status !== "draft"),
             config: {
               type: "customer",
               source: "customer",
@@ -168,7 +159,7 @@ export const ordersModuleSchema = {
             required: true,
             placeholder: "Select PI Number",
             gridSpan: 12,
-            disabledWhen: (values) => !values.customer_id || Boolean(values.order_status !== "draft"),
+            disabledWhen: (values) => !values.customer_id || Boolean(values.production_note_status !== "draft"),
             config: {
               type: "proforma_invoice",
               source: "proforma_invoices",
@@ -211,20 +202,20 @@ export const ordersModuleSchema = {
         fields: [
           {
             name: "brand", label: "Brand", type: "text", required: true, placeholder: "Brand", gridSpan: 12,
-            readOnlyWhen: (values) => Boolean(values.order_status !== "draft"),
+            readOnlyWhen: (values) => Boolean(values.production_note_status !== "draft"),
           },
         ],
       },
       {
         columns: 3,
         fields: [
-          { name: "order_date", label: "Order Date", type: "date", required: true, placeholder: "Order date", gridSpan: 12, readOnlyWhen: (values) => Boolean(values.order_status !== "draft"), },
+          { name: "production_note_date", label: "Production Note Date", type: "date", required: true, placeholder: "Production Note Date", gridSpan: 12, readOnlyWhen: (values) => Boolean(values.production_note_status !== "draft"), },
         ]
       },
       {
         columns: 3,
         fields: [
-          { name: "expected_delivery_date", label: "Expected delivery Date", type: "date", required: true, placeholder: "Expected delivery date", gridSpan: 12, readOnlyWhen: (values) => Boolean(values.order_status !== "draft"), },
+          { name: "expected_delivery_date", label: "Expected Delivery Date", type: "date", required: true, placeholder: "Expected delivery date", gridSpan: 12, readOnlyWhen: (values) => Boolean(values.production_note_status !== "draft"), },
         ]
       },
       {
@@ -249,7 +240,7 @@ export const ordersModuleSchema = {
             gridSpan: 12, name: "remarks", label: "Remark", type: "textarea", placeholder: "Provide remark about the order...", rows: 2,
             alwaysVisible: true,
             alwaysEditable: true,
-            readOnlyWhen: (values) => Boolean(values.order_status !== "draft"),
+            readOnlyWhen: (values) => Boolean(values.production_note_status !== "draft"),
           },
         ]
       },
@@ -257,16 +248,16 @@ export const ordersModuleSchema = {
   },
   validationSchema: z.object({
     order_type: z.string().nullable().refine((val) => val !== null && val.trim() !== "", { message: "Order type required", }),
-    order_code: z.string().nullable().refine((val) => val !== null && val.trim() !== "", { message: "Order code required", }),
+    production_code: z.string().nullable().refine((val) => val !== null && val.trim() !== "", { message: "Order code required", }),
     pi_number: z.string().nullable().refine((val) => val !== null && val.trim() !== "", { message: "PI number required", }),
     brand: z.string().nullable().refine((val) => val !== null && val.trim() !== "", { message: "Brand required", }),
     customer_id: z.coerce.number({ required_error: "Customer is required", invalid_type_error: "Customer is required", }).int("Invalid customer").positive("Customer is required"),
-    order_date: z.coerce.date().nullable()
+    production_note_date: z.coerce.date().nullable()
       .refine((val) => val !== null, {
-        message: "Order date is required",
+        message: "Production Note Date is required",
       })
       .refine((val) => val && val <= new Date(), {
-        message: "Order date cannot be in the future",
+        message: "Production Note Date cannot be in the future",
       }),
     expected_delivery_date: z.coerce.date().nullable()
       .refine((val) => val !== null, {

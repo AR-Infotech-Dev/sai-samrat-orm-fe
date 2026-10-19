@@ -22,7 +22,7 @@ export const useOrderPlanningModule = ({ filterState }) => {
 
   const getOrderList = async () => {
     const action = await dispatch(fetchOrderPlannings({ filterState, page }));
-    if (fetchOrderPlannings.rejected.match(action)) toast.error(action.payload || "Error while fetching order plannings");
+    if (fetchOrderPlannings.rejected.match(action)) toast.error(action.payload || "Error while fetching production plannings");
   };
 
   const handlePageChange = (pageNumber) => dispatch(setOrderPlanningPage(pageNumber));
@@ -37,7 +37,7 @@ export const useOrderPlanningModule = ({ filterState }) => {
 
   const handleToggleAllRows = (checked) => {
     if (!checked) { dispatch(clearOrderPlanningSelection()); return; }
-    dispatch(setOrderPlanningSelection(orderList.map((row) => row?.order_id).filter(Boolean)));
+    dispatch(setOrderPlanningSelection(orderList.map((row) => row?.production_note_id).filter(Boolean)));
   };
 
   return { pagination, page, loading, selectedRowIds, handlePageChange, getOrderList, handleToggleRow, handleToggleAllRows };

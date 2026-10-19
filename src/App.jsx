@@ -37,7 +37,8 @@ function App() {
             pauseOnFocusLoss
             draggable
             pauseOnHover
-            theme="dark"
+            theme="light"
+            limit={3}
             className="toast-container-compact"
             toastClassName="toast-item-compact"
             bodyClassName="toast-body-compact"

@@ -1,7 +1,8 @@
 ﻿import { toast } from "react-toastify";
 import { useMemo, useState, useEffect } from "react";
 import { defaultSortConfig } from "@utils/sorting";
-import { getDefinitions, buildFilterFieldsFromStructure, buildTableColumnsFromStructure, } from "@utils/moduleStructure";
+import { buildFilterFieldsFromStructure, buildTableColumnsFromStructure, } from "@utils/moduleStructure";
+import { getPlanningDefinitions } from "../data/planning.service";
 import { ordersFallbackColumns, ordersModuleSchema } from "../data/module.schema";
 
 export const useOrderPlanningTableConfig = ({ resolvedMenuID, filterState }) => {
@@ -58,7 +59,7 @@ export const useOrderPlanningTableConfig = ({ resolvedMenuID, filterState }) => 
         [fields]
     );
     const getColumnList = async () => {
-        const res = await getDefinitions(resolvedMenuID);
+        const res = await getPlanningDefinitions(resolvedMenuID);
         if (res.success) {
             setFields(res.data || []);
             return;

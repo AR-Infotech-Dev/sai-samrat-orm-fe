@@ -457,7 +457,7 @@
 /* Order lifecycle dashboard table */
 .dashboard-kpi-grid {
   display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: 8px;
 }
 
@@ -543,7 +543,48 @@
   white-space: nowrap;
 }
 
-@media (max-width: 1280px) {
+@media (min-width: 1024px) {
+  .dashboard-kpi-grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .dashboard-kpi-card {
+    padding: 6px 7px;
+    min-height: 74px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .dashboard-kpi-card h3 {
+    font-size: 11px;
+  }
+
+  .dashboard-kpi-card .text-xs {
+    font-size: 10px;
+  }
+
+  .dashboard-kpi-icon {
+    width: 23px;
+    height: 23px;
+  }
+
+  .dashboard-kpi-icon svg {
+    width: 15px;
+    height: 15px;
+  }
+
+  .dashboard-kpi-value {
+    font-size: 18px;
+  }
+
+  .dashboard-kpi-secondary {
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 1023px) {
   .dashboard-kpi-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }

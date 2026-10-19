@@ -1,15 +1,15 @@
-import { ChevronDown, ChevronRight, Clock3, Columns3, Package, PackageCheck, ShoppingCart, Truck, Workflow } from "lucide-react";
+import { ChevronDown, ChevronRight, Clock3, Columns3, Package, PackageCheck, Truck, Workflow } from "lucide-react";
 import { Fragment, useMemo, useState } from "react";
 
 const tabKeys = ["all", "confirmation", "planning", "production", "ready_stock", "dispatch"];
 
 export const tableColumns = [
   { key: "sr", label: "#", width: "3%", align: "left" },
-  { key: "order_code", label: "Production Note", width: "11%", align: "left", isAlwaysVisible: true },
+  { key: "production_code", label: "Production Note", width: "11%", align: "left", isAlwaysVisible: true },
   { key: "pi_number", label: "PI Number", width: "11%", align: "left", isAlwaysVisible: true },
   { key: "customer", label: "Customer", width: "12%", align: "left" },
   { key: "product", label: "Product / Model", width: "15%", align: "left" },
-  { key: "order_qty", label: "Order", width: "5.5%", align: "right" },
+  { key: "production_note_qty", label: "Order", width: "5.5%", align: "right" },
   { key: "planned", label: "Plan", width: "5%", align: "right" },
   { key: "pmk", label: "Out S.", width: "5%", align: "right" },
   { key: "produced", label: "Prod.", width: "5.5%", align: "right" },
@@ -24,8 +24,8 @@ export const tableColumns = [
 export const dashboardLifecycleRoleColumns = {
   super_admin: tableColumns.map((column) => column.key),
   admin: tableColumns.map((column) => column.key),
-  employee: ["sr", "order_code", "pi_number", "customer", "product", "order_qty", "planned", "pmk", "produced", "ready", "pending", "dispatch", "value", "expected", "stage"],
-  default: ["sr", "order_code", "pi_number", "customer", "product", "order_qty", "planned", "produced", "ready", "pending", "dispatch", "stage"],
+  employee: ["sr", "production_code", "pi_number", "customer", "product", "production_note_qty", "planned", "pmk", "produced", "ready", "pending", "dispatch", "value", "expected", "stage"],
+  default: ["sr", "production_code", "pi_number", "customer", "product", "production_note_qty", "planned", "produced", "ready", "pending", "dispatch", "stage"],
 };
 
 const VISIBLE_COLUMNS_STORAGE_SUFFIX = "-visible-columns";
@@ -72,7 +72,7 @@ export const normalizeVisibleColumnKeys = (columnKeys = [], roleSlug = "default"
   const repairPrimaryOrder = (keys = []) => {
     const nextKeys = [...new Set(keys)];
     const srIndex = nextKeys.indexOf("sr");
-    const orderCodeIndex = nextKeys.indexOf("order_code");
+    const orderCodeIndex = nextKeys.indexOf("production_code");
 
     if (srIndex !== -1 && orderCodeIndex !== -1 && orderCodeIndex < srIndex) {
       nextKeys.splice(srIndex, 1);
@@ -120,7 +120,7 @@ const formatDate = (value) => {
 
 const sumBy = (rows = [], key) => rows.reduce((total, row) => total + Number(row?.[key] || 0), 0);
 
-const getOrderGroupKey = (row = {}) => row.order_id || row.order_code || row.order_no || row.order_item_id;
+const getOrderGroupKey = (row = {}) => row.production_note_id || row.production_code || row.production_note_no || row.production_note_item_id;
 
 const getGroupedOrders = (rows = []) => {
   const groupMap = new Map();
@@ -139,14 +139,14 @@ const getGroupedOrders = (rows = []) => {
 
   return Array.from(groupMap.values()).map((group) => {
     const { first, items } = group;
-    const stages = new Set(items.map((item) => String(item.current_stage || item.order_status || "").trim()).filter(Boolean));
+    const stages = new Set(items.map((item) => String(item.current_stage || item.production_note_status || "").trim()).filter(Boolean));
 
     return {
       ...first,
       group_key: group.key,
       item_count: items.length,
       items,
-      order_qty: sumBy(items, "order_qty"),
+      production_note_qty: sumBy(items, "production_note_qty"),
       planned_qty: sumBy(items, "planned_qty"),
       pmk_qty: sumBy(items, "pmk_qty"),
       produced_qty: sumBy(items, "produced_qty"),
@@ -154,18 +154,19 @@ const getGroupedOrders = (rows = []) => {
       pending_qty: sumBy(items, "pending_qty"),
       dispatched_qty: sumBy(items, "dispatched_qty"),
       line_value: sumBy(items, "line_value"),
-      current_stage: stages.size > 1 ? "mixed" : (first.current_stage || first.order_status),
+      current_stage: stages.size > 1 ? "mixed" : (first.current_stage || first.production_note_status),
     };
   });
 };
 
 const summaryItems = [
-  { qtyKey: "total_orders", qtyLabel: "Total Orders", valueKey: "avg_order_value", valueLabel: "Avg Order Value", icon: ShoppingCart, accent: "#3B82F6" },
-  { qtyKey: "total_order_qty", qtyLabel: "Total Booking Qty", valueKey: "total_value", valueLabel: "Booking Value", icon: Package, accent: "#8B5CF6" },
+  // { qtyKey: "total_orders", qtyLabel: "Total Orders", valueKey: "avg_order_value", valueLabel: "Avg Order Value", icon: ShoppingCart, accent: "#3B82F6" },
+  { qtyKey: "total_production_note_qty", qtyLabel: "Total Booking Qty", valueKey: "total_value", valueLabel: "Booking Value", icon: Package, accent: "#8B5CF6" },
   { qtyKey: "ready_qty", qtyLabel: "Ready Qty", valueKey: "ready_value", valueLabel: "Ready Value", icon: PackageCheck, accent: "#10B981" },
   { qtyKey: "pending_qty", qtyLabel: "Pending Production", valueKey: "pending_value", valueLabel: "Pending Value", icon: Clock3, accent: "#EF4444" },
-  { qtyKey: "dispatched_qty", qtyLabel: "Dispatched Qty", valueKey: "dispatched_value", valueLabel: "Dispatched Value", icon: Truck, accent: "#06B6D4" },
   { qtyKey: "pmk_qty", qtyLabel: "Outsourcing", valueKey: "pmk_value", valueLabel: "Outsource Value", icon: Workflow, accent: "#7C3AED" },
+  { qtyKey: "dispatched_qty", qtyLabel: "Dispatched Qty", valueKey: "dispatched_value", valueLabel: "Dispatched Value", icon: Truck, accent: "#06B6D4" },
+  { qtyKey: "ready_pending_dispatch_qty", qtyLabel: "Pending Dispatch", valueKey: "ready_pending_dispatch_value", valueLabel: "Pending Dispatch Value", icon: Truck, accent: "#F59E0B" },
 ];
 
 const getCellStyle = (columnKey) => {
@@ -237,12 +238,12 @@ function LifecycleOrderTable({ data = {}, loading = false, activeTab = "all", on
     switch (column.key) {
       case "sr":
         return <td key={column.key} className="text-slate-500 tabular-nums" style={getCellStyle("sr")}>{index + 1}</td>;
-      case "order_code":
+      case "production_code":
         return (
-          <td key={column.key} style={getCellStyle("order_code")}>
+          <td key={column.key} style={getCellStyle("production_code")}>
             <div className="flex min-w-0 items-center gap-1.5">
               <ToggleIcon size={13} className="shrink-0 text-slate-400" />
-              <TruncateCol title={row.order_code} className="font-bold text-orange-600">{row.order_code || "-"}</TruncateCol>
+              <TruncateCol title={row.production_code} className="font-bold text-orange-600">{row.production_code || "-"}</TruncateCol>
             </div>
           </td>
         );
@@ -259,8 +260,8 @@ function LifecycleOrderTable({ data = {}, loading = false, activeTab = "all", on
             </TruncateCol>
           </td>
         );
-      case "order_qty":
-        return <td key={column.key} className="text-right tabular-nums" style={getCellStyle("order_qty")}><span className="lifecycle-qty lifecycle-qty-order">{formatNumber(row.order_qty)}</span></td>;
+      case "production_note_qty":
+        return <td key={column.key} className="text-right tabular-nums" style={getCellStyle("production_note_qty")}><span className="lifecycle-qty lifecycle-qty-order">{formatNumber(row.production_note_qty)}</span></td>;
       case "planned":
         return <td key={column.key} className="text-right tabular-nums" style={getCellStyle("planned")}><span className="lifecycle-qty lifecycle-qty-plan">{formatNumber(row.planned_qty)}</span></td>;
       case "pmk":
@@ -280,8 +281,8 @@ function LifecycleOrderTable({ data = {}, loading = false, activeTab = "all", on
       case "stage":
         return (
           <td key={column.key} className="text-center" style={getCellStyle("stage")}>
-            <span className={`lifecycle-stage-badge ${statusClass(row.current_stage)}`} title={String(row.current_stage || row.order_status || "-").replace(/_/g, " ")}>
-              {String(row.current_stage || row.order_status || "-").replace(/_/g, " ")}
+            <span className={`lifecycle-stage-badge ${statusClass(row.current_stage)}`} title={String(row.current_stage || row.production_note_status || "-").replace(/_/g, " ")}>
+              {String(row.current_stage || row.production_note_status || "-").replace(/_/g, " ")}
             </span>
           </td>
         );
@@ -294,8 +295,8 @@ function LifecycleOrderTable({ data = {}, loading = false, activeTab = "all", on
     switch (column.key) {
       case "sr":
         return <td key={column.key} className="text-slate-400 tabular-nums" style={getCellStyle("sr")}>{`${index + 1}.${itemIndex + 1}`}</td>;
-      case "order_code":
-        return <td key={column.key} style={getCellStyle("order_code")}><span className="pl-5 text-[10px] font-bold uppercase text-slate-400">Item Line</span></td>;
+      case "production_code":
+        return <td key={column.key} style={getCellStyle("production_code")}><span className="pl-5 text-[10px] font-bold uppercase text-slate-400">Item Line</span></td>;
       case "customer":
         return <td key={column.key} style={getCellStyle("customer")}><TruncateCol title={item.customer_name} className="font-semibold text-slate-500">{item.customer_name || "-"}</TruncateCol></td>;
       case "pi_number":
@@ -307,8 +308,8 @@ function LifecycleOrderTable({ data = {}, loading = false, activeTab = "all", on
             <TruncateCol title={`${item.product_code || "-"} • ${item.model || "-"}`} className="mt-0.5 text-[10px] font-medium leading-[1.05] text-slate-400">{item.product_code || "-"} • {item.model || "-"}</TruncateCol>
           </td>
         );
-      case "order_qty":
-        return <td key={column.key} className="text-right tabular-nums" style={getCellStyle("order_qty")}><span className="lifecycle-qty lifecycle-qty-order">{formatNumber(item.order_qty)}</span></td>;
+      case "production_note_qty":
+        return <td key={column.key} className="text-right tabular-nums" style={getCellStyle("production_note_qty")}><span className="lifecycle-qty lifecycle-qty-order">{formatNumber(item.production_note_qty)}</span></td>;
       case "planned":
         return <td key={column.key} className="text-right tabular-nums" style={getCellStyle("planned")}><span className="lifecycle-qty lifecycle-qty-plan">{formatNumber(item.planned_qty)}</span></td>;
       case "pmk":
@@ -328,8 +329,8 @@ function LifecycleOrderTable({ data = {}, loading = false, activeTab = "all", on
       case "stage":
         return (
           <td key={column.key} className="text-center" style={getCellStyle("stage")}>
-            <span className={`lifecycle-stage-badge ${statusClass(item.current_stage)}`} title={String(item.current_stage || item.order_status || "-").replace(/_/g, " ")}>
-              {String(item.current_stage || item.order_status || "-").replace(/_/g, " ")}
+            <span className={`lifecycle-stage-badge ${statusClass(item.current_stage)}`} title={String(item.current_stage || item.production_note_status || "-").replace(/_/g, " ")}>
+              {String(item.current_stage || item.production_note_status || "-").replace(/_/g, " ")}
             </span>
           </td>
         );
@@ -345,10 +346,10 @@ function LifecycleOrderTable({ data = {}, loading = false, activeTab = "all", on
           const Icon = item.icon;
           return (
             <div key={item.qtyKey} className="dashboard-kpi-card" style={{ "--kpi-accent": item.accent, "--kpi-soft": `${item.accent}14`, }} >
-              <div className="mb-1 flex items-start justify-between">
+              <div className="mb-0.5 flex items-start justify-between gap-1">
                 <div className="min-w-0">
                   <h3 className="truncate text-sm font-semibold text-slate-700">{item.qtyLabel}</h3>
-                  <div className="mt-1 flex min-w-0 items-center gap-1.5">
+                  <div className="mt-0.5 flex min-w-0 items-center gap-1.5">
                     <span className="truncate text-xs text-slate-400">{item.valueLabel}</span>
                   </div>
                 </div>
@@ -356,7 +357,7 @@ function LifecycleOrderTable({ data = {}, loading = false, activeTab = "all", on
                   <Icon size={18} strokeWidth={1.8} />
                 </div>
               </div>
-              <div className="flex items-end justify-between gap-3">
+              <div className="flex flex-wrap items-end justify-between gap-x-1 gap-y-1">
                 <h2 className="dashboard-kpi-value">{formatNumber(summary[item.qtyKey])}</h2>
                 <div className="min-w-0 text-right">
                   <span className="dashboard-kpi-secondary">{formatCurrency(summary[item.valueKey])}</span>
@@ -399,7 +400,7 @@ function LifecycleOrderTable({ data = {}, loading = false, activeTab = "all", on
             {visibleColumns.map((column) => <col key={column.key} style={{ width: column.width }} />)}
           </colgroup>
 
-          <thead className="lifecycle-table-head" style={{ position: "sticky", top: 0, zIndex: 20 }}>
+          <thead className="lifecycle-table-head" style={{ position: "sticky", top: 0, zIndex: 19 }}>
             <tr style={{ height: 34 }} className="bg-white!">
               {visibleColumns.map((column) => (
                 <th key={column.key} className={`shadow-sm ${alignClass(column.align)} ${column.sticky ? "lifecycle-action-head" : ""}`} style={{ ...getCellStyle(column.key), height: 34, maxHeight: 34, borderBottom: "1px solid #eef2f7", color: "#475569", fontSize: 10, fontWeight: 700, textTransform: "uppercase" }}>
@@ -425,7 +426,7 @@ function LifecycleOrderTable({ data = {}, loading = false, activeTab = "all", on
                   </tr>
 
                   {isExpanded ? row.items.map((item, itemIndex) => (
-                    <tr key={`item-${item.order_id}-${item.order_item_id}`} className="lifecycle-table-row lifecycle-child-row" style={{ height: 42, maxHeight: 42, borderBottom: "1px solid #f1f5f9" }}>
+                    <tr key={`item-${item.production_note_id}-${item.production_note_item_id}`} className="lifecycle-table-row lifecycle-child-row" style={{ height: 42, maxHeight: 42, borderBottom: "1px solid #f1f5f9" }}>
                       {visibleColumns.map((column) => renderChildCell(column, item, index, itemIndex))}
                     </tr>
                   )) : null}

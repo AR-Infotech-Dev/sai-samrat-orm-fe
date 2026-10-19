@@ -9,7 +9,7 @@ import Spinner from "@components/ui/Spinner";
 import { getProformaInvoicePdf, getProformaInvoicePreview } from "../data/proforma.service";
 import "@modules/orders/confirmation/components/proforma-invoice.css";
 
-function ProformaPreviewFlyout({ isOpen, onClose, pi, title = "Proforma Invoice Preview", loadDocument = getProformaInvoicePreview, downloadDocument = getProformaInvoicePdf }) {
+function ProformaPreviewFlyout({ isOpen, onClose, pi, title = "Proforma Invoice Preview", headerSubtitle, loadDocument = getProformaInvoicePreview, downloadDocument = getProformaInvoicePdf }) {
   const [previewHtml, setPreviewHtml] = useState("");
   const [invoice, setInvoice] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -60,11 +60,11 @@ function ProformaPreviewFlyout({ isOpen, onClose, pi, title = "Proforma Invoice 
       isOpen={isOpen}
       onClose={onClose}
       title={title}
-      subtitle={invoice?.pi_no || pi?.pi_no || "Backend rendered preview"}
+      subtitle={typeof headerSubtitle === "function" ? headerSubtitle(invoice) : headerSubtitle || invoice?.pi_no || pi?.pi_no || "Backend rendered preview"}
       panelClassName="!w-[680px] max-w-full"
       closeButton={<button className="flyout-close" onClick={onClose} aria-label="Close proforma invoice preview"><X size={18} /></button>}
       footer={
-        <div className="flex w-full items-center justify-between gap-3 border-t border-slate-100 bg-white px-4 py-2">
+        <div className="flex w-full items-center justify-between gap-3  bg-white px-4 py-2">
           <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-slate-500">
             <FileText size={13} /> Backend rendered preview
           </span>

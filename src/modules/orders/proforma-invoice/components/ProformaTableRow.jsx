@@ -1,13 +1,13 @@
-function ProformaTableRow({ row, index, columns, table }) {
+function ProformaTableRow({ row, index, columns, table, onEdit }) {
   const rowKey = table.getRowIdentifier(row) ?? row?.pi_no ?? index;
   return (
     <tr key={rowKey} className="group">
       {columns.map((column) => (
         <td
           key={column.key}
-          className={`${column.className || ""}`.trim()}
+          className={`${column.className || ""} ${column.isActionsColumn ? "table-actions-cell" : ""}`.trim()}
           style={table.getCellStyle(column)}
-          onClick={table.getRowClick(column, row)}
+          onClick={!column.isActionsColumn && !column.checkbox ? onEdit : undefined}
         >
           {column.isActionsColumn
             ? table.renderActionCell(row, index)

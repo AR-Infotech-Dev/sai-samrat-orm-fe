@@ -74,7 +74,7 @@ export const useProductsModule = ({ filterState }) => {
     const handleDeleteRow = async (row) => {
         const rowId = row?.product_id ?? row?._id ?? row?.id;
         if (!rowId) { toast.error("Product id not found."); return; }
-        if (!window.confirm("Delete this product?")) return;
+        if (!await confirmAction("Delete this product?")) return;
 
         const action = await dispatch(deleteProducts([rowId]));
 
@@ -110,3 +110,4 @@ export const useProductsModule = ({ filterState }) => {
         handleExportsExcel,
     }
 }
+import { confirmAction } from "@utils/confirmAction";

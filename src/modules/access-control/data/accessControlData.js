@@ -1,13 +1,4 @@
-import {
-  Gauge,
-  LayoutGrid,
-  MapPin,
-  Package,
-  Shapes,
-  Ticket,
-  User,
-  Users,
-} from "lucide-react";
+import { Gauge, LayoutGrid, MapPin, Package, Shapes, Ticket, User } from "lucide-react";
 
 export const accessIdentities = [
   {

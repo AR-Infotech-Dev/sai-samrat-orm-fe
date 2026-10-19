@@ -200,7 +200,7 @@ const OrderItems = ({ currency = "INR", formData, exchangeRate = 1, defaultItems
     <section className="flex h-full min-h-0 flex-col overflow-visible border border-slate-100 bg-white px-2.5 py-2 shadow-sm">
       <div className="mb-1 flex shrink-0 flex-wrap items-center justify-between gap-2 pb-2">
         <div className="min-w-0">
-          <h2 className="text-sm font-semibold text-slate-800">Order Items</h2>
+          <h2 className="text-sm font-semibold text-slate-800">Production Note Items</h2>
         </div>
 
         <div className="flex items-center gap-2">

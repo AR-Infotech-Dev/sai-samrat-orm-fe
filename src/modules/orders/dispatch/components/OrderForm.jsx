@@ -13,12 +13,12 @@ const dateValue = (value) => (value ? String(value).slice(0, 10) : "");
 const todayValue = () => new Date().toISOString().slice(0, 10);
 
 const normalizeCreateItem = (item = {}) => ({
-  order_item_id: item.order_item_id,
+  production_note_item_id: item.production_note_item_id,
   product_id: item.product_id,
   product_name: item.product_name || "-",
   product_code: item.product_code || "-",
   weight: item.weight ?? "-",
-  order_qty: toNumber(item.order_qty),
+  production_note_qty: toNumber(item.production_note_qty),
   ready_qty: toNumber(item.total_ready_qty),
   already_dispatched_qty: toNumber(item.dispatched_qty),
   available_qty: toNumber(item.available_dispatch_qty),
@@ -27,12 +27,12 @@ const normalizeCreateItem = (item = {}) => ({
 });
 
 const normalizeViewItem = (item = {}) => ({
-  order_item_id: item.order_item_id,
+  production_note_item_id: item.production_note_item_id,
   product_id: item.product_id,
   product_name: item.product_name || "-",
   product_code: item.product_code || "-",
   weight: item.weight ?? "-",
-  order_qty: toNumber(item.order_qty),
+  production_note_qty: toNumber(item.production_note_qty),
   ready_qty: toNumber(item.ready_qty),
   already_dispatched_qty: toNumber(item.already_dispatched_qty),
   available_qty: toNumber(item.available_qty),
@@ -46,7 +46,7 @@ const SummaryMetric = ({ icon: Icon, label, value, tone = "slate" }) => {
 };
 
 function DispatchForm({ isOpen, onClose, sourceOrder, selectedDispatch, onAfterSave }) {
-  const isCreateMode = Boolean(sourceOrder?.order_id) && !selectedDispatch?.dispatch_id;
+  const isCreateMode = Boolean(sourceOrder?.production_note_id) && !selectedDispatch?.dispatch_id;
   const [header, setHeader] = useState({ dispatch_date: todayValue(), dispatch_status: "dispatched" });
   const [order, setOrder] = useState(null);
   const [items, setItems] = useState([]);
@@ -56,7 +56,7 @@ function DispatchForm({ isOpen, onClose, sourceOrder, selectedDispatch, onAfterS
 
   const totals = useMemo(() => items.reduce((acc, item) => {
     acc.totalItems += 1;
-    acc.orderQty += toNumber(item.order_qty);
+    acc.orderQty += toNumber(item.production_note_qty);
     acc.readyQty += toNumber(item.ready_qty);
     acc.alreadyDispatchedQty += toNumber(item.already_dispatched_qty);
     acc.availableQty += toNumber(item.available_qty);
@@ -69,11 +69,11 @@ function DispatchForm({ isOpen, onClose, sourceOrder, selectedDispatch, onAfterS
       setFetching(true);
       setRowErrors({});
       if (isCreateMode) {
-        const res = await getReadyOrderForDispatch(sourceOrder.order_id);
+        const res = await getReadyOrderForDispatch(sourceOrder.production_note_id);
         if (!res.success) { toast.error(res.message || "Unable to fetch ready stock for dispatch"); return; }
         const data = res.data?.data || res.data || {};
         setOrder(data);
-        setHeader({ dispatch_date: todayValue(), dispatch_status: "dispatched", dispatch_no: "Auto Generated", order_id: data.order_id, customer_id: data.customer_id });
+        setHeader({ dispatch_date: todayValue(), dispatch_status: "dispatched", dispatch_no: "Auto Generated", production_note_id: data.production_note_id, customer_id: data.customer_id });
         setItems((data.items || []).filter((item) => toNumber(item.available_dispatch_qty) > 0).map(normalizeCreateItem));
       } else if (selectedDispatch?.dispatch_id) {
         const res = await getDispatchDetails(selectedDispatch.dispatch_id);
@@ -93,7 +93,7 @@ function DispatchForm({ isOpen, onClose, sourceOrder, selectedDispatch, onAfterS
   useEffect(() => {
     if (isOpen) fetchData();
     if (!isOpen) { setHeader({ dispatch_date: todayValue(), dispatch_status: "dispatched" }); setOrder(null); setItems([]); setRowErrors({}); }
-  }, [isOpen, sourceOrder?.order_id, selectedDispatch?.dispatch_id]);
+  }, [isOpen, sourceOrder?.production_note_id, selectedDispatch?.dispatch_id]);
 
   const updateHeader = (field, value) => setHeader((current) => ({ ...current, [field]: value }));
   const updateItem = (index, value) => {
@@ -123,7 +123,7 @@ function DispatchForm({ isOpen, onClose, sourceOrder, selectedDispatch, onAfterS
 
     try {
       setSaving(true);
-      const payload = { ...header, order_id: order?.order_id || sourceOrder?.order_id, customer_id: order?.customer_id, items };
+      const payload = { ...header, production_note_id: order?.production_note_id || sourceOrder?.production_note_id, customer_id: order?.customer_id, items };
       const res = await saveDispatch({ payload });
       if (!res.success) { toast.error(res.message || "Unable to save dispatch"); return; }
       toast.success(res.message || "Dispatch saved successfully");
@@ -143,10 +143,10 @@ function DispatchForm({ isOpen, onClose, sourceOrder, selectedDispatch, onAfterS
       isOpen={isOpen}
       onClose={onClose}
       title={isCreateMode ? "Create Dispatch" : "Dispatch Details"}
-      subtitle={order?.order_no ? `${order.order_no} • ${order.customer_name || "Customer"}` : "Dispatch ready stock"}
+      subtitle={order?.production_note_no ? `${order.production_note_no} • ${order.customer_name || "Customer"}` : "Dispatch ready stock"}
       panelClassName="!w-[1180px] max-w-full"
       closeButton={<button className="flyout-close" onClick={onClose} aria-label="Close panel"><X size={18} /></button>}
-      footer={<div className="flex w-full items-center justify-between gap-2 border-t border-slate-100 bg-white px-4 py-2"><span className="text-xs text-slate-400">Dispatch Qty must be less than or equal to Available Qty</span><div className="flex items-center gap-2"><ActionButton type="button" variant="flyoutSecondary" disabled={saving} onClick={onClose}>{isCreateMode ? "Cancel" : "Close"}</ActionButton>{isCreateMode ? <ActionButton type="button" variant="flyoutPrimary" disabled={saving || fetching} onClick={handleSave}>{saving ? <Spinner size="sm" /> : <><Save size={14} /> Save Dispatch</>}</ActionButton> : null}</div></div>}
+      footer={<div className="flex w-full items-center justify-between gap-2  bg-white px-4 py-2"><span className="text-xs text-slate-400">Dispatch Qty must be less than or equal to Available Qty</span><div className="flex items-center gap-2"><ActionButton type="button" variant="flyoutSecondary" disabled={saving} onClick={onClose}>{isCreateMode ? "Cancel" : "Close"}</ActionButton>{isCreateMode ? <ActionButton type="button" variant="flyoutPrimary" disabled={saving || fetching} onClick={handleSave}>{saving ? <Spinner size="sm" /> : <><Save size={14} /> Save Dispatch</>}</ActionButton> : null}</div></div>}
     >
       <div className="flex h-full min-h-0 flex-col overflow-hidden bg-slate-50/60 px-3 py-2">
         {fetching ? <div className="grid h-full place-items-center"><Spinner /></div> : <>
@@ -175,10 +175,10 @@ function DispatchForm({ isOpen, onClose, sourceOrder, selectedDispatch, onAfterS
             <div className="min-h-0 min-w-0 flex-1 overflow-y-auto overflow-x-hidden rounded-lg border border-slate-100 [scrollbar-width:thin]">
               <div className={`sticky top-0 z-10 grid ${dispatchGrid} items-center gap-1.5 border-b border-slate-100 bg-slate-50 px-2 py-2 text-[9px] font-bold uppercase leading-tight tracking-wide text-slate-500`}><span>#</span><span>Product / Model</span><span className="text-center">Order</span><span className="text-center">Ready</span><span className="text-center">Dispatched</span><span className="text-center">Available</span><span className="text-center">Dispatch Qty</span><span className="text-center">Pending After</span></div>
               <div className="divide-y divide-slate-100">
-                {items.map((item, index) => <div key={item.order_item_id ?? index} className={`grid ${dispatchGrid} items-center gap-1.5 px-2 py-1.5 text-[11px] text-slate-700 transition hover:bg-slate-50/70`}>
+                {items.map((item, index) => <div key={item.production_note_item_id ?? index} className={`grid ${dispatchGrid} items-center gap-1.5 px-2 py-1.5 text-[11px] text-slate-700 transition hover:bg-slate-50/70`}>
                   <span className="font-semibold text-slate-500">{index + 1}</span>
                   <div className="min-w-0"><div className="truncate font-semibold text-slate-800">{item.product_name}</div><div className="truncate text-[9px] text-slate-400">{item.product_code} • {item.weight || 0}Kg</div>{rowErrors[index] ? <div className="mt-0.5 truncate text-[9px] font-semibold text-red-500">{rowErrors[index]}</div> : null}</div>
-                  <span className="rounded-md bg-blue-50 px-1 py-1.5 text-center font-semibold text-blue-600">{formatNumber(item.order_qty)}</span>
+                  <span className="rounded-md bg-blue-50 px-1 py-1.5 text-center font-semibold text-blue-600">{formatNumber(item.production_note_qty)}</span>
                   <span className="rounded-md bg-emerald-50 px-1 py-1.5 text-center font-semibold text-emerald-600">{formatNumber(item.ready_qty)}</span>
                   <span className="rounded-md bg-slate-50 px-1 py-1.5 text-center font-semibold text-slate-500">{formatNumber(item.already_dispatched_qty)}</span>
                   <span className="rounded-md bg-orange-50 px-1 py-1.5 text-center font-bold text-orange-600">{formatNumber(item.available_qty)}</span>

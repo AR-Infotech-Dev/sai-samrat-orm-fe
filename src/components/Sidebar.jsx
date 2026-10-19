@@ -28,6 +28,11 @@ const iconMap = {
 
 const getIcon = (iconName) => iconMap[iconName] || Folder;
 
+const getNavigationLabel = (menu) => {
+  const label = getMenuLabel(menu);
+  return ({ "Orders Booking": "Production Note", "Order Booking": "Production Note", "Order Confirmation": "Production Note Confirmation", "Order Planning": "Production Note Planning" })[label] || label;
+};
+
 const buildSidebar = (menus = [], permissions = {}, user = {}) =>
   buildAllowedMenuTree(menus, permissions, user).map((parent) => {
     const children = parent?.subMenu || parent?.submenu || parent?.children || [];
@@ -53,7 +58,7 @@ const buildSidebar = (menus = [], permissions = {}, user = {}) =>
   })
     .filter(Boolean);
 
-function Sidebar({ onSelectModule, isMobileOpen = false, onClose, onToggle, isSidebarCollapsed = false }) {
+function Sidebar({ onSelectModule, isMobileOpen = false, onClose, isSidebarCollapsed = false }) {
   const { authSession } = useAuth();
   const [menus, setMenus] = useState(() => getStoredMenuList());
   const [loading, setLoading] = useState(() => !getStoredMenuList().length);
@@ -100,15 +105,6 @@ function Sidebar({ onSelectModule, isMobileOpen = false, onClose, onToggle, isSi
       />
       <aside className={`sidebar ${isMobileOpen ? "mobile-open" : ""}`}>
         <div className="sidebar-brand" title={APP_NAME}>
-          <button
-            type="button"
-            className="sidebar-hamburger"
-            onClick={onToggle}
-            aria-label={isSidebarCollapsed ? "Expand navigation menu" : "Collapse navigation menu"}
-            aria-expanded={!isSidebarCollapsed}
-          >
-            <Menu size={18} />
-          </button>
           <button
             type="button"
             className="sidebar-mobile-close"

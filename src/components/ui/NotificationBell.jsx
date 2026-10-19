@@ -4,7 +4,7 @@ import { Bell } from "lucide-react";
 import { makeRequest } from "../../api/httpClient";
 import { formatRelativeTime } from "../../utils/common";
 import { messageTone } from "../../../assets/sounds";
-import socket from "../../socket";
+import "../../socket";
 
 let unreadCountRequest = null;
 let unreadCountCache = {

@@ -7,7 +7,7 @@ import { ordersModuleSchema } from "../data/module.schema";
 const getValidOrderItems = (items = []) => {
     return items.filter((item) => {
         const productId = Number(item.product_id || item.id || 0);
-        const qty = Number(item.qty || item.order_qty || 0);
+        const qty = Number(item.qty || item.production_note_qty || 0);
         return productId > 0 && qty > 0;
     });
 };
@@ -17,16 +17,16 @@ const mapApiOrderItems = (items = [], order = {}) => {
     const exchangeRate = Number(order.exchange_rate || 1) || 1;
 
     return items.map((item, index) => ({
-        id: item.order_item_id || `${item.order_id || "order"}-${index}`,
-        order_item_id: item.order_item_id || null,
+        id: item.production_note_item_id || `${item.production_note_id || "order"}-${index}`,
+        production_note_item_id: item.production_note_item_id || null,
         product_id: item.product_id || null,
         pi_item_id: item.pi_item_id || null,
-        available_qty: Number(item.available_qty ?? item.order_qty ?? 0),
+        available_qty: Number(item.available_qty ?? item.production_note_qty ?? 0),
         product: item.product_name_snapshot || item.product_name || null,
         productCode: item.product_code_snapshot || item.product_code || null,
         model: item.brand_snapshot || item.brand || null,
         weight: Number(item.weight || 0),
-        qty: Number(item.order_qty || 0),
+        qty: Number(item.production_note_qty || 0),
         unitRate: Number(item.unit_rate || item.standard_rate || 0),
         unitRateInInr: Number(item.unit_rate_in_inr || item.standard_rate || item.unit_rate / exchangeRate || 0),
         standard_rate: Number(item.standard_rate || item.unit_rate / exchangeRate || 0),
@@ -95,7 +95,7 @@ export const useOrderBookingForm = ({ isOpen, onClose, onAfterSave, selectedOrde
         const currencyCode = getCurrencyCode(formData.currency || "INR");
         if (!isOpen) return;
         const savedCurrencyCode = getCurrencyCode(selectedOrder?.currency || "");
-        if (mode === "edit" && formData.order_id && currencyCode === savedCurrencyCode && Number(formData.exchange_rate || 0) > 0) {
+        if (mode === "edit" && formData.production_note_id && currencyCode === savedCurrencyCode && Number(formData.exchange_rate || 0) > 0) {
             return;
         }
 
@@ -144,7 +144,7 @@ export const useOrderBookingForm = ({ isOpen, onClose, onAfterSave, selectedOrde
             ...formData,
             [name]: value,
         };
-        if (name === "order_date") {
+        if (name === "production_note_date") {
             nextData.expected_delivery_date = addMonthsForInputDate(value, 1);
         }
         if (name == 'order_type') {
@@ -252,13 +252,13 @@ export const useOrderBookingForm = ({ isOpen, onClose, onAfterSave, selectedOrde
             setErrors({});
             setLoading(true);
             const payload = {
-                order: {
+                production_note: {
                     ...formData,
                     customer_id: formData.customer_id || formData.client_id,
                     remarks: formData.remarks || formData.remark,
-                    order_status: statusOverride || formData.order_status || "draft",
-                    total_order_qty: summary.totalQty || 0,
-                    total_order_value: summary.subtotal || 0,
+                    production_note_status: statusOverride || formData.production_note_status || "draft",
+                    total_production_note_qty: summary.totalQty || 0,
+                    total_production_note_value: summary.subtotal || 0,
                     total_value_in_inr: summary.grandTotal || 0,
                     currency: formData.currency || "INR",
                     exchange_rate: formData.exchange_rate || 1,
@@ -273,7 +273,7 @@ export const useOrderBookingForm = ({ isOpen, onClose, onAfterSave, selectedOrde
             if (res.success) {
                 toast.success(
                     res?.message ||
-                    `Order ${mode === "create" ? "created" : "updated"} successfully`
+                    `Production Note ${mode === "create" ? "created" : "updated"} successfully`
                 );
                 setFormData({
                     ...ordersModuleSchema.form.initialValues,

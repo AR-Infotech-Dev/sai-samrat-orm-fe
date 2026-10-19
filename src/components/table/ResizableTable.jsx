@@ -1,8 +1,10 @@
-import { Fragment, useEffect, useMemo, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
+import { useModuleColumns } from "@context/ModuleColumnsContext";
 import TableHeader from "./TableHeader";
 import TableSkeleton from "./TableSkeleton";
 import NoTableData from "./NoTableData";
 import ColumnArranger from "./ColumnArranger";
+import { useFloatingRowActions } from "./useFloatingRowActions";
 import { useAuth } from "@auth/components/AuthProvider";
 import { hasFieldVisiblePermission } from "@auth/utils/permissions";
 import {
@@ -124,6 +126,7 @@ function ResizableTable({
   onVisibleColumnsChange,
 }) {
   const { authSession } = useAuth();
+  const floatingActions = useFloatingRowActions();
   const user = authSession?.user;
   const [columnWidths, setColumnWidths] = useState(() => getStoredWidths(storageKey));
   const [visibleColumnKeys, setVisibleColumnKeys] = useState(() => {
@@ -132,6 +135,10 @@ function ResizableTable({
   
 
   const [isColumnMenuOpen, setIsColumnMenuOpen] = useState(false);
+  const moduleColumns = useModuleColumns();
+  const registerColumns = moduleColumns?.registerColumns;
+  const openColumns = useCallback(() => setIsColumnMenuOpen(true), []);
+  useEffect(() => registerColumns?.(openColumns), [registerColumns, openColumns]);
   const handleEditRow = onEditRow || editRow;
   const shouldShowActions = showActions ?? Boolean(handleEditRow || onDeleteRow || rowActions.length || renderActions);
 
@@ -244,7 +251,7 @@ function ResizableTable({
     }));
   };
   return (
-    <div className="table-card">
+    <div className="table-card" {...floatingActions}>
       <ColumnArranger
         setIsColumnMenuOpen={setIsColumnMenuOpen}
         isColumnMenuOpen={isColumnMenuOpen}
@@ -256,7 +263,7 @@ function ResizableTable({
       <div className="table-scroll-x">
         <table style={{ width: "100%", minWidth: "100%" }}>
           <TableHeader
-            setIsColumnMenuOpen={setIsColumnMenuOpen}
+            setIsColumnMenuOpen={moduleColumns ? undefined : setIsColumnMenuOpen}
             columns={resolvedColumns}
             onResize={handleResize}
             sortConfig={sortConfig}

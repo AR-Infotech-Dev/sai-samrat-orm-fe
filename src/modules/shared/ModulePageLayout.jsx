@@ -1,4 +1,5 @@
-import ActionButton from "../../components/ui/ActionButton";
+import "../../components/ui/ActionButton";
+import { ModuleColumnsProvider } from "@context/ModuleColumnsContext";
 
 function ModulePageLayout({
   title,
@@ -13,6 +14,7 @@ function ModulePageLayout({
   const showHeader = Boolean(title || description);
 
   return (
+    <ModuleColumnsProvider>
     <section className="module-page">
       <div className={`module-controls-card ${controlsCardClassName}`}>
         {showHeader ? (
@@ -29,6 +31,7 @@ function ModulePageLayout({
       {table ? <div className="module-table-panel">{table}</div> : null} 
       {footer ? <div className="module-table-footer">{footer}</div> : null}
     </section>
+    </ModuleColumnsProvider>
   );
 }
 

@@ -5,7 +5,7 @@ function OrderTableRow({ row, index, columns, table }) {
       {columns.map((column) => (
         <td
           key={column.key}
-          className={`${column.className || ""}`.trim()}
+          className={`${column.className || ""} ${column.isActionsColumn ? "table-actions-cell" : ""}`.trim()}
           style={table.getCellStyle(column)}
           onClick={table.getRowClick(column, row)}
         >

@@ -168,12 +168,13 @@ export const useProformaForm = ({ isOpen, onClose, onAfterSave, selectedPi }) =>
     return { isValid: Object.keys(nextErrors).length === 0, validItems };
   };
 
-  const buildPayload = (validItems) => {
+  const buildPayload = (validItems, targetStatus) => {
     const normalizedItems = validItems.map((item) => calculatePiItem(item, headerGstRate));
     const normalizedSummary = buildPiSummary(normalizedItems);
     return {
       proforma: {
         ...formData,
+        pi_status: targetStatus,
         total_qty: normalizedSummary.total_qty,
         total_value: roundMoney(normalizedSummary.total_value),
         total_value_in_inr: formData.currency === "INR" ? roundMoney(normalizedSummary.total_value) : roundMoney(normalizedSummary.total_value / (toNumber(formData.exchange_rate, 1) || 1)),
@@ -196,12 +197,16 @@ export const useProformaForm = ({ isOpen, onClose, onAfterSave, selectedPi }) =>
     };
   };
 
-  const handleSave = async () => {
+  const handleSave = async (targetStatus = "waiting") => {
+    if (mode === "edit" && formData.pi_status !== "draft") {
+      toast.error("Only Draft PIs can be updated");
+      return null;
+    }
     const { isValid, validItems } = validate();
     if (!isValid) return null;
     try {
       setLoading(true);
-      const res = await saveProformaInvoice({ mode, piId: selectedPi?.pi_id, payload: buildPayload(validItems) });
+      const res = await saveProformaInvoice({ mode, piId: selectedPi?.pi_id, payload: buildPayload(validItems, targetStatus) });
       if (!res.success) { toast.error(res.message || "Unable to save Proforma Invoice"); return null; }
       toast.success(res.message || "Proforma Invoice saved");
       onAfterSave?.();

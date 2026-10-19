@@ -11,7 +11,7 @@ function OrderItemsHeader({ className = 'grid grid-cols-[28px_minmax(130px,1.7fr
         <div className={`sticky top-0 z-10 items-center gap-2 border-b border-slate-100 bg-gray-100 text-white px-2.5 py-2 ${className}`}>
             <HeaderCell>#</HeaderCell>
             <HeaderCell>Product / Model *</HeaderCell>
-            <HeaderCell>Series</HeaderCell>
+            <HeaderCell>Brand</HeaderCell>
             <HeaderCell>Weight</HeaderCell>
             <HeaderCell>Qty *</HeaderCell>
             <HeaderCell>Rate ({currencySymbol}) *</HeaderCell>

@@ -34,7 +34,7 @@ export function getSelectedLabel(field, value, selectedOrder) {
   return value;
 }
 export function getOrderIdentifier(order = {}) {
-  return order?.order_id;
+  return order?.production_note_id ?? order?.order_id;
 }
 
 export const formatDateInputValue = (date = new Date()) => {
@@ -56,7 +56,7 @@ export const addMonthsForInputDate = (date = new Date(), months = 1) => {
 export const getDefaultOrderDates = () => {
   const today = new Date();
   return {
-    order_date: formatDateInputValue(today),
+    production_note_date: formatDateInputValue(today),
     expected_delivery_date: addMonthsForInputDate(today, 1),
   };
 };
@@ -216,7 +216,7 @@ export function buildOrderSummary(items = [], orderHeader = {}) {
       const readyQty = Math.min(qty, readyStock);
       const pendingQty = Math.max(qty - readyStock, 0);
 
-      summary.orderNo = orderHeader.order_code || '-';
+      summary.orderNo = orderHeader.production_code || '-';
       summary.totalItems += item.product_id || item.product ? 1 : 0;
       summary.totalQty += qty;
       summary.readyQty += readyQty;

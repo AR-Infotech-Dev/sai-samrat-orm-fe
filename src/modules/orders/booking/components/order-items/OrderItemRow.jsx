@@ -1,5 +1,5 @@
 import { Trash2 } from "lucide-react";
-import { gstOptions, formatIndianCurrency, getCurrencySymbol, getLineValue } from "../../utils/booking.utils";
+import { formatIndianCurrency, getCurrencySymbol, getLineValue } from "../../utils/booking.utils";
 import ProductSmartSelect from "@components/form-inputs/ProductSmartSelect";
 import PiItemSmartSelect from "./PiItemSmartSelect";
 const fieldClassName = `

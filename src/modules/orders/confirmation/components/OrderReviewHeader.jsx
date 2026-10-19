@@ -26,7 +26,7 @@ const DetailCell = ({ label, value, highlight }) => (
   </div>
 );
 
-const itemGridClass = "grid w-full grid-cols-[38px_minmax(170px,2fr)_minmax(100px,1fr)_80px_70px_100px_70px_130px] items-center";
+const itemGridClass = "grid w-full grid-cols-[38px__minmax(100px,1fr)minmax(170px,2fr)_80px_70px_100px_70px_130px] items-center";
 
 function OrderReviewHeader({ order = {}, items = [], remarks = "", actionLoading = false, onRemarksChange, onAction }) {
   const currency = order?.currency || "INR";
@@ -36,12 +36,12 @@ function OrderReviewHeader({ order = {}, items = [], remarks = "", actionLoading
     <div className="px-3">
       <div className="grid grid-cols-1 gap-2 lg:grid-cols-2">
         <section className="rounded-sm border border-slate-100 bg-white p-2.5 shadow-xs">
-          <h3 className="mb-1.5 text-sm font-bold text-slate-800">Order Header</h3>
+          <h3 className="mb-1.5 text-sm font-bold text-slate-800">Production Note Header</h3>
           <div className="grid grid-cols-2 gap-0">
-            <DetailCell label="Order Code" value={order?.order_code} highlight />
-            <DetailCell label="Status" value={order?.order_status || "waiting"} />
+            <DetailCell label="Production Code" value={order?.production_code} highlight />
+            <DetailCell label="Status" value={order?.production_note_status || "waiting"} />
             <DetailCell label="Priority" value={order?.priority || "normal"} />
-            <DetailCell label="Order Date" value={formatDate(order?.order_date)} />
+            <DetailCell label="Production Note Date" value={formatDate(order?.production_note_date)} />
             <DetailCell label="Expected Delivery" value={formatDate(order?.expected_delivery_date)} />
           </div>
         </section>
@@ -59,15 +59,15 @@ function OrderReviewHeader({ order = {}, items = [], remarks = "", actionLoading
 
       <section className="mt-2 overflow-hidden rounded-sm border border-slate-100 bg-white shadow-xs">
         <div className="flex items-center justify-between border-b border-slate-100 px-3 py-1.5">
-          <h3 className="text-sm font-bold text-slate-800">Order Items</h3>
+          <h3 className="text-sm font-bold text-slate-800">Production Note Items</h3>
           <p className="text-xs text-slate-400">All values in {currencySymbol}</p>
         </div>
 
         <div className="w-full overflow-hidden text-left text-sm">
           <div className={`${itemGridClass} bg-slate-50 text-[10px] font-bold uppercase text-slate-500`}>
             <div className="px-2 py-2">#</div>
+            <div className="px-2 py-2">Brand</div>
             <div className="px-2 py-2">Product / Model</div>
-            <div className="px-2 py-2">Series</div>
             <div className="px-2 py-2 text-right">Weight</div>
             <div className="px-2 py-2 text-right">Qty</div>
             <div className="px-2 py-2 text-right">Rate ({currencySymbol})</div>
@@ -77,12 +77,12 @@ function OrderReviewHeader({ order = {}, items = [], remarks = "", actionLoading
 
           <div className="divide-y divide-slate-100">
             {items.map((item, index) => (
-              <div className={itemGridClass} key={item.order_item_id || index}>
+              <div className={itemGridClass} key={item.production_note_item_id || index}>
                 <div className="px-2 py-1.5 text-slate-400">{index + 1}</div>
-                <div className="truncate px-2 py-1.5 font-semibold text-slate-700">{item.product_name_snapshot || item.product || item.product_name || "-"}</div>
                 <div className="truncate px-2 py-1.5 text-slate-500">{item.brand_snapshot || item.brand || "-"}</div>
+                <div className="truncate px-2 py-1.5 font-semibold text-slate-700">{item.product_name_snapshot || item.product || item.product_name || "-"}</div>
                 <div className="px-2 py-1.5 text-right text-slate-500">{formatNumber(item.weight)}</div>
-                <div className="px-2 py-1.5 text-right font-semibold text-slate-700">{formatNumber(item.order_qty)}</div>
+                <div className="px-2 py-1.5 text-right font-semibold text-slate-700">{formatNumber(item.production_note_qty)}</div>
                 <div className="px-2 py-1.5 text-right text-slate-600">{formatCurrency(item.unit_rate, currency)}</div>
                 <div className="px-2 py-1.5 text-right text-slate-600">{Number(item.gst_rate || 0)}%</div>
                 <div className="px-2 py-1.5 text-right font-bold text-slate-800">{formatCurrency(item.line_value, currency)}</div>
@@ -94,11 +94,11 @@ function OrderReviewHeader({ order = {}, items = [], remarks = "", actionLoading
 
       <div className="mt-2 grid grid-cols-1 gap-2 lg:grid-cols-[1fr_1fr]">
         <section className="rounded-sm border border-slate-100 bg-white p-2.5 shadow-xs">
-          <h3 className="text-sm font-bold text-slate-800">Order Summary</h3>
+          <h3 className="text-sm font-bold text-slate-800">Note Summary</h3>
           <div className="mt-2 space-y-1.5 text-sm">
             <div className="flex justify-between"><span className="text-slate-500">Total Items</span><strong>{formatNumber(items.length)}</strong></div>
-            <div className="flex justify-between"><span className="text-slate-500">Total Qty</span><strong>{formatNumber(order?.total_order_qty)}</strong></div>
-            <div className="flex justify-between"><span className="text-slate-500">Subtotal</span><strong>{formatCurrency(order?.total_order_value, currency)}</strong></div>
+            <div className="flex justify-between"><span className="text-slate-500">Total Qty</span><strong>{formatNumber(order?.total_production_note_qty)}</strong></div>
+            <div className="flex justify-between"><span className="text-slate-500">Subtotal</span><strong>{formatCurrency(order?.total_production_note_value, currency)}</strong></div>
             <div className="border-t border-dashed border-slate-200 pt-1.5 flex justify-between"><span className="font-semibold text-slate-700">Grand Total</span><strong className="text-md text-orange-600">{formatCurrency(order?.total_value_in_inr, currency)}</strong></div>
           </div>
         </section>

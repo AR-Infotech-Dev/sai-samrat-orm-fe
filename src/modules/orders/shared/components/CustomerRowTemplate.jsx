@@ -1,5 +1,5 @@
 import React from 'react'
-import { FileDigit } from 'lucide-react';
+import 'lucide-react';
 const CustomerRowTemplate = ({ item, isSelected, onClick, style }) => {
     const customer = item.original || {};
     return (

@@ -7,7 +7,7 @@ import { ordersModuleSchema } from "../data/module.schema";
 const getValidOrderItems = (items = []) => {
     return items.filter((item) => {
         const productId = Number(item.product_id || item.id || 0);
-        const qty = Number(item.qty || item.order_qty || 0);
+        const qty = Number(item.qty || item.production_note_qty || 0);
         return productId > 0 && qty > 0;
     });
 };
@@ -16,14 +16,14 @@ const mapApiOrderItems = (items = []) => {
     if (!Array.isArray(items)) return [];
 
     return items.map((item, index) => ({
-        id: item.order_item_id || `${item.order_id || "order"}-${index}`,
-        order_item_id: item.order_item_id || null,
+        id: item.production_note_item_id || `${item.production_note_id || "order"}-${index}`,
+        production_note_item_id: item.production_note_item_id || null,
         product_id: item.product_id || null,
         product: item.product_name_snapshot || item.product_name || null,
         productCode: item.product_code_snapshot || item.product_code || null,
         model: item.brand_snapshot || item.brand || null,
         weight: Number(item.weight || 0),
-        qty: Number(item.order_qty || 0),
+        qty: Number(item.production_note_qty || 0),
         unitRate: Number(item.unit_rate || item.standard_rate || 0),
         gst: Number(item.gst_rate || 0),
         readyStock: Number(item.ready_stock || item.readyStock || 0),
@@ -104,9 +104,9 @@ export const useOrderForm = ({ isOpen, onClose, onAfterSave, selectedOrder }) =>
                     ...formData,
                     customer_id: formData.customer_id || formData.client_id,
                     remarks: formData.remarks || formData.remark,
-                    order_status: statusOverride || formData.order_status || "draft",
-                    total_order_qty: summary.totalQty || 0,
-                    total_order_value: summary.subtotal || 0,
+                    production_note_status: statusOverride || formData.production_note_status || "draft",
+                    total_production_note_qty: summary.totalQty || 0,
+                    total_production_note_value: summary.subtotal || 0,
                     total_value_in_inr: summary.grandTotal || 0,
                     currency: formData.currency || "INR",
                     exchange_rate: formData.exchange_rate || 1,

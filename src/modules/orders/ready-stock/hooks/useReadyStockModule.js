@@ -34,7 +34,7 @@ export const useReadyStockModule = ({ filterState }) => {
 
   const handleToggleAllRows = (checked) => {
     if (!checked) { dispatch(clearReadyStockSelection()); return; }
-    dispatch(setReadyStockSelection(orderList.map((row) => row?.order_id).filter(Boolean)));
+    dispatch(setReadyStockSelection(orderList.map((row) => row?.production_note_id).filter(Boolean)));
   };
 
   return { pagination, page, loading, selectedRowIds, handlePageChange, getOrderList, handleToggleRow, handleToggleAllRows };
