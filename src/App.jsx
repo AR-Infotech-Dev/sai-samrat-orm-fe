@@ -7,7 +7,6 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import FlowupSLoader from "./components/ui/FlowupsLoader";
 
-
 function App() {
   const [showSplash, setShowSplash] = useState(true);
 
