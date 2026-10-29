@@ -1,6 +1,8 @@
 import { Plus, Trash2 } from "lucide-react";
 import ProductSmartSelect from "@components/form-inputs/ProductSmartSelect";
 import { formatCurrency, getCurrencySymbol } from "../utils/proforma.utils";
+import SmartSelectInput from "@/components/form-inputs/smartSelectInput";
+import { proformaItemBrandField } from "../data/module.schema";
 
 const inputClass = "h-8 w-full min-w-0 rounded-md border border-slate-200 bg-slate-50 px-2 text-xs font-medium text-slate-700 outline-none transition focus:border-orange-400 focus:bg-white focus:ring-2 focus:ring-orange-400/15";
 const gridClass = "grid grid-cols-[28px_minmax(130px,1.7fr)_minmax(96px,1.05fr)_58px_64px_82px_58px_96px_34px]";
@@ -60,7 +62,12 @@ function ProformaItems({ items = [], currency = "INR", onAdd, onDelete, onFieldC
                 <div className={`${gridClass} items-center gap-2`}>
                   <span className="text-xs font-semibold text-slate-500">{index + 1}</span>
                   <ProductSmartSelect value={item.product} onSelect={(product) => onProductSelect?.(item.id, product)} />
-                  <input value={item.brand || ""} onChange={(event) => onFieldChange(item.id, "brand", event.target.value)} className={inputClass} placeholder="Brand" />
+                  <SmartSelectInput
+                    field={proformaItemBrandField}
+                    config={proformaItemBrandField.config}
+                    value={item.brand || ""}
+                    onSelect={(value) => onFieldChange(item.id, "brand", value)}
+                  />
                   <NumberInput value={item.weight} onChange={(value) => onFieldChange(item.id, "weight", value)} />
                   <NumberInput value={item.qty} onChange={(value) => onFieldChange(item.id, "qty", value)} />
                   <NumberInput value={item.unit_rate} onChange={(value) => onFieldChange(item.id, "unit_rate", value)} prefix={currencySymbol} />

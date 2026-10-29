@@ -7,6 +7,7 @@ import { Check } from 'lucide-react';
 import DefaultLabel from './DefaultLabel';
 import ValidationError from './ValidationError';
 import { getFormInputClass, FORM_DROPDOWN_CLASS } from './formInput.styles';
+import { useCategoryQuickCreate } from '@context/CategoryQuickCreateContext';
 const cacheStore = new Map();
 function StatusIndicator({ status }) {
   return (
@@ -25,7 +26,7 @@ function StatusIndicator({ status }) {
   );
 }
 const SmartSelectInput = ({ id, field = {}, value, onSelect, onObjectSelect, config = {}, error, addNewFunction, formValues = {} }) => {
-
+  const quickCreate = useCategoryQuickCreate();
   const isLocked = Boolean(field.disabled || field.readOnly);
   const {
     type = 'category',
@@ -34,7 +35,7 @@ const SmartSelectInput = ({ id, field = {}, value, onSelect, onObjectSelect, con
     check = '',
     list = '',
     placeholder = 'Select...',
-    allowAddNew = false,
+    allowAddNew = type === 'category' && Boolean(config.slug || source),
     showRecent = false,
     preload = false,
     cache = true,
@@ -51,6 +52,7 @@ const SmartSelectInput = ({ id, field = {}, value, onSelect, onObjectSelect, con
     countLabel = "",
     customURL = "",
     dropdownPortal = false,
+    dropdownWidth = null,
     statusCheck = false,
     isCompanyWise = false,
     customParameters = {},
@@ -340,10 +342,13 @@ const SmartSelectInput = ({ id, field = {}, value, onSelect, onObjectSelect, con
     const updateDropdownPosition = () => {
       const rect = containerRef.current?.getBoundingClientRect();
       if (!rect) return;
+      const viewportWidth = Math.max(0, window.innerWidth - 24);
+      const requestedWidth = Number.parseFloat(dropdownWidth);
+      const width = Math.min(Number.isFinite(requestedWidth) && requestedWidth > 0 ? requestedWidth : rect.width, viewportWidth);
       setDropdownPosition({
-        left: rect.left,
+        left: Math.max(12, Math.min(rect.left, window.innerWidth - width - 12)),
         top: rect.bottom + 4,
-        width: rect.width,
+        width,
       });
     };
 
@@ -354,7 +359,7 @@ const SmartSelectInput = ({ id, field = {}, value, onSelect, onObjectSelect, con
       window.removeEventListener('resize', updateDropdownPosition);
       window.removeEventListener('scroll', updateDropdownPosition, true);
     };
-  }, [showDropdown, dropdownPortal]);
+  }, [showDropdown, dropdownPortal, dropdownWidth]);
   const handleSelect = (item) => {
     if (isLocked) return;
     if (transientOptionRef.current && String(transientOptionRef.current.value) !== String(item.value)) {
@@ -398,10 +403,19 @@ const SmartSelectInput = ({ id, field = {}, value, onSelect, onObjectSelect, con
     handleSelect(option);
   };
 
+  const categoryAddUnavailable = !addNewFunction && type === 'category' && !quickCreate?.canCreate;
+  const effectiveAddNew = addNewFunction || (type === 'category' && (slug || source) && quickCreate
+    ? ({ searchText }) => quickCreate.open({
+      slug: slug || source, searchText, onCreated: (item) => {
+        cacheStore.delete(key);
+        selectCreatedOption({ value: getValue ? getValue(item) : item[valueKey || 'category_id'], label: getLabel ? getLabel(item) : item[labelKey || 'categoryName'], original: item });
+      }
+    }) : null);
+
   const handleAddNew = () => {
-    if (isLocked || typeof addNewFunction !== "function") return;
+    if (isLocked || typeof effectiveAddNew !== "function") return;
     setShowDropdown(false);
-    addNewFunction({
+    effectiveAddNew({
       searchText: inputValue || "",
       selectOption: selectCreatedOption,
       refreshOptions: handleRefresh,
@@ -497,7 +511,7 @@ const SmartSelectInput = ({ id, field = {}, value, onSelect, onObjectSelect, con
               {item.label}
             </span>
             {isSelected && <Check size={16} className="text-green-600 ml-2" />}
-            {item.original.status && item.original.status != "" && <StatusIndicator status={item.original.status} />}
+            {/* {item.original.status && item.original.status != "" && <StatusIndicator status={item.original.status} />} */}
           </div >
         )
     );
@@ -569,14 +583,14 @@ const SmartSelectInput = ({ id, field = {}, value, onSelect, onObjectSelect, con
         )}
 
         {showDropdown && !isLocked && (!dropdownPortal || dropdownPosition) && createPortal(
-          <div ref={dropdownRef} className={`${dropdownPortal ? "fixed z-1000" : "absolute left-0 right-0 top-full z-50 mt-1"} max-h-60 ${FORM_DROPDOWN_CLASS}`} style={dropdownPortal ? dropdownPosition : undefined} >
+          <div ref={dropdownRef} className={`${dropdownPortal ? "fixed z-1000" : "absolute left-0 right-0 top-full z-50 mt-1"} max-h-60 ${FORM_DROPDOWN_CLASS}`} style={dropdownPortal ? dropdownPosition : dropdownWidth ? { width: Number.parseFloat(dropdownWidth) || undefined, maxWidth: "calc(100vw - 24px)" } : undefined} >
             <div className="flex h-10 items-center justify-between rounded-t-md border-b border-slate-100 bg-slate-50 p-2 pr-2">
               {loading
                 ? (<div className="p-3 text-sm text-gray-500">Loading...</div>)
                 : (<button onClick={handleRefresh} className="hover:underline text-blue-600">Refresh List</button>)
               }
-              {allowAddNew && typeof addNewFunction === "function" && (
-                <button type="button" onClick={handleAddNew} className="hover:underline text-blue-600"> + Add New  {label || field.label || "Item"} </button>
+              {allowAddNew && typeof effectiveAddNew === "function" && (
+                <button type="button" onClick={handleAddNew} disabled={categoryAddUnavailable} title={categoryAddUnavailable ? "Category Add permission is required. Contact your administrator." : "Create category"} className="hover:underline text-blue-600 disabled:text-slate-400 disabled:cursor-not-allowed">+ Add New</button>
               )}
             </div>
             {filteredOptions.length
@@ -590,6 +604,7 @@ const SmartSelectInput = ({ id, field = {}, value, onSelect, onObjectSelect, con
                   className={'scrollbar-none'}
                   itemSize={rowHeight}
                   width="100%"
+                  style={{ scrollbarWidth: "none" }}
                 >
                   {Row}
                 </List>
@@ -597,8 +612,8 @@ const SmartSelectInput = ({ id, field = {}, value, onSelect, onObjectSelect, con
               : (
                 <div className="px-4 py-5 text-sm text-gray-500">
                   No options found.
-                  {allowAddNew && typeof addNewFunction === "function" && (
-                    <button type="button" onClick={handleAddNew} className="ml-2 font-medium text-blue-600 hover:underline">
+                  {allowAddNew && typeof effectiveAddNew === "function" && (
+                    <button type="button" onClick={handleAddNew} disabled={categoryAddUnavailable} title={categoryAddUnavailable ? "Category Add permission is required. Contact your administrator." : "Create category"} className="ml-2 font-medium text-blue-600 hover:underline disabled:text-slate-400 disabled:cursor-not-allowed">
                       Add New {label || field.label || "Item"}
                     </button>
                   )}

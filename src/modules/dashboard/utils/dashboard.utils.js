@@ -1,3 +1,26 @@
+export function getLifecycleTone(status = "") {
+  const key = String(status).trim().toLowerCase().replace(/[\s-]+/g, "_");
+  if (["hold", "on_hold", "cancelled", "critical", "rework", "overdue"].includes(key)) return "hold";
+  if (["partial_dispatch", "partially_dispatch", "partially_dispatched"].includes(key)) return "partial-dispatch";
+  if (["dispatch", "dispatched", "completed"].includes(key)) return "completed";
+  if (["ready", "ready_stock"].includes(key)) return "ready";
+  if (["production", "in_progress", "partially_ready", "not_started"].includes(key)) return "production";
+  if (["planning", "planned", "partial_planned", "not_planned", "confirmed"].includes(key)) return "planning";
+  if (["draft", "waiting", "confirmation", "pending"].includes(key)) return "confirmation";
+  return "neutral";
+}
+
+export function getParentLifecycleStatus(row = {}) {
+  const status = row.production_note_status || row.current_stage || "";
+  const key = String(status).toLowerCase().replace(/[\s-]+/g, "_");
+  if (["hold", "on_hold", "cancelled"].includes(key)) return status;
+  const ordered = Number(row.production_note_qty || 0);
+  const dispatched = Number(row.dispatched_qty || 0);
+  if (ordered > 0 && dispatched >= ordered) return "completed";
+  if (dispatched > 0) return "partial_dispatch";
+  return status;
+}
+
 export function getRoleLabel(roleSlug) {
   if (roleSlug === "super_admin") return "Super Admin";
   if (roleSlug === "admin") return "Admin";

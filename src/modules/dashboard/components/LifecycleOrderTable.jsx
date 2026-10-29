@@ -1,5 +1,6 @@
 import { ChevronDown, ChevronRight, Clock3, Columns3, Package, PackageCheck, Truck, Workflow } from "lucide-react";
 import { Fragment, useMemo, useState } from "react";
+import { getLifecycleTone, getParentLifecycleStatus } from "../utils/dashboard.utils";
 
 const tabKeys = ["all", "confirmation", "planning", "production", "ready_stock", "dispatch"];
 
@@ -91,15 +92,15 @@ export const normalizeVisibleColumnKeys = (columnKeys = [], roleSlug = "default"
 };
 
 const statusClass = (status = "") => {
-  const key = String(status || "").toLowerCase().replace(/\s+/g, "_").replace(/-/g, "_");
-  if (["ready", "ready_stock", "completed", "dispatched"].includes(key)) return "border-emerald-200 bg-emerald-50 text-emerald-700";
-  if (["partial_dispatch", "partially_dispatch", "partially_dispatched"].includes(key)) return "border-cyan-200 bg-cyan-50 text-cyan-700";
-  if (["production", "in_progress", "partially_ready"].includes(key)) return "border-orange-200 bg-orange-50 text-orange-700";
-  if (["planning", "planned", "partial_planned"].includes(key)) return "border-violet-200 bg-violet-50 text-violet-700";
-  if (["waiting", "confirmation", "not_planned", "not_started", "confirmed"].includes(key)) return "border-blue-200 bg-blue-50 text-blue-700";
-  if (["hold", "pending"].includes(key)) return "border-amber-200 bg-amber-50 text-amber-700";
-  if (["critical", "cancelled", "overdue", "rework"].includes(key)) return "border-red-200 bg-red-50 text-red-700";
-  return "border-slate-200 bg-slate-50 text-slate-600";
+  const classes = {
+    ready: "border-emerald-200 bg-emerald-50 text-emerald-700",
+    "partial-dispatch": "border-orange-200 bg-orange-50 text-orange-700",
+    production: "border-blue-200 bg-blue-50 text-blue-700",
+    planning: "border-violet-200 bg-violet-50 text-violet-700",
+    confirmation: "border-amber-200 bg-amber-50 text-amber-700",
+    hold: "border-red-200 bg-red-50 text-red-700",
+  };
+  return classes[getLifecycleTone(status)] || "border-slate-200 bg-slate-50 text-slate-600";
 };
 
 const alignClass = (align) => {
@@ -109,6 +110,7 @@ const alignClass = (align) => {
 };
 
 const formatNumber = (value) => Number(value || 0).toLocaleString("en-IN", { maximumFractionDigits: 2 });
+const Quantity = ({ value, tone }) => <span className={`lifecycle-qty lifecycle-qty-${tone} ${Number(value || 0) === 0 ? "is-zero" : ""}`}>{formatNumber(value)}</span>;
 const formatCurrency = (value) => `₹ ${Math.round(Number(value || 0)).toLocaleString("en-IN", { maximumFractionDigits: 0 })}`;
 const getPiNumber = (row = {}) => row.pi_number || row.pi_no || row.proforma_pi_no || row.proforma_invoice_no || "-";
 const formatDate = (value) => {
@@ -234,6 +236,7 @@ function LifecycleOrderTable({ data = {}, loading = false, activeTab = "all", on
 
   const renderParentCell = (column, row, index, isExpanded) => {
     const ToggleIcon = isExpanded ? ChevronDown : ChevronRight;
+    const parentStatus = getParentLifecycleStatus(row);
 
     switch (column.key) {
       case "sr":
@@ -261,19 +264,19 @@ function LifecycleOrderTable({ data = {}, loading = false, activeTab = "all", on
           </td>
         );
       case "production_note_qty":
-        return <td key={column.key} className="text-right tabular-nums" style={getCellStyle("production_note_qty")}><span className="lifecycle-qty lifecycle-qty-order">{formatNumber(row.production_note_qty)}</span></td>;
+        return <td key={column.key} className="text-right tabular-nums" style={getCellStyle("production_note_qty")}><Quantity value={row.production_note_qty} tone="order" /></td>;
       case "planned":
-        return <td key={column.key} className="text-right tabular-nums" style={getCellStyle("planned")}><span className="lifecycle-qty lifecycle-qty-plan">{formatNumber(row.planned_qty)}</span></td>;
+        return <td key={column.key} className="text-right tabular-nums" style={getCellStyle("planned")}><Quantity value={row.planned_qty} tone="plan" /></td>;
       case "pmk":
-        return <td key={column.key} className="text-right tabular-nums" style={getCellStyle("pmk")}><span className="lifecycle-qty lifecycle-qty-pmk">{formatNumber(row.pmk_qty)}</span></td>;
+        return <td key={column.key} className="text-right tabular-nums" style={getCellStyle("pmk")}><Quantity value={row.pmk_qty} tone="pmk" /></td>;
       case "produced":
-        return <td key={column.key} className="text-right tabular-nums" style={getCellStyle("produced")}><span className="lifecycle-qty lifecycle-qty-prod">{formatNumber(row.produced_qty)}</span></td>;
+        return <td key={column.key} className="text-right tabular-nums" style={getCellStyle("produced")}><Quantity value={row.produced_qty} tone="prod" /></td>;
       case "ready":
-        return <td key={column.key} className="text-right tabular-nums" style={getCellStyle("ready")}><span className="lifecycle-qty lifecycle-qty-ready">{formatNumber(row.ready_qty)}</span></td>;
+        return <td key={column.key} className="text-right tabular-nums" style={getCellStyle("ready")}><Quantity value={row.ready_qty} tone="ready" /></td>;
       case "pending":
-        return <td key={column.key} className="text-right tabular-nums" style={getCellStyle("pending")}><span className="lifecycle-qty lifecycle-qty-pending">{formatNumber(row.pending_qty)}</span></td>;
+        return <td key={column.key} className="text-right tabular-nums" style={getCellStyle("pending")}><Quantity value={row.pending_qty} tone="pending" /></td>;
       case "dispatch":
-        return <td key={column.key} className="text-right tabular-nums" style={getCellStyle("dispatch")}><span className="lifecycle-qty lifecycle-qty-dispatch">{formatNumber(row.dispatched_qty)}</span></td>;
+        return <td key={column.key} className="text-right tabular-nums" style={getCellStyle("dispatch")}><Quantity value={row.dispatched_qty} tone="dispatch" /></td>;
       case "value":
         return <td key={column.key} className="text-right font-bold text-slate-800 tabular-nums" style={getCellStyle("value")}>{formatCurrency(row.line_value)}</td>;
       case "expected":
@@ -281,8 +284,8 @@ function LifecycleOrderTable({ data = {}, loading = false, activeTab = "all", on
       case "stage":
         return (
           <td key={column.key} className="text-center" style={getCellStyle("stage")}>
-            <span className={`lifecycle-stage-badge ${statusClass(row.current_stage)}`} title={String(row.current_stage || row.production_note_status || "-").replace(/_/g, " ")}>
-              {String(row.current_stage || row.production_note_status || "-").replace(/_/g, " ")}
+            <span className={`lifecycle-stage-badge ${statusClass(parentStatus)}`} title={String(parentStatus || "-").replace(/_/g, " ")}>
+              {String(parentStatus || "-").replace(/_/g, " ")}
             </span>
           </td>
         );
@@ -304,24 +307,26 @@ function LifecycleOrderTable({ data = {}, loading = false, activeTab = "all", on
       case "product":
         return (
           <td key={column.key} style={{ ...getCellStyle("product"), whiteSpace: "normal" }}>
-            <TruncateCol title={item.product_name} className="font-bold leading-[1.1] text-slate-700">{item.product_name || "-"}</TruncateCol>
-            <TruncateCol title={`${item.product_code || "-"} • ${item.model || "-"}`} className="mt-0.5 text-[10px] font-medium leading-[1.05] text-slate-400">{item.product_code || "-"} • {item.model || "-"}</TruncateCol>
+            <div className="lifecycle-child-product">
+              <TruncateCol title={item.product_name} className="font-medium leading-[1.1] text-slate-700">{item.product_name || "-"}</TruncateCol>
+              <TruncateCol title={`${item.product_code || "-"} • ${item.model || "-"}`} className="mt-0.5 text-[10px] font-medium leading-[1.05] text-slate-400">{item.product_code || "-"} • {item.model || "-"}</TruncateCol>
+            </div>
           </td>
         );
       case "production_note_qty":
-        return <td key={column.key} className="text-right tabular-nums" style={getCellStyle("production_note_qty")}><span className="lifecycle-qty lifecycle-qty-order">{formatNumber(item.production_note_qty)}</span></td>;
+        return <td key={column.key} className="text-right tabular-nums" style={getCellStyle("production_note_qty")}><Quantity value={item.production_note_qty} tone="order" /></td>;
       case "planned":
-        return <td key={column.key} className="text-right tabular-nums" style={getCellStyle("planned")}><span className="lifecycle-qty lifecycle-qty-plan">{formatNumber(item.planned_qty)}</span></td>;
+        return <td key={column.key} className="text-right tabular-nums" style={getCellStyle("planned")}><Quantity value={item.planned_qty} tone="plan" /></td>;
       case "pmk":
-        return <td key={column.key} className="text-right tabular-nums" style={getCellStyle("pmk")}><span className="lifecycle-qty lifecycle-qty-pmk">{formatNumber(item.pmk_qty)}</span></td>;
+        return <td key={column.key} className="text-right tabular-nums" style={getCellStyle("pmk")}><Quantity value={item.pmk_qty} tone="pmk" /></td>;
       case "produced":
-        return <td key={column.key} className="text-right tabular-nums" style={getCellStyle("produced")}><span className="lifecycle-qty lifecycle-qty-prod">{formatNumber(item.produced_qty)}</span></td>;
+        return <td key={column.key} className="text-right tabular-nums" style={getCellStyle("produced")}><Quantity value={item.produced_qty} tone="prod" /></td>;
       case "ready":
-        return <td key={column.key} className="text-right tabular-nums" style={getCellStyle("ready")}><span className="lifecycle-qty lifecycle-qty-ready">{formatNumber(item.ready_qty)}</span></td>;
+        return <td key={column.key} className="text-right tabular-nums" style={getCellStyle("ready")}><Quantity value={item.ready_qty} tone="ready" /></td>;
       case "pending":
-        return <td key={column.key} className="text-right tabular-nums" style={getCellStyle("pending")}><span className="lifecycle-qty lifecycle-qty-pending">{formatNumber(item.pending_qty)}</span></td>;
+        return <td key={column.key} className="text-right tabular-nums" style={getCellStyle("pending")}><Quantity value={item.pending_qty} tone="pending" /></td>;
       case "dispatch":
-        return <td key={column.key} className="text-right tabular-nums" style={getCellStyle("dispatch")}><span className="lifecycle-qty lifecycle-qty-dispatch">{formatNumber(item.dispatched_qty)}</span></td>;
+        return <td key={column.key} className="text-right tabular-nums" style={getCellStyle("dispatch")}><Quantity value={item.dispatched_qty} tone="dispatch" /></td>;
       case "value":
         return <td key={column.key} className="text-right font-bold text-slate-700 tabular-nums" style={getCellStyle("value")}>{formatCurrency(item.line_value)}</td>;
       case "expected":
@@ -418,7 +423,7 @@ function LifecycleOrderTable({ data = {}, loading = false, activeTab = "all", on
                 <Fragment key={`group-${row.group_key}`}>
                   <tr
                     key={`order-${row.group_key}`}
-                    className={`lifecycle-table-row lifecycle-parent-row ${isExpanded ? "is-expanded" : ""}`}
+                    className={`lifecycle-table-row lifecycle-parent-row lifecycle-tone-${getLifecycleTone(getParentLifecycleStatus(row))} ${isExpanded ? "is-expanded" : ""}`}
                     style={{ height: 42, maxHeight: 42, borderBottom: "1px solid #f1f5f9" }}
                     onClick={() => toggleOrder(row.group_key)}
                   >
@@ -426,7 +431,7 @@ function LifecycleOrderTable({ data = {}, loading = false, activeTab = "all", on
                   </tr>
 
                   {isExpanded ? row.items.map((item, itemIndex) => (
-                    <tr key={`item-${item.production_note_id}-${item.production_note_item_id}`} className="lifecycle-table-row lifecycle-child-row" style={{ height: 42, maxHeight: 42, borderBottom: "1px solid #f1f5f9" }}>
+                    <tr key={`item-${item.production_note_id}-${item.production_note_item_id}`} className={`lifecycle-table-row lifecycle-child-row lifecycle-tone-${getLifecycleTone(item.current_stage || item.production_note_status)}`} style={{ height: 42, maxHeight: 42, borderBottom: "1px solid #f1f5f9" }}>
                       {visibleColumns.map((column) => renderChildCell(column, item, index, itemIndex))}
                     </tr>
                   )) : null}

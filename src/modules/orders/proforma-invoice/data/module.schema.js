@@ -1,6 +1,29 @@
 import { buildFallbackColumnsFromKeys } from "../../../../utils/moduleStructure";
 import CustomerRowTemplate from "@modules/orders/shared/components/CustomerRowTemplate";
 
+export const proformaItemBrandField = {
+  name: "brand",
+  type: "smartSelectInput",
+  required: true,
+  config: {
+    type: "category",
+    source: "categories",
+    allowAddNew: true,
+    preload: true,
+    dropdownPortal: true,
+    dropdownWidth: 200,
+    apiUrl: "/system/searchSlugList",
+    tableName: "categories",
+    selectFields: "category_id,categoryName",
+    searchField: "categoryName",
+    slug: "brands",
+    status: "active",
+    labelKey: "categoryName",
+    valueKey: "categoryName",
+    placeholder: "Brand",
+  },
+};
+
 const FIXED_TABLE_COLUMNS = [
   { key: "select", className: "check-col", checkbox: true, width: 42, minWidth: 42, resizable: false },
 ];
@@ -221,8 +244,77 @@ export const proformaModuleSchema = {
         fields: [
           { name: "country_of_origin", label: "Country of Origin", type: "text", placeholder: "Country of origin", gridSpan: 6, alwaysVisible: true, alwaysEditable: true },
           { name: "port_of_loading", label: "Port of Loading", type: "text", placeholder: "Port of loading", gridSpan: 6, alwaysVisible: true, alwaysEditable: true },
-          { name: "country_of_export", label: "Country of Export", type: "text", placeholder: "Country of export", gridSpan: 6, alwaysVisible: true, alwaysEditable: true },
-          { name: "port_of_discharge", label: "Port of Discharge", type: "text", placeholder: "Port of discharge", gridSpan: 6, alwaysVisible: true, alwaysEditable: true },
+        ],
+      },
+      {
+        columns: 3,
+        fields: [
+          {
+            name: "country_of_export",
+            label: "Select Country of Export",
+            type: "smartSelectInput",
+            id: "country_of_export",
+            required: false,
+            config: {
+              apiUrl: "/system/searchSlugList",
+              tableName: "categories",
+              selectFields: "category_id,categoryName",
+              searchField: "categoryName",
+              slug: 'country-of-exports',
+              dropdownWidth: 280,
+              type: "category",
+              source: "categories",
+              allowAddNew: true,
+              preload: true,
+              dropdownPortal: true,
+              status: 'active',
+              labelKey: "categoryName",
+              valueKey: "categoryName",
+              placeholder: "Select Country of Export",
+              multi: false,
+            },
+            gridSpan: 12,
+            alwaysVisible: true,
+            alwaysEditable: true
+          },
+        ],
+      },
+      {
+        columns: 3,
+        fields: [
+          {
+            name: "port_of_discharge",
+            label: "Port of Discharge",
+            type: "smartSelectInput",
+            id: "port_of_discharge",
+            required: false,
+            config: {
+              apiUrl: "/system/searchSlugList",
+              tableName: "categories",
+              selectFields: "category_id,categoryName",
+              searchField: "categoryName",
+              slug: 'port-of-discharge',
+              dropdownWidth: 280,
+              type: "category",
+              source: "categories",
+              allowAddNew: true,
+              preload: true,
+              dropdownPortal: true,
+              status: 'active',
+              labelKey: "categoryName",
+              valueKey: "categoryName",
+              placeholder: "Select Port of Discharge",
+              multi: false,
+            },
+            gridSpan: 12,
+            alwaysVisible: true,
+            alwaysEditable: true
+          },
+        ],
+      },
+      {
+        columns: 3,
+        fields: [
           { name: "final_destination", label: "Final Destination", type: "text", placeholder: "Final destination", gridSpan: 6, alwaysVisible: true, alwaysEditable: true },
         ],
       },

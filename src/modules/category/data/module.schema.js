@@ -127,6 +127,7 @@ export const categoryModuleSchema = {
             required: true,
             placeholder: "enter-category-slug",
             gridSpan: 4,
+            disabledWhen: (values) => values.__lockedParent,
             readOnlyWhen: (values) => values.is_sys_category === "yes",
           },
           {
@@ -134,6 +135,8 @@ export const categoryModuleSchema = {
             label: "Is A Parent Category",
             type: "radio",
             gridSpan: 4,
+            required: true,
+            disabledWhen: (values) => values.__lockedParent,
             readOnlyWhen: (values) => values.is_sys_category === "yes",
             options: [
               { value: "yes", label: "Yes" },
@@ -152,6 +155,7 @@ export const categoryModuleSchema = {
             id: "parent_id",
             required: true,
             visibleWhen: (values) => values.is_parent === "no",
+            disabledWhen: (values) => values.__lockedParent,
             readOnlyWhen: (values) => values.is_sys_category === "yes",
             config: {
               apiUrl: "/system/searchList",

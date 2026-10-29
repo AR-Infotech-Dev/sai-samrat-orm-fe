@@ -6,6 +6,7 @@ import MainRoutes from "@routes/MainRoutes";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import FlowupSLoader from "./components/ui/FlowupsLoader";
+import { CategoryQuickCreateProvider } from "@context/CategoryQuickCreateContext";
 
 function App() {
   const [showSplash, setShowSplash] = useState(true);
@@ -43,7 +44,7 @@ function App() {
             bodyClassName="toast-body-compact"
             progressClassName="toast-progress-compact"
           />
-          <MainRoutes />
+          <CategoryQuickCreateProvider><MainRoutes /></CategoryQuickCreateProvider>
         </AuthProvider>
       </LoaderProvider>
     </BrowserRouter>

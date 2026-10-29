@@ -710,22 +710,43 @@
 
 .lifecycle-parent-row {
   cursor: pointer;
+  --row-tint: #f8fafc;
+  --row-accent: #94a3b8;
 }
 
+.lifecycle-table-row.lifecycle-tone-confirmation { --row-tint: #fff9e8; --row-accent: #d97706; }
+.lifecycle-table-row.lifecycle-tone-planning { --row-tint: #f5f2ff; --row-accent: #8b5cf6; }
+.lifecycle-table-row.lifecycle-tone-production { --row-tint: #edf5ff; --row-accent: #3b82f6; }
+.lifecycle-table-row.lifecycle-tone-ready { --row-tint: #eafbf2; --row-accent: #10b981; }
+.lifecycle-table-row.lifecycle-tone-partial-dispatch { --row-tint: #fff5e9; --row-accent: #f97316; }
+.lifecycle-table-row.lifecycle-tone-completed { --row-tint: #f1f4f8; --row-accent: #64748b; }
+.lifecycle-table-row.lifecycle-tone-hold { --row-tint: #fff0f0; --row-accent: #ef4444; }
+.lifecycle-table-row.lifecycle-tone-neutral { --row-tint: #f8fafc; --row-accent: #94a3b8; }
+
 .lifecycle-parent-row td {
-  background: #ffffff;
+  background: var(--row-tint);
+  transition: background-color 150ms ease;
+}
+
+.lifecycle-parent-row td:first-child {
+  box-shadow: inset 3px 0 0 var(--row-accent);
+}
+
+.lifecycle-parent-row:hover td {
+  background: color-mix(in srgb, var(--row-tint), var(--row-accent) 5%);
 }
 
 .lifecycle-parent-row.is-expanded td {
-  background: #fff7ed;
+  background: var(--row-tint);
 }
 
 .lifecycle-child-row td {
-  background: #fffaf5;
+  background: var(--row-tint, #f8fafc);
+  transition: background-color 150ms ease;
 }
 
 .lifecycle-child-row:hover td {
-  background: #ffedd5;
+  background: color-mix(in srgb, var(--row-tint, #f8fafc), var(--row-accent, #94a3b8) 5%);
 }
 
 .lifecycle-qty {
@@ -760,6 +781,29 @@
 
 .lifecycle-qty-pending {
   color: #dc2626 !important;
+}
+
+.dashboard-lifecycle-table .lifecycle-qty.is-zero {
+  color: #94a3b8 !important;
+  font-weight: 500;
+}
+
+.dashboard-lifecycle-table .lifecycle-parent-row td {
+  font-weight: 600;
+  border-top: 1px solid #e2e8f0;
+}
+
+.dashboard-lifecycle-table .lifecycle-child-row td:nth-child(n) {
+  font-weight: 400;
+}
+
+.dashboard-lifecycle-table .lifecycle-child-row td .lifecycle-qty:not(.is-zero) {
+  font-weight: 600;
+}
+
+.dashboard-lifecycle-table .lifecycle-child-product {
+  padding-left: 12px;
+  border-left: 2px solid #cbd5e1;
 }
 
 .lifecycle-stage-badge {

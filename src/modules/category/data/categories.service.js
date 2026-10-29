@@ -1,6 +1,11 @@
 import { makeRequest } from "@/api/httpClient";
 import { categoryModuleSchema } from "./module.schema";
 
+export const getCategoryParentBySlug = (slug) => makeRequest("/system/searchSlugList", {
+  method: "POST",
+  body: { slug, status: "active", is_parent: "yes" },
+});
+
 export const getCategoriesList = async ({ filterState, page }) => {
   return await makeRequest(categoryModuleSchema.api.list, {
     method: "POST",
