@@ -92,7 +92,7 @@ const SmartSelectInput = ({ id, field = {}, value, onSelect, onObjectSelect, con
   const fetchingRef = useRef(false);
   const usesRemoteSearch = type !== 'category' && remoteSearch;
   const effectiveSearchColumns = check || (type === 'customer'
-    ? 'name,mobile_no,email,contact_person,customer_products'
+    ? 'name,mobile_no,email,contact_person'
     : 'name');
   const getOptionsCacheKey = (searchText = '') => {
     const normalizedSearchText = String(searchText || '').trim().toLowerCase();
