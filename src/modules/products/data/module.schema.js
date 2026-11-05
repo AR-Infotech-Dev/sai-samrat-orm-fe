@@ -74,7 +74,7 @@ export const productsModuleSchema = {
           {
             name: "product_type",
             label: "Product Type",
-            type: "smartSelect",
+            type: "smartSelectInput",
             required: true,
             gridSpan: 4,
             config: {
@@ -83,6 +83,12 @@ export const productsModuleSchema = {
               selectFields: "category_id,categoryName",
               searchField: "categoryName",
               slug: 'product-types',
+              type: "category",
+              source: "categories",
+              allowAddNew: true,
+              preload: true,
+              dropdownPortal: true,
+              dropdownWidth: 300,
               status: 'active',
               isCompanyWise: false,
               labelKey: "categoryName",
