@@ -56,7 +56,7 @@ const orderBookingSlice = createSlice({
                 state.deleting = false;
                 state.selectedRowIds = [];
                 const deletedIds = action.payload.deletedIds || [];
-                state.rows = state.rows.filter((row) => !deletedIds.includes(row.order_id));
+                state.rows = state.rows.filter((row) => !deletedIds.includes(row.production_note_id));
             })
             .addCase(deleteOrderBookingRows.rejected, (state, action) => { state.deleting = false; state.error = action.payload || "Error while deleting order bookings"; });
     },

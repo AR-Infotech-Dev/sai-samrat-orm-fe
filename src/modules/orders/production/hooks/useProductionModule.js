@@ -34,7 +34,7 @@ export const useOrderProductionModule = ({ filterState }) => {
 
   const handleToggleAllRows = (checked) => {
     if (!checked) { dispatch(clearOrderProductionSelection()); return; }
-    dispatch(setOrderProductionSelection(orderList.map((row) => row?.order_id).filter(Boolean)));
+    dispatch(setOrderProductionSelection(orderList.map((row) => row?.production_note_id).filter(Boolean)));
   };
 
   return { pagination, page, loading, selectedRowIds, handlePageChange, getOrderList, handleToggleRow, handleToggleAllRows };

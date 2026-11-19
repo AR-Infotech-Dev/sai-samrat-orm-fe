@@ -2,7 +2,7 @@
 import { RefreshCw, Search, UserRoundCheck } from "lucide-react";
 import { toast } from "react-toastify";
 import { makeRequest } from "../../../api/httpClient";
-import { usersModuleSchema } from "../../users/data/module.schema";
+import "../../users/data/module.schema";
 import { normalizeUserIdentity } from "../data/helper";
 
 function IdentitySelector({ selectedIdentity, onSelect }) {

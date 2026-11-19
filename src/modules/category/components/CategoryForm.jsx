@@ -6,7 +6,7 @@ import DynamicModuleForm from "@components/ui/DynamicModuleForm";
 import { categoryModuleSchema } from "../data/module.schema";
 import { useCategoryForm } from "../hooks/useCategoryForm";
 
-function CategoryForm({ isOpen, onClose, selectedCategory, onAfterSave, menu_id }) {
+function CategoryForm({ isOpen, onClose, selectedCategory, onAfterSave, menu_id, parentSlug = "", initialName = "" }) {
   const {
     loading,
     fetchingCategory,
@@ -15,7 +15,7 @@ function CategoryForm({ isOpen, onClose, selectedCategory, onAfterSave, menu_id 
     handleClose,
     handleChange,
     handleSave,
-  } = useCategoryForm({ isOpen, onClose, selectedCategory, onAfterSave });
+  } = useCategoryForm({ isOpen, onClose, selectedCategory, onAfterSave, parentSlug, initialName });
 
   if (!isOpen) {
     return null;

@@ -3,8 +3,9 @@
 }
 
 .pi-preview-shell {
-  min-height: calc(100vh - 132px);
-  background: #6b7280;
+  /* min-height: calc(100vh - 132px); */
+  min-height: calc(100vh - 105px);
+  background: #f1f5f9;
 }
 
 .pi-preview-loader {
@@ -17,9 +18,10 @@
 .pi-preview-frame {
   display: block;
   width: 100%;
-  height: calc(100vh - 118px);
+  /* height: calc(100vh - 118px); */
+  height: calc(100vh - 103px);
   border: 0;
-  background: #6b7280;
+  background: #f1f5f9;
   scrollbar-width: none;
 }
 

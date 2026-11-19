@@ -15,12 +15,15 @@ import ResizableTable from "@components/table/ResizableTable";
 import useMenuPermissions from "@auth/utils/useMenuPermissions";
 import OrderForm from "./components/OrderForm";
 import OrderTableRow from "./components/OrderTableRow";
+import { FileText } from "lucide-react";
+import ProductionNotePreview from "./components/ProductionNotePreview";
 
 function OrdersBookingPage({ menu_id }) {
   const location = useLocation();
   const resolvedMenuID = menu_id || ordersModuleSchema.menu_id || null;
   const permissions = useMenuPermissions(resolvedMenuID);
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [previewOrder, setPreviewOrder] = useState(null);
   const [isFlyoutOpen, setIsFlyoutOpen] = useState(false);
   const orderList = useAppSelector(selectOrderBookingRows);
   const { filterState, setSearchText, applyFilterPayload, setSort, clearFilters, } = useModuleFilters("order-master", orderList);
@@ -108,6 +111,7 @@ function OrdersBookingPage({ menu_id }) {
               setIsFlyoutOpen(true);
             } : undefined}
             onDeleteRow={permissions.canDelete ? handleDeleteRow : undefined}
+            rowActions={[{ key: "production-note", label: "Production Note", icon: FileText, onClick: setPreviewOrder }]}
             allowSelection={permissions.canDelete}
             selectedRowIds={selectedRowIds}
             onToggleRow={handleToggleRow}
@@ -131,6 +135,7 @@ function OrdersBookingPage({ menu_id }) {
         onAfterSave={getOrderList}
         menu_id={resolvedMenuID}
       />
+      <ProductionNotePreview order={previewOrder} onClose={() => setPreviewOrder(null)} />
     </>
   );
 }

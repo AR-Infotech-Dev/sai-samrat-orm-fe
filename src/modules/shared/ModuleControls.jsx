@@ -1,13 +1,5 @@
-import {
-  CirclePlus,
-  Trash2,
-  Eye,
-  Filter,
-  MoreHorizontal,
-  Settings2,
-  Upload,
-  RefreshCcw
-} from "lucide-react";
+import { CirclePlus, Trash2, RefreshCcw, Columns3 } from "lucide-react";
+import { useModuleColumns } from "@context/ModuleColumnsContext";
 import ActionButton from "../../components/ui/ActionButton";
 import Spinner from "../../components/ui/Spinner";
 function ModuleControls({
@@ -28,18 +20,20 @@ function ModuleControls({
   canCreate = true,
   canDelete = true
 }) {
+  const columns = useModuleColumns();
   return (
     <div className="module-controls">
       {showTraditional && (
         <div className="module-header-actions">
+          {columns?.openColumns && <ActionButton className="bg-white! shadow-xs!" onClick={columns.openColumns} title="Manage Columns"><Columns3 size={15}  className="text-gray-500"  /></ActionButton>}
           {canCreate && (
             <ActionButton variant="primary" onClick={onCreate}>
               <CirclePlus size={16} />
               {createLabel}
             </ActionButton>
           )}
-          <ActionButton onClick={onRefresh}>
-            {loading ? <Spinner /> : <RefreshCcw size={15} />}
+          <ActionButton className="bg-white! shadow-xs!" onClick={onRefresh}>
+            {loading ? <Spinner /> : <RefreshCcw className="text-gray-500" size={15} />}
           </ActionButton>
         </div>
       )}

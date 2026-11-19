@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
+import { createPortal } from "react-dom";
+import FlyoutPanel from "@components/ui/FlyoutPanel";
 import { DndContext, PointerSensor, closestCenter, useSensor, useSensors } from "@dnd-kit/core";
 import { SortableContext, arrayMove, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { GripVertical } from "lucide-react";
+import { GripVertical, X } from "lucide-react";
 
 function isLockedColumn(column) {
   return column?.checkbox || column?.className === "icon-col";
@@ -113,7 +115,6 @@ function ColumnArranger({
     [draftSelectedKeys, manageableColumns]
   );
 
-  if (!isColumnMenuOpen) return null;
 
   const handleToggleColumn = (columnKey, checked) => {
     if (alwaysVisibleKeySet.has(columnKey)) {
@@ -159,11 +160,27 @@ function ColumnArranger({
     setIsColumnMenuOpen(false);
   };
 
-  return (
-    <div className="table-column-picker-menu column-arranger-menu">
-      <div className="column-arranger-title">Manage Columns</div>
-
-      <div className="column-arranger-list">
+  return createPortal(
+    <FlyoutPanel
+      isOpen={isColumnMenuOpen}
+      onClose={handleCancel}
+      title="Manage Columns"
+      subtitle={`${selectedColumns.length} selected`}
+      panelClassName="!w-[360px] max-w-full"
+      closeButton={<button type="button" className="flyout-close" onClick={handleCancel} aria-label="Close column arranger"><X size={18} /></button>}
+      footer={<div className="flex justify-end gap-2 px-3 py-2">
+        <button type="button" className="column-arranger-button secondary" onClick={handleCancel}>Cancel</button>
+        <button type="button" className="column-arranger-button primary" onClick={handleApply}>Apply</button>
+      </div>}
+    >
+      <div className="column-arranger-partitions h-full space-y-4 overflow-y-auto bg-white p-3 [scrollbar-width:thin]">
+        <section aria-labelledby="selected-columns-heading">
+          <div className="mb-2 flex items-center justify-between gap-2">
+            <h3 id="selected-columns-heading" className="text-xs font-semibold text-slate-800">Selected Columns</h3>
+            <span className="rounded-sm bg-orange-50 px-2 py-0.5 text-[10px] font-semibold text-orange-600">{selectedColumns.length}</span>
+          </div>
+          <p className="mb-2 text-[10px] text-slate-400">Drag the handle to change the display order.</p>
+          <div className="space-y-1.5">
         <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
           <SortableContext items={draftSelectedKeys} strategy={verticalListSortingStrategy}>
             {selectedColumns.map((column) => (
@@ -177,21 +194,26 @@ function ColumnArranger({
             ))}
           </SortableContext>
         </DndContext>
+          {selectedColumns.length === 0 && <p className="rounded-sm bg-slate-50 p-3 text-xs text-slate-400">No columns selected.</p>}
+          </div>
+        </section>
 
+        <section className="border-t border-slate-100 pt-3" aria-labelledby="unselected-columns-heading">
+          <div className="mb-2 flex items-center justify-between gap-2">
+            <h3 id="unselected-columns-heading" className="text-xs font-semibold text-slate-600">Unselected Columns</h3>
+            <span className="rounded-sm bg-slate-100 px-2 py-0.5 text-[10px] font-medium text-slate-500">{hiddenColumns.length}</span>
+          </div>
+          <p className="mb-2 text-[10px] text-slate-400">Select a column to add it to the table.</p>
+          <div className="space-y-1.5">
         {hiddenColumns.map((column) => (
           <StaticColumnRow key={column.key} column={column} onToggle={handleToggleColumn} />
         ))}
+          {hiddenColumns.length === 0 && <p className="rounded-sm bg-slate-50 p-3 text-xs text-slate-400">All columns are selected.</p>}
+          </div>
+        </section>
       </div>
 
-      <div className="column-arranger-footer">
-        <button type="button" className="column-arranger-button secondary" onClick={handleCancel}>
-          Cancel
-        </button>
-        <button type="button" className="column-arranger-button primary" onClick={handleApply}>
-          Apply
-        </button>
-      </div>
-    </div>
+    </FlyoutPanel>, document.body
   );
 }
 

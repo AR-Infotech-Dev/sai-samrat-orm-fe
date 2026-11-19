@@ -3,6 +3,7 @@ import { createPortal } from "react-dom";
 import { Check, ChevronDown, Loader2, Package, Search } from "lucide-react";
 import { makeRequest } from "@api/httpClient";
 import { formatIndianCurrency } from "@modules/orders/shared/utils/currency.utils";
+import { getFormInputClass } from "./formInput.styles";
 
 const productCache = new Map();
 const numberFormat = new Intl.NumberFormat("en-IN");
@@ -19,6 +20,8 @@ const normalizeProduct = (item = {}) => {
     product_id: productId,
     product: productName,
     productCode: item.product_code || item.productCode || item.item_code || item.code || "-",
+    productDescription: item.product_description || item.product_desscription || item.description || "",
+    productMarking: item.product_marking || item.product_marking_snapshot || item.product_description || item.product_desscription || item.description || "",
     model,
     weight: Number(item.weight ?? item.weight_kg ?? item.standard_weight ?? 0),
     unitRate: Number(item.standard_rate ?? item.unitRate ?? item.rate ?? item.sales_rate ?? 0),
@@ -192,8 +195,7 @@ function ProductSmartSelect({ value, onSelect, disabled = false, apiUrl = "/prod
         type="button"
         disabled={disabled}
         onClick={() => setOpen((current) => !current)}
-        className={`flex h-8 w-full min-w-0 items-center justify-between gap-2 rounded-sm   bg-slate-50 px-2 text-left text-xs font-medium text-slate-700 outline-none transition hover:border-orange-300 focus:border-orange-400 focus:bg-white focus:ring-2 focus:ring-orange-400/15 border border-gray-200 ${open ? "border-orange-400 bg-white ring-2 ring-orange-400/15" : "border-gray-200"
-          } ${disabled ? "cursor-not-allowed opacity-70" : ""}`}
+        className={`${getFormInputClass(false, "flex h-8 min-w-0 items-center justify-between gap-2 px-2 text-left text-xs font-medium hover:border-orange-300")} ${open ? "border-orange-400 bg-white ring-2 ring-orange-400/15" : ""} ${disabled ? "cursor-not-allowed opacity-70" : ""}`}
       >
         <span className="min-w-0 truncate">{selectedLabel}</span>
         <ChevronDown size={14} className={`shrink-0 text-slate-400 transition ${open ? "rotate-180 text-orange-500" : ""}`} />
@@ -209,7 +211,7 @@ function ProductSmartSelect({ value, onSelect, disabled = false, apiUrl = "/prod
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
                 placeholder="Search product, series, code..."
-                className="h-8 w-full rounded-sm border border-gray-200 text-gray-600 pl-8 pr-8 text-xs outline-none focus:border-orange-400 focus:bg-white focus:ring-2 focus:ring-orange-400/15"
+                className={getFormInputClass(false, "h-8 pl-8 pr-8 text-xs")}
               />
               {loading ? <Loader2 size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 animate-spin text-orange-500" /> : null}
             </div>

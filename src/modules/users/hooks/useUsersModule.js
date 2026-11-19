@@ -72,7 +72,7 @@ export const useUsersModule = ({ filterState }) => {
     const handleDeleteRow = async (row) => {
         const rowId = row?._id ?? row?.id ?? row?.adminID;
         if (!rowId) { toast.error("User id not found."); return; }
-        if (!window.confirm("Delete this user?")) return;
+        if (!await confirmAction("Delete this user?")) return;
 
         const action = await dispatch(deleteUsers([rowId]));
 
@@ -99,3 +99,4 @@ export const useUsersModule = ({ filterState }) => {
         handleDeleteRow,
     }
 }
+import { confirmAction } from "@utils/confirmAction";

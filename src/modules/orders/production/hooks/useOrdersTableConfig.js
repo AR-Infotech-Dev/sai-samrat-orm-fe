@@ -1,7 +1,8 @@
 ﻿import { toast } from "react-toastify";
 import { useEffect, useMemo, useState } from "react";
 import { defaultSortConfig } from "@utils/sorting";
-import { getDefinitions, buildFilterFieldsFromStructure, buildTableColumnsFromStructure } from "@utils/moduleStructure";
+import { buildFilterFieldsFromStructure, buildTableColumnsFromStructure } from "@utils/moduleStructure";
+import { getProductionDefinitions } from "../data/production.service";
 import { ordersFallbackColumns, ordersModuleSchema } from "../data/module.schema";
 
 const mergeFallbackColumns = (columns = []) => {
@@ -31,7 +32,7 @@ export const useOrdersTableConfig = ({ resolvedMenuID, filterState }) => {
   ), [fields]);
 
   const getColumnList = async () => {
-    const res = await getDefinitions(resolvedMenuID);
+    const res = await getProductionDefinitions(resolvedMenuID);
     if (res.success) { setFields(res.data || []); return; }
     toast.error(res?.message || "Error while fetching model fields");
   };

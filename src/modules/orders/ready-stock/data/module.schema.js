@@ -8,11 +8,11 @@ const FIXED_TABLE_COLUMNS = [
 export const ordersModuleSchema = {
   title: "Ready Stock",
   description: "View dispatch-ready stock calculated from planning and production.",
-  table: "orders",
+  table: "production_notes",
   menu_id: 20,
-  primaryKey: 'order_id',
+  primaryKey: 'production_note_id',
   api: {
-    list: "/orders/ready-stock"
+    list: "/production-notes/ready-stock"
   },
   definitionRequest: {
     menuIDField: "menu_id",
@@ -20,16 +20,15 @@ export const ordersModuleSchema = {
     modelName: "order",
   },
   staticJoined: [],
-  defaultColumns: ["order_no", "customer_id", "ready_stock_status", "expected_delivery_date", "total_items", "item_total_qty", "planning_ready_qty", "produced_qty", "procured_qty", "total_ready_qty", "dispatched_qty", "available_dispatch_qty", "pending_qty", "priority",],
+  defaultColumns: ["production_note_no", "customer_id", "ready_stock_status", "expected_delivery_date", "total_items", "item_total_qty", "planning_ready_qty", "produced_qty", "procured_qty", "total_ready_qty", "dispatched_qty", "available_dispatch_qty", "pending_qty", "priority",],
   skipFields: ["created_by", "created_date", "modified_by", "modified_date", "status", "remarks", "excel_row_no", "source"],
   tableCellConfig: [
     { column_name: "customer_id", type: "person" },
     { column_name: "ready_stock_status", type: "badge", color_field: "ready_stock_status_color" },
-    { column_name: "order_status", type: "badge", color_field: "order_status_color" },
+    { column_name: "production_note_status", type: "badge", color_field: "production_note_status_color" },
     { column_name: "priority", type: "badge", color_field: "priority_color" },
   ],
   columnMappings: [
-    { order_no: "Order No" },
     { customer_id: "Customer" },
     { customer_name: "Customer" },
     { expected_delivery_date: "Expected Date" },
@@ -44,29 +43,29 @@ export const ordersModuleSchema = {
     { pending_qty: "Pending" },
     { ready_stock_status: "Ready Status" },
     { priority: "Priority" },
-    { order_status: "Order Status" },
+    { production_note_status: "Order Status" },
     { customer_id: "Customer Name" },
-    { total_order_qty: "Order Qty " },
-    { total_order_value: "Order Value " },
+    { total_production_note_qty: "Order Qty " },
+    { total_production_note_value: "Order Value " },
   ],
   savedFilters: [],
   form: {
     initialValues: {
-      order_id: null,
-      order_no: "",
+      production_note_id: null,
+      production_note_no: "",
       company_id: null,
       customer_id: null,
       brand: "",
-      order_date: "",
-      order_month: "",
-      order_week: "",
+      production_note_date: "",
+      production_note_month: "",
+      production_note_week: "",
       expected_delivery_date: "",
 
-      order_status: "draft",
+      production_note_status: "draft",
       priority: "normal",
 
-      total_order_qty: 0,
-      total_order_value: 0,
+      total_production_note_qty: 0,
+      total_production_note_value: 0,
       currency: "INR",
       exchange_rate: 1,
       total_value_in_inr: 0,
@@ -94,7 +93,7 @@ export const ordersModuleSchema = {
             required: true,
             id: "customer_id",
             gridSpan: 12,
-            readOnlyWhen: (values) => Boolean(values.order_id),
+            readOnlyWhen: (values) => Boolean(values.production_note_id),
             config: {
               type: "customer",
               source: "customer",
@@ -123,7 +122,7 @@ export const ordersModuleSchema = {
       {
         columns: 3,
         fields: [
-          { name: "order_date", label: "Order Date", type: "date", required: true, placeholder: "Order date", gridSpan: 12 },
+          { name: "production_note_date", label: "Order Date", type: "date", required: true, placeholder: "Order date", gridSpan: 12 },
         ]
       },
       {
@@ -135,13 +134,13 @@ export const ordersModuleSchema = {
       // {
       //   columns: 3,
       //   fields: [
-      //     { name: "order_week", label: "Order Week", type: "date", required: true, placeholder: "Order week", gridSpan: 12 },
+      //     { name: "production_note_week", label: "Order Week", type: "date", required: true, placeholder: "Order week", gridSpan: 12 },
       //   ],
       // },
       // {
       //   columns: 3,
       //   fields: [
-      //     { name: "order_month", label: "Order Week", type: "date", required: true, placeholder: "Order month", gridSpan: 12 },
+      //     { name: "production_note_month", label: "Order Week", type: "date", required: true, placeholder: "Order month", gridSpan: 12 },
       //   ],
       // },
       {
@@ -173,10 +172,10 @@ export const ordersModuleSchema = {
         columns: 3,
         fields: [
           {
-            name: "order_status",
+            name: "production_note_status",
             label: "Order Status",
             type: "smartSelect",
-            id: "order_status",
+            id: "production_note_status",
             gridSpan: 12,
             config: {
               apiUrl: "/system/searchSlugList",
@@ -204,7 +203,7 @@ export const ordersModuleSchema = {
   },
   validationSchema: z.object({
     customer_id: z.coerce.number({ required_error: "Customer is required", invalid_type_error: "Customer is required", }).int("Invalid customer").positive("Customer is required"),
-    order_date: z.coerce.date().nullable()
+    production_note_date: z.coerce.date().nullable()
       .refine((val) => val !== null, {
         message: "Order date is required",
       })

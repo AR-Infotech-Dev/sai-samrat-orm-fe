@@ -43,7 +43,7 @@ export const deleteOrders = createAsyncThunk(
 );
 
 const ordersSlice = createSlice({
-    name: "orders",
+    name: "production_notes",
     initialState,
     reducers: {
         setOrdersPage(state, action) {

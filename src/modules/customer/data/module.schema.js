@@ -75,6 +75,9 @@ export const customerModuleSchema = {
       name: "",
       gst_no: null,
       address: null,
+      country: null,
+      postal_code: null,
+      vat_no: null,
       pan_number: null,
       contact_person: null,
       customer_type: 'domestic',
@@ -97,6 +100,14 @@ export const customerModuleSchema = {
         fields: [
           { name: "pan_number", label: "PAN Number", type: "text", placeholder: "Enter PAN number", gridSpan: 6 },
           { name: "gst_number", label: "GST Number", type: "text", placeholder: "Enter GST number", gridSpan: 6 },
+          { name: "vat_no", label: "VAT No", type: "text", placeholder: "Enter VAT number", gridSpan: 6 },
+        ],
+      },
+      {
+        columns: 3,
+        fields: [
+          { name: "country", label: "Country", type: "text", placeholder: "Enter country", gridSpan: 6 },
+          { name: "postal_code", label: "Postal Code", type: "text", placeholder: "Enter postal code", gridSpan: 6 },
         ],
       },
       {

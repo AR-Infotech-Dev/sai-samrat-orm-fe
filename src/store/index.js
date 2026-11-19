@@ -11,6 +11,7 @@ import orderPlanningReducer from "@modules/orders/planning/data/planning.slice";
 import orderProductionReducer from "@modules/orders/production/data/production.slice";
 import readyStockReducer from "@modules/orders/ready-stock/data/readyStock.slice";
 import dispatchReducer from "@modules/orders/dispatch/data/dispatch.slice";
+import proformaInvoiceReducer from "@modules/orders/proforma-invoice/data/proforma.slice";
 
 export const store = configureStore({
   reducer: {
@@ -26,6 +27,7 @@ export const store = configureStore({
     orderProduction: orderProductionReducer,
     readyStock: readyStockReducer,
     dispatch: dispatchReducer,
+    proformaInvoice: proformaInvoiceReducer,
   },
 });
 

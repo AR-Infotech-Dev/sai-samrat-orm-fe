@@ -5,6 +5,7 @@ import "./styles/colors.css";
 import "./styles.css";
 import "./styles/flyout-form.css";
 import "./styles/auth.css";
+import "./styles/sidebar-compact.css";
 
 document.documentElement.setAttribute("data-theme", "light");
 document.documentElement.style.colorScheme = "light";

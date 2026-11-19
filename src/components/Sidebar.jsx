@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { NavLink } from "react-router-dom";
-import { Accessibility, BriefcaseBusiness, Building2, ChevronDown, ContactRound, FileText, Folder, Gauge, LayoutGrid, Mail, Map, MenuSquare, NotepadText, Package, ShieldCheck, Sparkles, Ticket, Users, Workflow, X, } from "lucide-react";
+import { Accessibility, BriefcaseBusiness, Building2, ChevronDown, ContactRound, FileText, Folder, Gauge, LayoutGrid, Mail, Map, Menu, MenuSquare, NotepadText, Package, ShieldCheck, Sparkles, Ticket, Users, Workflow, X, } from "lucide-react";
 import { useAuth } from "@auth/components/AuthProvider";
 import { APP_NAME } from "@api/config";
 import { getStoredMenuList, getStoredPermissions } from "@auth/utils/authStorage";
@@ -28,6 +28,11 @@ const iconMap = {
 
 const getIcon = (iconName) => iconMap[iconName] || Folder;
 
+const getNavigationLabel = (menu) => {
+  const label = getMenuLabel(menu);
+  return ({ "Orders Booking": "Production Note", "Order Booking": "Production Note", "Order Confirmation": "Production Note Confirmation", "Order Planning": "Production Note Planning" })[label] || label;
+};
+
 const buildSidebar = (menus = [], permissions = {}, user = {}) =>
   buildAllowedMenuTree(menus, permissions, user).map((parent) => {
     const children = parent?.subMenu || parent?.submenu || parent?.children || [];
@@ -53,7 +58,7 @@ const buildSidebar = (menus = [], permissions = {}, user = {}) =>
   })
     .filter(Boolean);
 
-function Sidebar({ onSelectModule, isMobileOpen = false, onClose, isDashboardCollapsed = false }) {
+function Sidebar({ onSelectModule, isMobileOpen = false, onClose, isSidebarCollapsed = false }) {
   const { authSession } = useAuth();
   const [menus, setMenus] = useState(() => getStoredMenuList());
   const [loading, setLoading] = useState(() => !getStoredMenuList().length);
@@ -98,15 +103,8 @@ function Sidebar({ onSelectModule, isMobileOpen = false, onClose, isDashboardCol
         aria-label="Close navigation menu"
         tabIndex={isMobileOpen ? 0 : -1}
       />
-      <aside className={`sidebar ${isMobileOpen ? "mobile-open" : ""} ${isDashboardCollapsed ? "dashboard-mini-sidebar" : ""}`}>
+      <aside className={`sidebar ${isMobileOpen ? "mobile-open" : ""}`}>
         <div className="sidebar-brand" title={APP_NAME}>
-          <img
-            // src="/logo 1.png"
-            src="/logo.png"
-            alt={APP_NAME}
-            className="sidebar-logo"
-          />
-          <span className="sidebar-brand-fallback">{APP_NAME}</span>
           <button
             type="button"
             className="sidebar-mobile-close"

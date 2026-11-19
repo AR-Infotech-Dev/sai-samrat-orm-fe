@@ -1,0 +1,7 @@
+.orm-swal-container { z-index: 20000 !important; }
+.orm-swal-popup { border-radius: 4px !important; font-family: inherit; }
+.orm-swal-popup .orm-swal-title { padding: 0; font-size: 16px; font-weight: 600; line-height: 1.4; }
+.orm-swal-popup .orm-swal-text { margin: 8px 0 0; font-size: 12px; line-height: 1.6; }
+.orm-swal-popup .orm-swal-actions { margin: 14px 0 0; gap: 6px; }
+.orm-swal-popup .orm-swal-button { margin: 0; border-radius: 4px; padding: 7px 14px; font-size: 12px; font-weight: 500; }
+.orm-swal-popup .orm-swal-icon { margin: 0 auto 10px; transform: scale(.65); zoom: .8; }

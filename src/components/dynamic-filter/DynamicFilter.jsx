@@ -1,6 +1,6 @@
 import FieldPicker from "./components/FieldPicker";
 import FilterChip from "./components/FilterChip";
-import SavedFiltersMenu from "./components/SavedFiltersMenu";
+import "./components/SavedFiltersMenu";
 import SearchInput from "./components/SearchInput";
 import useDynamicFilter from "./hooks/useDynamicFilter";
 

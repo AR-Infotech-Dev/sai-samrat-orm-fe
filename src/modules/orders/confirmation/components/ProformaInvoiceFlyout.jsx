@@ -13,7 +13,7 @@ function ProformaInvoiceFlyout({ isOpen, onClose, order }) {
   const [previewHtml, setPreviewHtml] = useState("");
   const [invoice, setInvoice] = useState(null);
 
-  const orderId = order?.order_id;
+  const orderId = order?.production_note_id;
 
   const loadPreview = async () => {
     if (!orderId) return;
@@ -53,7 +53,7 @@ function ProformaInvoiceFlyout({ isOpen, onClose, order }) {
       isOpen={isOpen}
       onClose={onClose}
       title="Proforma Invoice Preview"
-      subtitle={invoice?.pi_no || order?.order_no || "Preview generated from backend template"}
+      subtitle={invoice?.pi_no || order?.production_code || "Preview generated from backend template"}
       panelClassName="pi-preview-flyout"
       closeButton={
         <button className="flyout-close" onClick={onClose} aria-label="Close proforma invoice preview">

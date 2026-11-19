@@ -8,7 +8,7 @@ const equalFilter = (field, value, type) => ({
 export const dashboardActions = {
   waiting_confirmation: {
     path: "/order-confirmation",
-    filters: [equalFilter("order_status", "waiting")],
+    filters: [equalFilter("production_note_status", "waiting")],
   },
   planning_pending: {
     path: "/order-planning",

@@ -35,7 +35,9 @@ const PILL_BASE_CLASS = {
 
 export function getRowIdentifier(row) {
   return (
+    row?.production_note_id ??
     row?.order_id ??
+    row?.pi_id ??
     row?.order_item_id ??
     row?.planning_id ??
     row?.category_id ??
@@ -408,6 +410,7 @@ function ActionCell({ row, index, editRow, onDeleteRow, rowActions = [], renderA
           }}
         >
           {renderActionIcon(action.icon)}
+          <span className="table-action-label">{action.label}</span>
         </button>
       ))}
     </div>

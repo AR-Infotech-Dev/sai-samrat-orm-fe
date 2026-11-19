@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { categoryModuleSchema } from "../data/module.schema";
-import { getCategoryDetails, saveCategory } from "../data/categories.service";
+import { getCategoryDetails, saveCategory, getCategoryParentBySlug } from "../data/categories.service";
 import {
   getCategoryIdentifier,
   normalizeCategoryData,
@@ -9,7 +9,7 @@ import {
   slugifyCategory,
 } from "../utils/category.utils";
 
-export const useCategoryForm = ({ isOpen, onClose, selectedCategory, onAfterSave }) => {
+export const useCategoryForm = ({ isOpen, onClose, selectedCategory, onAfterSave, parentSlug = "", initialName = "" }) => {
   const [loading, setLoading] = useState(false);
   const [fetchingCategory, setFetchingCategory] = useState(false);
   const [formData, setFormData] = useState(categoryModuleSchema.form.initialValues);
@@ -19,6 +19,19 @@ export const useCategoryForm = ({ isOpen, onClose, selectedCategory, onAfterSave
   const categoryId = getCategoryIdentifier(selectedCategory);
 
   useEffect(() => {
+    let active = true;
+    if (isOpen && !selectedCategory && parentSlug) {
+      setErrors({});
+      setFetchingCategory(true);
+      setFormData({ ...categoryModuleSchema.form.initialValues, categoryName: initialName, slug: parentSlug, is_parent: "no", __lockedParent: true });
+      getCategoryParentBySlug(parentSlug).then((res) => {
+        const parent = res?.data?.[0];
+        if (!parent?.category_id) throw new Error("Parent category not found");
+        if (active) setFormData((current) => ({ ...current, parent_id: parent.category_id }));
+      }).catch((error) => { if (active) toast.error(error.message || "Unable to load parent category"); })
+        .finally(() => { if (active) setFetchingCategory(false); });
+      return () => { active = false; };
+    }
     const fetchCategoryDetails = async () => {
       if (!isOpen || !categoryId) return;
 
@@ -41,7 +54,7 @@ export const useCategoryForm = ({ isOpen, onClose, selectedCategory, onAfterSave
 
     setFormData(categoryModuleSchema.form.initialValues);
     setErrors({});
-  }, [selectedCategory, isOpen, categoryId]);
+  }, [selectedCategory, isOpen, categoryId, parentSlug, initialName]);
 
   const handleClose = () => {
     setFormData(categoryModuleSchema.form.initialValues);
@@ -51,6 +64,7 @@ export const useCategoryForm = ({ isOpen, onClose, selectedCategory, onAfterSave
 
   const handleChange = (event) => {
     const { name, value } = event.target;
+    if (parentSlug && ["slug", "is_parent", "parent_id"].includes(name)) return;
 
     setFormData((current) => {
       const nextState = {
@@ -58,7 +72,7 @@ export const useCategoryForm = ({ isOpen, onClose, selectedCategory, onAfterSave
         [name]: value,
       };
 
-      if (name === "categoryName") {
+      if (name === "categoryName" && !parentSlug) {
         const currentSlug = String(current.slug || "");
         const nextSlug = slugifyCategory(value);
         const previousGeneratedSlug = slugifyCategory(current.categoryName || "");
@@ -77,7 +91,8 @@ export const useCategoryForm = ({ isOpen, onClose, selectedCategory, onAfterSave
   };
 
   const handleSave = async () => {
-    const payload = normalizeCategorySavePayload(formData);
+    const { __lockedParent, ...values } = formData;
+    const payload = normalizeCategorySavePayload(parentSlug ? { ...values, slug: parentSlug, is_parent: "no" } : values);
     const result = categoryModuleSchema.validationSchema.safeParse(payload);
 
     if (!result.success) {
@@ -98,7 +113,7 @@ export const useCategoryForm = ({ isOpen, onClose, selectedCategory, onAfterSave
         toast.success(res?.message || `Category ${mode === "create" ? "created" : "updated"} successfully`);
         setFormData(categoryModuleSchema.form.initialValues);
         onClose();
-        onAfterSave?.();
+        onAfterSave?.({ ...payload, category_id: res?.data?.insertId || categoryId });
         return;
       }
 

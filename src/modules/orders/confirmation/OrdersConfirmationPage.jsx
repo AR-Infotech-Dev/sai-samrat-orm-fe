@@ -28,7 +28,7 @@ const normalizeCurrencyCode = (currency = "INR") => {
   return currencyMap[normalized] || currencyMap[currency] || normalized || "INR";
 };
 
-const getOrderDisplayValue = (row = {}) => Number(row.total_value_in_inr ?? row.total_order_value ?? 0) || 0;
+const getOrderDisplayValue = (row = {}) => Number(row.total_value_in_inr ?? row.total_production_note_value ?? 0) || 0;
 const getOrderBaseInrValue = (row = {}) => {
   const currency = normalizeCurrencyCode(row.currency || "INR");
   const value = getOrderDisplayValue(row);
@@ -60,18 +60,18 @@ function OrdersConfirmationPage({ menu_id }) {
   };
 
   const handleQuickAction = async (order, action) => {
-    if (!order?.order_id) {
-      toast.error("Order id not found");
+    if (!order?.production_note_id) {
+      toast.error("Production note id not found");
       return;
     }
 
     if (action === "confirm") {
-      const allowed = window.confirm(`Confirm order ${order.order_no || ""}?`);
+      const allowed = await confirmAction(`Confirm Production note ${order.production_note_no || ""}?`);
       if (!allowed) return;
 
       try {
-        setQuickActionLoadingId(order.order_id);
-        const res = await confirmOrder({ orderId: order.order_id, remarks: "" });
+        setQuickActionLoadingId(order.production_note_id);
+        const res = await confirmOrder({ orderId: order.production_note_id, remarks: "" });
         if (!res?.success) {
           toast.error(res?.message || "Unable to confirm order");
           return;
@@ -92,10 +92,10 @@ function OrdersConfirmationPage({ menu_id }) {
   const totals = useMemo(() => {
     return orderList.reduce(
       (acc, row) => {
-        acc.waiting += ["waiting", "Waiting"].includes(row.order_status) ? 1 : 0;
-        acc.hold += ["hold", "Hold"].includes(row.order_status) ? 1 : 0;
-        acc.high += ["high","High", "urgent"].includes(row.priority) ? 1 : 0;
-        acc.qty += Number(row.total_order_qty || 0);
+        acc.waiting += ["waiting", "Waiting"].includes(row.production_note_status) ? 1 : 0;
+        acc.hold += ["hold", "Hold"].includes(row.production_note_status) ? 1 : 0;
+        acc.high += ["high", "High", "urgent"].includes(row.priority) ? 1 : 0;
+        acc.qty += Number(row.total_production_note_qty || 0);
         acc.value += getOrderDisplayValue(row);
         acc.baseInrValue += getOrderBaseInrValue(row);
         acc.currencies.add(normalizeCurrencyCode(row.currency || "INR"));
@@ -187,8 +187,8 @@ function OrdersConfirmationPage({ menu_id }) {
         footer={<ModulePagination pagination={pagination} onPageChange={handlePageChange} />}
       >
         <div className="my-1.5 mt-2 grid w-full gap-2 md:grid-cols-2 xl:grid-cols-5">
-          <KpiCard icon={Clock3} label="Waiting Orders" value={totals.waiting} hint="confirmation pending" />
-          <KpiCard icon={PauseCircle} label="Hold Orders" value={totals.hold} hint="needs reason" tone="amber" />
+          <KpiCard icon={Clock3} label="Waiting Notes" value={totals.waiting} hint="confirmation pending" />
+          <KpiCard icon={PauseCircle} label="Hold Notes" value={totals.hold} hint="needs reason" tone="amber" />
           <KpiCard icon={RotateCcw} label="High Priority" value={totals.high} hint="quick review" tone="red" />
           <KpiCard icon={CheckCircle2} label="Total Qty" value={totals.qty.toLocaleString("en-IN")} hint="visible queue" tone="green" />
           <KpiCard icon={CheckCircle2} label="Pending Value" value={pendingValueLabel} hint={pendingValueHint} tone="blue" />
@@ -207,3 +207,4 @@ function OrdersConfirmationPage({ menu_id }) {
 }
 
 export default OrdersConfirmationPage;
+import { confirmAction } from "@utils/confirmAction";

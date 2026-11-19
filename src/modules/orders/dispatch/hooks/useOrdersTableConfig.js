@@ -1,7 +1,7 @@
 import { toast } from "react-toastify";
 import { useEffect, useMemo, useState } from "react";
 import { defaultSortConfig } from "@utils/sorting";
-import { getDefinitions, buildFilterFieldsFromStructure, buildTableColumnsFromStructure } from "@utils/moduleStructure";
+import { buildFilterFieldsFromStructure, buildTableColumnsFromStructure } from "@utils/moduleStructure";
 import { ordersFallbackColumns, ordersModuleSchema } from "../data/module.schema";
 
 const mergeFallbackColumns = (columns = []) => {
@@ -19,7 +19,7 @@ export const useOrdersTableConfig = ({ resolvedMenuID, filterState }) => {
   const resolvedFilterFields = useMemo(() => buildFilterFieldsFromStructure(fields, ordersModuleSchema.defaultColumns.map((key) => ({ label: ordersFallbackColumns.find((column) => column.key === key)?.label || key, value: key, type: "text" })), columnOptions), [fields]);
 
   const getColumnList = async () => {
-    const res = await getDefinitions(resolvedMenuID);
+    const res = await getModuleDefinitions(resolvedMenuID);
     if (res.success) { setFields(res.data || []); return; }
     toast.error(res?.message || "Error while fetching model fields");
   };
@@ -27,3 +27,4 @@ export const useOrdersTableConfig = ({ resolvedMenuID, filterState }) => {
   useEffect(() => { getColumnList(); }, [resolvedMenuID]);
   return { sortConfig, resolvedColumns, defaultVisibleColumnKeys, resolvedFilterFields };
 };
+import { getModuleDefinitions } from "../data/dispatch.service.js";

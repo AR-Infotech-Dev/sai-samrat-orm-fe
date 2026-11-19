@@ -34,8 +34,32 @@ export function getSelectedLabel(field, value, selectedOrder) {
   return value;
 }
 export function getOrderIdentifier(order = {}) {
-  return order?.order_id;
+  return order?.production_note_id ?? order?.order_id;
 }
+
+export const formatDateInputValue = (date = new Date()) => {
+  const parsedDate = date instanceof Date ? date : new Date(date);
+  if (Number.isNaN(parsedDate.getTime())) return "";
+  const year = parsedDate.getFullYear();
+  const month = String(parsedDate.getMonth() + 1).padStart(2, "0");
+  const day = String(parsedDate.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
+export const addMonthsForInputDate = (date = new Date(), months = 1) => {
+  const parsedDate = date instanceof Date ? new Date(date) : new Date(date);
+  if (Number.isNaN(parsedDate.getTime())) return "";
+  parsedDate.setMonth(parsedDate.getMonth() + Number(months || 0));
+  return formatDateInputValue(parsedDate);
+};
+
+export const getDefaultOrderDates = () => {
+  const today = new Date();
+  return {
+    production_note_date: formatDateInputValue(today),
+    expected_delivery_date: addMonthsForInputDate(today, 1),
+  };
+};
 
 export const getGstRateByOrderType = (orderType = "domestic") => {
   if (orderType === "export") return 0;
@@ -192,7 +216,7 @@ export function buildOrderSummary(items = [], orderHeader = {}) {
       const readyQty = Math.min(qty, readyStock);
       const pendingQty = Math.max(qty - readyStock, 0);
 
-      summary.orderNo = orderHeader.order_code || '-';
+      summary.orderNo = orderHeader.production_code || '-';
       summary.totalItems += item.product_id || item.product ? 1 : 0;
       summary.totalQty += qty;
       summary.readyQty += readyQty;

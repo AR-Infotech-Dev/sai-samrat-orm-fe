@@ -2,8 +2,11 @@ import React, { useEffect, useState } from "react";
 import { makeRequest } from "@api/httpClient";
 import DefaultLabel from "./DefaultLabel";
 import ValidationError from "./ValidationError";
+import { getFormInputClass } from "./formInput.styles";
+import { useCategoryQuickCreate } from "@context/CategoryQuickCreateContext";
 
 function SmartSelect({ field, value, onSelect, onObjectSelect, config = {}, error }) {
+  const quickCreate = useCategoryQuickCreate();
   const isLocked = Boolean(field.disabled || field.readOnly);
   const {
     apiUrl = "/system/searchList",
@@ -18,6 +21,7 @@ function SmartSelect({ field, value, onSelect, onObjectSelect, config = {}, erro
     countKey = "",
     countLabel = "",
     placeholder = "Select",
+    allowAddNew = true,
   } = config;
 
   const [options, setOptions] = useState([]);
@@ -92,12 +96,21 @@ function SmartSelect({ field, value, onSelect, onObjectSelect, config = {}, erro
       {/* Label */}
       {field?.label && (<DefaultLabel label={field.label} required={field.required} />)}
       {/* Select */}
-      <select name={field.name} value={value || ""} onChange={handleChange} disabled={isLocked} className={`border ${error ? "border-red-400 text-red-600" : "border-gray-200 text-gray-600"} bg-slate-50 px-3 py-1.5 rounded text-sm focus:outline-none focus:ring-2 focus:ring-purple-100 disabled:cursor-not-allowed disabled:opacity-70 `}>
+      <select name={field.name} value={value || ""} onChange={handleChange} disabled={isLocked} className={getFormInputClass(error)}>
         <option value="">{loading ? "Loading..." : placeholder}</option>
         {options.map((item) => (
           <option key={item.value} value={item.value}>{item.label}</option>
         ))}
       </select>
+
+      {allowAddNew && slug && tableName === "categories" && !isLocked && quickCreate?.canCreate && (
+        <button type="button" className="self-end text-[11px] font-medium text-orange-600 hover:text-orange-700"
+          onClick={() => quickCreate.open({ slug, onCreated: async (item) => {
+            await fetchOptions();
+            onSelect?.({ target: { name: field.name, value: item[valueKey] } });
+            onObjectSelect?.(item);
+          } })}>+ Add New</button>
+      )}
 
       {error && (
         <ValidationError error={error} />

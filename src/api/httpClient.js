@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { API_BASE_URL, DEFAULT_HEADERS, getDefaultHeaders } from "./config";
+import { API_BASE_URL, getDefaultHeaders } from "./config";
 import { clearAuthSession, getCurrentSession } from "@auth/utils/authStorage";
 import { hideGlobalLoader, showGlobalLoader } from "@context/loaderStore";
 

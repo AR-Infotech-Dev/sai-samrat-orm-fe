@@ -25,7 +25,7 @@ export const useOrderBookingModule = ({ filterState }) => {
 
   const getOrderList = async () => {
     const action = await dispatch(fetchOrderBookings({ filterState, page }));
-    if (fetchOrderBookings.rejected.match(action)) toast.error(action.payload || "Error while fetching Orders");
+    if (fetchOrderBookings.rejected.match(action)) toast.error(action.payload || "Error while fetching Production Note");
   };
 
   const handlePageChange = (pageNumber) => dispatch(setOrderBookingPage(pageNumber));
@@ -40,7 +40,7 @@ export const useOrderBookingModule = ({ filterState }) => {
 
   const handleToggleAllRows = (checked) => {
     if (!checked) { dispatch(clearOrderBookingSelection()); return; }
-    dispatch(setOrderBookingSelection(orderList.map((row) => row?.order_id).filter(Boolean)));
+    dispatch(setOrderBookingSelection(orderList.map((row) => row?.production_note_id).filter(Boolean)));
   };
 
   const handleDeleteSelected = async () => {
@@ -51,9 +51,9 @@ export const useOrderBookingModule = ({ filterState }) => {
   };
 
   const handleDeleteRow = async (row) => {
-    const rowId = row.order_id;
+    const rowId = row.production_note_id;
     if (!rowId) { toast.error("Order id not found."); return; }
-    if (!window.confirm("Delete this Order?")) return;
+    if (!await confirmAction("Delete this Order?")) return;
     const action = await dispatch(deleteOrderBookingRows([rowId]));
     if (deleteOrderBookingRows.fulfilled.match(action)) { toast.success(action.payload.message); await getOrderList(); }
     if (deleteOrderBookingRows.rejected.match(action)) toast.error(action.payload);
@@ -61,3 +61,4 @@ export const useOrderBookingModule = ({ filterState }) => {
 
   return { pagination, page, loading, deleting, selectedRowIds, handlePageChange, getOrderList, handleToggleRow, handleToggleAllRows, handleDeleteSelected, handleDeleteRow };
 };
+import { confirmAction } from "@utils/confirmAction";

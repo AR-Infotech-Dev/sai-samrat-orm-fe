@@ -1,7 +1,7 @@
 .flyout-overlay {
   position: absolute;
   right: 0;
-  padding-right: 8px;
+  padding-right: 4px;
   bottom: 0px;
   left: 0;
   z-index: 19;
@@ -25,8 +25,8 @@
   flex-direction: column;
   position: relative;
   width: min(100%, 835px);
-  height: calc(100vh - 13px);
-  max-height: calc(100vh - 13px);
+  height: calc(100vh - 4px);
+  max-height: calc(100vh - 1px);
   background: #ffffff;
   box-shadow: -14px 0 36px var(--shadow-strong);
   overflow: hidden;

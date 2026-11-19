@@ -1,4 +1,4 @@
-import { CalendarDays, Mail, MapPin, Phone, UserRound } from "lucide-react";
+import { CalendarDays, Mail, Phone, UserRound } from "lucide-react";
 import { ProfileField, ReadonlySegment, ReadonlySelect } from "./ProfileFields";
 
 export function ProfileDetailsPanel({ profile, onChange }) {

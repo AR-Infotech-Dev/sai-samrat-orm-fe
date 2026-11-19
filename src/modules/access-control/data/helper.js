@@ -1,4 +1,4 @@
-import { accessModules, accessPermissionColumns } from "./accessControlData";
+import { accessModules } from "./accessControlData";
 import { getSchemaFieldsForMenu } from "./moduleSchemaRegistry";
 
 export const getUserId = (user = {}) => {

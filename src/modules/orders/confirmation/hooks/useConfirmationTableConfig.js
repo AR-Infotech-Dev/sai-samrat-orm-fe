@@ -1,7 +1,7 @@
 ﻿import { toast } from "react-toastify";
 import { useMemo, useState, useEffect } from "react";
 import { defaultSortConfig } from "@utils/sorting";
-import { getDefinitions, buildFilterFieldsFromStructure, buildTableColumnsFromStructure, } from "@utils/moduleStructure";
+import { buildFilterFieldsFromStructure, buildTableColumnsFromStructure, } from "@utils/moduleStructure";
 import { ordersFallbackColumns, ordersModuleSchema } from "../data/module.schema";
 
 export const useOrderConfirmationTableConfig = ({ resolvedMenuID, filterState }) => {
@@ -43,7 +43,7 @@ export const useOrderConfirmationTableConfig = ({ resolvedMenuID, filterState })
         [fields]
     );
     const getColumnList = async () => {
-        const res = await getDefinitions(resolvedMenuID);
+        const res = await getModuleDefinitions(resolvedMenuID);
         if (res.success) {
             setFields(res.data || []);
             return;
@@ -62,3 +62,4 @@ export const useOrderConfirmationTableConfig = ({ resolvedMenuID, filterState })
         resolvedFilterFields,
     };
 }
+import { getModuleDefinitions } from "../data/confirmation.service.js";

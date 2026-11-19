@@ -73,7 +73,7 @@ function TableHeader({
           return (
             <th
               key={column.key}
-              className={`${column.className || ""} ${column.resizable === false ? "" : "is-resizable"} ${sortConfig?.key === column.key ? "is-sorted" : ""}`}
+              className={`${column.className || ""} ${column.isActionsColumn ? "table-actions-sticky-header" : ""} ${column.resizable === false ? "" : "is-resizable"} ${sortConfig?.key === column.key ? "is-sorted" : ""}`}
               style={{ width: columnWidth, minWidth: columnWidth, maxWidth: columnWidth }}
             >
             {column.checkbox ? (
@@ -85,7 +85,7 @@ function TableHeader({
             ) : column.isActionsColumn ? (
               <div className="table-header-shell table-actions-header">
                 <span className="table-header-label table-header-label-static">
-                  <span className="table-header-text">{column.label}</span>
+                  <span className="sr-only">Row actions</span>
                 </span>
               </div>
             ) : column.className === "icon-col" ? null : (
@@ -111,7 +111,7 @@ function TableHeader({
             </th>
           );
         })}
-        <th className="table-column-picker-header">
+        {setIsColumnMenuOpen && <th className="table-column-picker-header">
           <div className="table-column-picker">
             <button
               type="button"
@@ -126,7 +126,8 @@ function TableHeader({
             </button>
 
           </div>
-        </th>
+        </th>}
+        <th></th>
       </tr>
     </thead>
   );

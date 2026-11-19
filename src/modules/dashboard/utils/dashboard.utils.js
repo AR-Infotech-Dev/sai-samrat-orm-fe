@@ -1,3 +1,26 @@
+export function getLifecycleTone(status = "") {
+  const key = String(status).trim().toLowerCase().replace(/[\s-]+/g, "_");
+  if (["hold", "on_hold", "cancelled", "critical", "rework", "overdue"].includes(key)) return "hold";
+  if (["partial_dispatch", "partially_dispatch", "partially_dispatched"].includes(key)) return "partial-dispatch";
+  if (["dispatch", "dispatched", "completed"].includes(key)) return "completed";
+  if (["ready", "ready_stock"].includes(key)) return "ready";
+  if (["production", "in_progress", "partially_ready", "not_started"].includes(key)) return "production";
+  if (["planning", "planned", "partial_planned", "not_planned", "confirmed"].includes(key)) return "planning";
+  if (["draft", "waiting", "confirmation", "pending"].includes(key)) return "confirmation";
+  return "neutral";
+}
+
+export function getParentLifecycleStatus(row = {}) {
+  const status = row.production_note_status || row.current_stage || "";
+  const key = String(status).toLowerCase().replace(/[\s-]+/g, "_");
+  if (["hold", "on_hold", "cancelled"].includes(key)) return status;
+  const ordered = Number(row.production_note_qty || 0);
+  const dispatched = Number(row.dispatched_qty || 0);
+  if (ordered > 0 && dispatched >= ordered) return "completed";
+  if (dispatched > 0) return "partial_dispatch";
+  return status;
+}
+
 export function getRoleLabel(roleSlug) {
   if (roleSlug === "super_admin") return "Super Admin";
   if (roleSlug === "admin") return "Admin";
@@ -59,7 +82,6 @@ export const getRedirectFilters = ({ label = '', redirectTo = '' }) => {
 export const customerSmartSelectConfig = {
   type: "customer",
   source: "customer",
-  label: "Customer",
   placeholder: "Select Customer",
   apiUrl: "",
   check: "name",
@@ -83,7 +105,6 @@ export const customerSmartSelectConfig = {
 export const productSmartSelectConfig = {
   type: "product",
   source: "products",
-  label: "product",
   placeholder: "Select products",
   apiUrl: "",
   check: "product_name",
@@ -102,12 +123,11 @@ export const productSmartSelectConfig = {
 };
 export const orderSmartSelectConfig = {
   type: "order",
-  source: "orders",
-  label: "Order",
-  placeholder: "Select Order",
+  source: "production_notes",
+  placeholder: "Select Production Note",
   apiUrl: "",
-  check: "order_code",
-  list: "order_id,order_code",
+  check: "production_code",
+  list: "production_note_id,production_code",
   preload: true,
   cache: true,
   showRecent: true,
@@ -115,8 +135,8 @@ export const orderSmartSelectConfig = {
   statusCheck: true,
   allowAddNew: false,
   customParameters: {},
-  getValue: (order) => order.order_id,
+  getValue: (order) => order.production_note_id,
   getLabel: (order) => {
-    return order.order_code || "Unnamed order";
+    return order.production_code || "Unnamed order";
   },
 };
